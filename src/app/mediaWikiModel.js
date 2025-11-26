@@ -36,14 +36,38 @@ export async function getPageSummary(title) {
 export async function getPageContent(title) {
     try {
         const encodedTitle = encodeURIComponent(title);
-        const response = await fetch(`${WIKIPEDIA_API_BASE}/page/mobile-sections/${encodedTitle}`);
+
+        // Use MediaWiki action API with origin=* to avoid CORS issues from the browser.
+        // The REST `mobile-sections` endpoint may be blocked by CORS or UA rules in some environments.
+        const apiUrl = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodedTitle}&format=json&prop=text&origin=*`;
+        const response = await fetch(apiUrl);
 
         if (!response.ok) {
             throw new Error(`Wikipedia API error: ${response.status}`);
         }
 
         const data = await response.json();
-        return data;
+
+        // Normalize to the shape expected by the slice (lead.sections / remaining.sections)
+        // parse.text["*"] contains the HTML for the page; keep it under lead.sections[0].text
+        const html = data?.parse?.text?.['*'] || '';
+        const titleFromParse = data?.parse?.title || title;
+
+        return {
+            lead: {
+                displaytitle: titleFromParse,
+                sections: [{
+                    id: 0,
+                    line: titleFromParse,
+                    level: 1,
+                    number: '0',
+                    fromtitle: titleFromParse,
+                    anchor: 'top',
+                    text: html,
+                }],
+            },
+            remaining: { sections: [] },
+        };
     } catch (error) {
         console.error('Error fetching Wikipedia page content:', error);
         throw error;

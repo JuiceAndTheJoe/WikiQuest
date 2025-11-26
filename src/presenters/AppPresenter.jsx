@@ -69,6 +69,9 @@ function AppPresenter({
                 wikipediaData={wikipediaData}
                 wikipediaLoading={wikipediaLoading}
                 wikipediaError={wikipediaError}
+                // pass explicit summary and full text to avoid shape confusion
+                wikipediaSummary={wikipediaData?.summary}
+                wikipediaContentText={wikipediaData?.contentText}
               />
             ) : (
               <Navigate to="/login" replace />

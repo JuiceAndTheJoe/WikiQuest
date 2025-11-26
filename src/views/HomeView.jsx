@@ -1,4 +1,5 @@
 import PrimaryButton from "../components/PrimaryButton";
+import { useState } from "react";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
@@ -15,10 +16,18 @@ function HomeView({
   loading,
   user,
   onLogout,
+  // wikipediaData is supported for backward compatibility, but prefer explicit props
   wikipediaData,
+  wikipediaSummary,
+  wikipediaContentText,
   wikipediaLoading,
   wikipediaError,
 }) {
+  const [showFullText, setShowFullText] = useState(false);
+
+  // Prefer explicit presenter props; fallback to wikipediaData shape
+  const summary = wikipediaSummary || wikipediaData?.summary || wikipediaData || null;
+  const contentText = wikipediaContentText || wikipediaData?.contentText || null;
   return (
     <Paper elevation={3} sx={{ p: 3, maxWidth: 640, m: "2rem auto" }}>
       <Stack spacing={2} alignItems="flex-start">
@@ -86,29 +95,29 @@ function HomeView({
             Error: {wikipediaError}
           </Typography>
         )}
-        {wikipediaData && (
+        {summary && (
           <Paper elevation={1} sx={{ p: 2, width: "100%", bgcolor: "grey.50" }}>
             <Stack spacing={1.5}>
               <Typography variant="h6" component="h3">
-                {wikipediaData.title}
+                {summary.title}
               </Typography>
-              {wikipediaData.thumbnail && (
+              {summary.thumbnail && (
                 <Box
                   component="img"
-                  src={wikipediaData.thumbnail.source}
-                  alt={wikipediaData.title}
+                  src={summary.thumbnail.source}
+                  alt={summary.title}
                   sx={{ maxWidth: "200px", borderRadius: 1 }}
                 />
               )}
               <Typography variant="body2" color="text.secondary">
-                {wikipediaData.description}
+                {summary.description}
               </Typography>
-              <Typography variant="body2">{wikipediaData.extract}</Typography>
-              {wikipediaData.content_urls?.desktop?.page && (
+              <Typography variant="body2">{summary.extract}</Typography>
+              {summary.content_urls?.desktop?.page && (
                 <Button
                   variant="outlined"
                   size="small"
-                  href={wikipediaData.content_urls.desktop.page}
+                  href={summary.content_urls.desktop.page}
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{ alignSelf: "flex-start" }}
@@ -118,6 +127,39 @@ function HomeView({
               )}
             </Stack>
           </Paper>
+        )}
+
+        {/* Full plain-text content (toggle) */}
+        {contentText && (
+          <>
+            <Button
+              variant="text"
+              size="small"
+              onClick={() => setShowFullText((s) => !s)}
+              sx={{ textTransform: "none" }}
+            >
+              {showFullText ? "Hide full text" : "Show full text"}
+            </Button>
+            {showFullText && (
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 2,
+                  width: "100%",
+                  bgcolor: "background.paper",
+                  whiteSpace: "pre-wrap",
+                  maxHeight: 320,
+                  overflow: "auto",
+                  border: "1px solid",
+                  borderColor: "divider",
+                }}
+              >
+                <Typography variant="body2" component="div" sx={{ fontFamily: "inherit" }}>
+                  {contentText}
+                </Typography>
+              </Paper>
+            )}
+          </>
         )}
       </Stack>
     </Paper>
