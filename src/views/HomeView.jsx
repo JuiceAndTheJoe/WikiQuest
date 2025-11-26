@@ -15,6 +15,9 @@ function HomeView({
   loading,
   user,
   onLogout,
+  wikipediaData,
+  wikipediaLoading,
+  wikipediaError,
 }) {
   return (
     <Paper elevation={3} sx={{ p: 3, maxWidth: 640, m: "2rem auto" }}>
@@ -62,6 +65,59 @@ function HomeView({
               Fetching persisted count…
             </Typography>
           </Stack>
+        )}
+
+        <Divider sx={{ width: "100%" }} />
+
+        {/* Wikipedia API Integration Example */}
+        <Typography variant="h5" component="h2">
+          Wikipedia API Example
+        </Typography>
+        {wikipediaLoading && (
+          <Stack direction="row" spacing={1} alignItems="center">
+            <CircularProgress size={20} />
+            <Typography variant="caption" color="text.secondary">
+              Loading Wikipedia data…
+            </Typography>
+          </Stack>
+        )}
+        {wikipediaError && (
+          <Typography variant="body2" color="error">
+            Error: {wikipediaError}
+          </Typography>
+        )}
+        {wikipediaData && (
+          <Paper elevation={1} sx={{ p: 2, width: "100%", bgcolor: "grey.50" }}>
+            <Stack spacing={1.5}>
+              <Typography variant="h6" component="h3">
+                {wikipediaData.title}
+              </Typography>
+              {wikipediaData.thumbnail && (
+                <Box
+                  component="img"
+                  src={wikipediaData.thumbnail.source}
+                  alt={wikipediaData.title}
+                  sx={{ maxWidth: "200px", borderRadius: 1 }}
+                />
+              )}
+              <Typography variant="body2" color="text.secondary">
+                {wikipediaData.description}
+              </Typography>
+              <Typography variant="body2">{wikipediaData.extract}</Typography>
+              {wikipediaData.content_urls?.desktop?.page && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  href={wikipediaData.content_urls.desktop.page}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ alignSelf: "flex-start" }}
+                >
+                  Read More on Wikipedia
+                </Button>
+              )}
+            </Stack>
+          </Paper>
         )}
       </Stack>
     </Paper>

@@ -13,6 +13,7 @@ import {
   clearError,
   initAuthListener,
 } from "../app/features/auth/authSlice";
+import { fetchWikipediaPage } from "../app/features/wikipedia/wikipediaSlice";
 
 function AppContainer({
   user,
@@ -21,9 +22,13 @@ function AppContainer({
   isAuthChecked,
   clickCount,
   uiLoading,
+  wikipediaData,
+  wikipediaLoading,
+  wikipediaError,
   onGetStarted,
   onReset,
   fetchGetStarted,
+  fetchWikipedia,
   onLogin,
   onRegister,
   onLogout,
@@ -43,6 +48,11 @@ function AppContainer({
     }
   }, [user?.uid, fetchGetStarted]);
 
+  // Fetch Wikipedia data on mount (example: React page)
+  useEffect(() => {
+    fetchWikipedia("React_(software)");
+  }, [fetchWikipedia]);
+
   return (
     <AppPresenter
       user={user}
@@ -51,6 +61,9 @@ function AppContainer({
       authError={authError}
       clickCount={clickCount}
       uiLoading={uiLoading}
+      wikipediaData={wikipediaData}
+      wikipediaLoading={wikipediaLoading}
+      wikipediaError={wikipediaError}
       onGetStarted={onGetStarted}
       onReset={onReset}
       onLogin={onLogin}
@@ -68,12 +81,16 @@ const mapStateToProps = (state) => ({
   isAuthChecked: state.auth.isAuthChecked,
   clickCount: state.ui.getStartedClicks,
   uiLoading: state.ui.loading,
+  wikipediaData: state.wikipedia.pageData,
+  wikipediaLoading: state.wikipedia.loading,
+  wikipediaError: state.wikipedia.error,
 });
 
 const mapDispatchToProps = (dispatch) => ({
   onGetStarted: () => dispatch(getStartedClicked()),
   onReset: () => dispatch(resetGetStarted()),
   fetchGetStarted: (userId) => dispatch(fetchGetStartedClicks(userId)),
+  fetchWikipedia: (pageTitle) => dispatch(fetchWikipediaPage(pageTitle)),
   onLogin: (credentials) => dispatch(loginUser(credentials)),
   onRegister: (credentials) => dispatch(registerUser(credentials)),
   onLogout: () => dispatch(logoutUser()),

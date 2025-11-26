@@ -12,6 +12,9 @@ function AppPresenter({
   authError,
   clickCount,
   uiLoading,
+  wikipediaData,
+  wikipediaLoading,
+  wikipediaError,
   onGetStarted,
   onReset,
   onLogin,
@@ -63,6 +66,9 @@ function AppPresenter({
                 loading={uiLoading}
                 user={user}
                 onLogout={onLogout}
+                wikipediaData={wikipediaData}
+                wikipediaLoading={wikipediaLoading}
+                wikipediaError={wikipediaError}
               />
             ) : (
               <Navigate to="/login" replace />
