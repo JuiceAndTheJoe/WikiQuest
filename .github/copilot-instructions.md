@@ -106,6 +106,7 @@ User submits form → `LoginView` calls `onLogin`/`onRegister` → `AppContainer
 - Limit slice state to serializable primitives; computed/derived values should be recalculated in selectors (if added later).
 - **Authentication gates**: All persistence operations must check user authentication status first. Currently implemented: middleware checks `state.auth.user?.uid` before persisting; `AppPresenter` uses route guards (`<Navigate>`) to redirect unauthenticated users to `/login`; `AppContainer` only fetches user data when `user?.uid` exists.
 - **One role per view**: Each view component should have a single, clear responsibility. Don't mix sidebar + summary in one component.
+- API Integration: Always use context7 (if avalible) when asked for code generation, setup or configuration steps, or library/API documentation. This means you should automatically use the Context7 MCP tools (if avalible) to resolve library id and get library docs without having to be explicitly asked.
 
 ## 12. Safe Extension Checklist (Grade A Compliance)
 
