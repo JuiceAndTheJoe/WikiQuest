@@ -15,10 +15,11 @@ function HomePresenter({
 }) {
   const [showFullText, setShowFullText] = useState(false);
 
-  const { summary, contentText } = useMemo(() => {
+  const { summary, contentText, contentSections } = useMemo(() => {
     return {
       summary: wikipediaData?.summary || null,
       contentText: wikipediaData?.contentText || null,
+      contentSections: wikipediaData?.contentSections || null,
     };
   }, [wikipediaData]);
 
@@ -34,6 +35,7 @@ function HomePresenter({
       onLogout={onLogout}
       wikipediaSummary={summary}
       wikipediaContentText={contentText}
+      wikipediaSections={contentSections}
       wikipediaLoading={wikipediaLoading}
       wikipediaError={wikipediaError}
       showFullText={showFullText}
