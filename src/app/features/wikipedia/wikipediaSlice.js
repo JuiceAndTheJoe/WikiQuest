@@ -5,15 +5,15 @@ import { stripHtml, htmlToSections, cleanText } from '../../mediaWikiParser';
 // Async thunk for fetching Wikipedia page summary + plain-text full content
 export const fetchWikipediaPage = createAsyncThunk(
     'wikipedia/fetchPage',
-    async (pageTitle, { rejectWithValue }) => {
+    async (pageTitle, { rejectWithValue, signal }) => {
         try {
-            const summary = await getPageSummary(pageTitle);
+            const summary = await getPageSummary(pageTitle, signal);
 
             let contentText = null;
             let contentSections = null;
             try {
                 // getPageContent now returns raw HTML string
-                const htmlContent = await getPageContent(pageTitle);
+                const htmlContent = await getPageContent(pageTitle, signal);
 
                 // Parse the HTML to extract readable text
                 contentText = stripHtml(htmlContent);
@@ -24,6 +24,10 @@ export const fetchWikipediaPage = createAsyncThunk(
                     text: cleanText(s.text),
                 }));
             } catch (err) {
+                if (err.name === 'AbortError') {
+                    // Pass through abort so caller can ignore
+                    throw err;
+                }
                 // Log and continue — summary is the primary content
                 console.warn('Failed to fetch/parse full page content', err);
                 contentText = null;
@@ -32,6 +36,10 @@ export const fetchWikipediaPage = createAsyncThunk(
 
             return { summary, contentText, contentSections };
         } catch (error) {
+            if (error.name === 'AbortError') {
+                // Let createAsyncThunk handle cancellation (it sets .meta.aborted)
+                throw error;
+            }
             return rejectWithValue(error.message || 'Failed to fetch Wikipedia page');
         }
     }
