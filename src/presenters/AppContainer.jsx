@@ -50,7 +50,7 @@ function AppContainer({
 
   // Fetch Wikipedia data on mount (example: React page)
   useEffect(() => {
-    fetchWikipedia("React_(software)");
+    fetchWikipedia("Barack_Obama");
   }, [fetchWikipedia]);
 
   return (
