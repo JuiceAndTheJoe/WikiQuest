@@ -1,43 +1,36 @@
-import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import HomeView from "../views/HomeView";
 
-// Presenter for HomeView: derives data and manages UI-only state
+// Presenter for MenuView: manages navigation and user stats
 function HomePresenter({
-  onGetStarted,
-  onReset,
-  clickCount,
-  loading,
   user,
   onLogout,
-  wikipediaData,
-  wikipediaLoading,
-  wikipediaError,
+  clickCount,
 }) {
-  const [showFullText, setShowFullText] = useState(false);
+  const navigate = useNavigate();
 
-  const { summary, contentText } = useMemo(() => {
-    return {
-      summary: wikipediaData?.summary || null,
-      contentText: wikipediaData?.contentText || null,
-    };
-  }, [wikipediaData]);
+  // Mock user stats for now - will connect to model later
+  const userStats = {
+    gamesPlayed: 0,
+    highScore: 0,
+    totalScore: 0
+  };
 
-  const handleToggleFullText = () => setShowFullText((s) => !s);
+  const handleStartGame = () => {
+    navigate("/game");
+  };
+
+  const handleViewLeaderboard = () => {
+    navigate("/leaderboard");
+  };
 
   return (
     <HomeView
-      onGetStarted={onGetStarted}
-      onReset={onReset}
-      clickCount={clickCount}
-      loading={loading}
       user={user}
       onLogout={onLogout}
-      wikipediaSummary={summary}
-      wikipediaContentText={contentText}
-      wikipediaLoading={wikipediaLoading}
-      wikipediaError={wikipediaError}
-      showFullText={showFullText}
-      onToggleFullText={handleToggleFullText}
+      onStartGame={handleStartGame}
+      onViewLeaderboard={handleViewLeaderboard}
+      userStats={userStats}
     />
   );
 }
