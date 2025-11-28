@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -7,29 +6,22 @@ import Alert from "@mui/material/Alert";
 import PrimaryButton from "../components/PrimaryButton";
 import Button from "@mui/material/Button";
 
-// Pure view: receives auth handlers and state via props
-function LoginView({ onLogin, onRegister, loading, error, onClearError }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isRegisterMode) {
-      onRegister({ email, password });
-    } else {
-      onLogin({ email, password });
-    }
-  };
-
-  const toggleMode = () => {
-    setIsRegisterMode(!isRegisterMode);
-    if (error) onClearError();
-  };
-
+// Pure view: all data and handlers are provided by presenter
+function LoginView({
+  email,
+  password,
+  isRegisterMode,
+  loading,
+  error,
+  onEmailChange,
+  onPasswordChange,
+  onToggleMode,
+  onSubmit,
+  onClearError,
+}) {
   return (
     <Paper elevation={3} sx={{ p: 3, maxWidth: 480, m: "2rem auto" }}>
-      <Stack spacing={2} component="form" onSubmit={handleSubmit}>
+      <Stack spacing={2} component="form" onSubmit={onSubmit}>
         <Typography variant="h4" component="h1">
           {isRegisterMode ? "Register" : "Login"}
         </Typography>
@@ -49,7 +41,7 @@ function LoginView({ onLogin, onRegister, loading, error, onClearError }) {
           label="Email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => onEmailChange(e.target.value)}
           required
           fullWidth
           disabled={loading}
@@ -59,7 +51,7 @@ function LoginView({ onLogin, onRegister, loading, error, onClearError }) {
           label="Password"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => onPasswordChange(e.target.value)}
           required
           fullWidth
           disabled={loading}
@@ -72,7 +64,7 @@ function LoginView({ onLogin, onRegister, loading, error, onClearError }) {
 
         <Button
           variant="text"
-          onClick={toggleMode}
+          onClick={onToggleMode}
           disabled={loading}
           sx={{ textTransform: "none" }}
         >

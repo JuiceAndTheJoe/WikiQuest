@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import HomeView from "../views/HomeView";
-import LoginView from "../views/LoginView";
+import HomePresenter from "./HomePresenter";
+import LoginPresenter from "./LoginPresenter";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
@@ -45,7 +45,7 @@ function AppPresenter({
             user ? (
               <Navigate to="/" replace />
             ) : (
-              <LoginView
+              <LoginPresenter
                 onLogin={onLogin}
                 onRegister={onRegister}
                 loading={authLoading}
@@ -59,7 +59,7 @@ function AppPresenter({
           path="/"
           element={
             user ? (
-              <HomeView
+              <HomePresenter
                 onGetStarted={onGetStarted}
                 onReset={onReset}
                 clickCount={clickCount}
@@ -69,9 +69,6 @@ function AppPresenter({
                 wikipediaData={wikipediaData}
                 wikipediaLoading={wikipediaLoading}
                 wikipediaError={wikipediaError}
-                // pass explicit summary and full text to avoid shape confusion
-                wikipediaSummary={wikipediaData?.summary}
-                wikipediaContentText={wikipediaData?.contentText}
               />
             ) : (
               <Navigate to="/login" replace />

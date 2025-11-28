@@ -3,7 +3,7 @@ import { getPageSummary, getPageContent } from '../../mediaWikiModel';
 
 /**
  * Wikipedia Feature Slice
- * Fetches both the summary and the full page (plain text) using MediaWiki mobile-sections
+ * Fetches both the summary and the full page HTML
  * Keeps UI-safe plain text in state (no raw HTML stored)
  */
 
@@ -125,25 +125,11 @@ export const fetchWikipediaPage = createAsyncThunk(
 
             let contentText = null;
             try {
-                const contentData = await getPageContent(pageTitle);
+                // getPageContent now returns raw HTML string
+                const htmlContent = await getPageContent(pageTitle);
 
-                const leadSections = contentData?.lead?.sections || [];
-                const remainingSections = contentData?.remaining?.sections || [];
-                const allSections = [...leadSections, ...remainingSections];
-
-                contentText = allSections
-                    .map((s) => stripHtml(s?.text || ''))
-                    .filter(Boolean)
-                    .join('\n\n');
-
-                // Fallback if no sections parsed
-                if (!contentText) {
-                    const fallback = (contentData?.lead?.sections || [])
-                        .map((s) => stripHtml(s?.text || ''))
-                        .filter(Boolean)
-                        .join('\n\n');
-                    contentText = fallback || null;
-                }
+                // Parse the HTML to extract readable text
+                contentText = stripHtml(htmlContent);
             } catch (err) {
                 // Log and continue — summary is the primary content
                 console.warn('Failed to fetch/parse full page content', err);

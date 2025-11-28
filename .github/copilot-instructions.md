@@ -11,7 +11,7 @@
 - Firebase (Auth + Firestore) initialized in `src/firebaseConfig.js`. All Firestore access is centralized in `src/app/firestoreModel.js`.
 - **Framework-independent Redux**: Use `connect()` for Redux mappings instead of custom hooks (`useSelector`, `useDispatch`).
 - **User-visible third-party components**: Material UI components count. Must have at least one in each major view.
-- Component hierarchy: `AppContainer.jsx` (Redux-connected via `connect()`, triggers side effects) wraps `AppPresenter.jsx` (routing + prop passing) which renders Views like `HomeView.jsx` (pure presentational, one role per view, one module per view).
+- Component hierarchy: `AppContainer.jsx` (Redux-connected via `connect()`, triggers side effects) wraps `AppPresenter.jsx` (routing + prop passing) which renders per-view Presenters (`HomePresenter.jsx`, `LoginPresenter.jsx`). Each Presenter composes props and manages view-specific UI state, and then renders a pure View (e.g., `HomeView.jsx`, `LoginView.jsx`).
 
 ## 2. Dev & Build Workflow
 
@@ -41,7 +41,7 @@
   - `saveUserData(userId, data)` - Generic user data save
   - `getUserData(userId)` - Generic user data read
   - `subscribeToUserData(userId, callback)` - Generic user data subscription
-- **Multi-source APIs (grade A+)**: When mashing up data from multiple external APIs, centralize each API client in separate model files (e.g., `externalApiModel.js`).
+- **Multi-source APIs (grade A+)**: When mashing up data from multiple external APIs, centralize each API client in separate model files (e.g., `externalApiModel.js`). **Currently implemented**: `mediaWikiModel.js` provides Wikipedia REST API integration with functions for fetching page summaries, full HTML content, and search results.
 - **Collaborative features (grade A+)**: For shared state where user actions complement each other, handle conflicts via Firestore transactions or optimistic UI updates with rollback.
 
 ## 5. Adding a New Feature Slice (Example Steps)
@@ -55,12 +55,14 @@
 
 - **`authSlice.js`**: Manages user authentication state (`user`, `loading`, `error`, `isAuthChecked`). Includes async thunks for login, register, logout. Auth listener initialized in `AppContainer`.
 - **`uiSlice.js`**: Manages UI interactions like Get Started button clicks. Includes async thunk for fetching persisted clicks. Persistence handled via middleware.
+- **`wikipediaSlice.js`**: Manages Wikipedia page data (`pageData`, `loading`, `error`, `lastFetchedTitle`). Fetches page summary and full HTML content, parses HTML to plain text. Demonstrates multi-source API integration (Grade A requirement).
 
 ## 6. Presenter / View Convention
 
 - Containers (`*Container.jsx`) connect Redux (`connect(...)`) – continue this pattern instead of mixing hooks for consistency.
-- Presenters (`AppPresenter.jsx`) handle routing composition, pass only data & callbacks.
-- Views (`HomeView.jsx`) remain stateless and only render props.
+- App-level presenter: `AppPresenter.jsx` handles routing only (no business logic).
+- Per-view presenters: `HomePresenter.jsx`, `LoginPresenter.jsx` (and any future `*Presenter.jsx`) manage local view state, derive props (map/shape data), and wire callbacks. They do not perform side effects (those stay in containers/middleware).
+- Views (`HomeView.jsx`, `LoginView.jsx`) remain stateless/pure and only render props.
 - Reusable UI elements (e.g., `PrimaryButton.jsx`) stay logic-free.
 
 ## 7. Theming & Styling (Grade A Requirements)
@@ -93,12 +95,20 @@ App mounts → `initAuthListener` called in `AppContainer` → `onAuthStateChang
 
 User submits form → `LoginView` calls `onLogin`/`onRegister` → `AppContainer` dispatches `loginUser`/`registerUser` thunk → Firebase Auth API called → on success, user object stored in Redux → `onAuthStateChanged` listener fires → routes redirect to home → user-specific data fetched.
 
+### Wikipedia API Flow
+
+App mounts → `AppContainer` dispatches `fetchWikipediaPage` thunk → `getPageSummary` and `getPageContent` called in `mediaWikiModel.js` → Wikipedia REST API returns JSON summary and HTML content → HTML parsed to plain text in slice using `stripHtml()` → state updates with `{ summary, contentText }` → `HomeView` renders Wikipedia data with loading/error states.
+
 ## 10. Debugging & Tooling
 
 - Sourcemaps enabled; build `minify: false` to ease Firebase-hosted debugging.
 - Fire-and-forget writes: middleware catches errors via `console.warn`; for production, evolve into dispatching an error slice/action.
 
-## 11. Guardrails for AI Changes (Grade A Compliance)
+## 11. Usage of external code
+
+- Always use Context7 when asked for code generation, setup or configuration steps, or library/API documentation. This means you should automatically use the Context7 MCP tools to resolve library id and get library docs without having to be explicitly asked. If Context7 is not available, you can proceed without it without mentioning it.
+
+## 12. Guardrails for AI Changes (Grade A Compliance)
 
 - **Zero concern mixing**: Do NOT introduce Firestore logic directly into components or slices—always route through model + middleware.
 - Preserve the Container/Presenter/View layering; new routes belong in `AppPresenter.jsx`.
@@ -108,7 +118,7 @@ User submits form → `LoginView` calls `onLogin`/`onRegister` → `AppContainer
 - **One role per view**: Each view component should have a single, clear responsibility. Don't mix sidebar + summary in one component.
 - API Integration: Always use context7 (if avalible) when asked for code generation, setup or configuration steps, or library/API documentation. This means you should automatically use the Context7 MCP tools (if avalible) to resolve library id and get library docs without having to be explicitly asked.
 
-## 12. Safe Extension Checklist (Grade A Compliance)
+## 13. Safe Extension Checklist (Grade A Compliance)
 
 Before committing a change:
 
@@ -117,6 +127,7 @@ Before committing a change:
 - Added remote read? Implemented thunk + dispatched from container.
 - Added UI element? Pure & receives all data via props. Includes loading/error states.
 - Added new view? Single clear role, one module per view, uses Material UI components.
+- Added new presenter? Ensure each view has a matching `*Presenter.jsx` that holds all view logic/state; do not put logic in views.
 - Added API integration? Centralized in model file, provides clear system status feedback.
 - **Grade A extras**: Live updates via `onSnapshot`? Multi-source API mashup? Collaborative features with conflict handling?
 
