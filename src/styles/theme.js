@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material/styles';
 // Example custom theme; adjust palette/typography as needed
 const theme = createTheme({
     palette: {
-        mode: 'light',
+        mode: 'dark',
         primary: {
             main: '#1976d2',
         },
@@ -11,8 +11,8 @@ const theme = createTheme({
             main: '#9c27b0',
         },
         background: {
-            default: '#f5f7fa',
-            paper: '#ffffff',
+            default: '#171717ff',
+            paper: '#393939ff',
         },
     },
     typography: {

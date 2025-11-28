@@ -24,6 +24,7 @@ import {
   ExitToApp,
   EmojiEvents
 } from '@mui/icons-material';
+import ColorBends from '../components/background/ColorBends';
 
 // Pure view: receives interaction handlers & data via props from Presenter.
 function MenuView({
@@ -34,9 +35,32 @@ function MenuView({
   userStats = { gamesPlayed: 0, highScore: 0, totalScore: 0 }
 }) {
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Stack spacing={4}>
-        {/* Header */}
+    <Box sx={{ position: 'relative', minHeight: '100vh' }}>
+      {/* Animated Background */}
+      <ColorBends
+        colors={["#d80000ff", "#00a90eff", "#0010bdff"]}
+        rotation={30}
+        speed={0.3}
+        scale={1.2}
+        frequency={1.4}
+        warpStrength={1.2}
+        mouseInfluence={0.8}
+        parallax={0.6}
+        noise={0.08}
+        transparent
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: -1
+        }}
+      />
+      
+      <Container maxWidth="lg" sx={{ py: 4, position: 'relative', zIndex: 1 }}>
+        <Stack spacing={4}>
+          {/* Header */}
         <Box sx={{ textAlign: 'center' }}>
           <Typography 
             variant="h2" 
@@ -44,7 +68,7 @@ function MenuView({
             gutterBottom
             sx={{ 
               fontWeight: 'bold',
-              background: 'linear-gradient(45deg, #1976d2, #42a5f5)',
+              background: 'linear-gradient(45deg, #4d77a1ff, #42a5f5)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent'
@@ -59,7 +83,13 @@ function MenuView({
         </Box>
 
         {/* User Info */}
-        <Paper elevation={2} sx={{ p: 3 }}>
+        <Box sx={{ 
+          p: 3, 
+          bgcolor: 'rgba(255, 255, 255, 0.1)', 
+          backdropFilter: 'blur(10px)',
+          borderRadius: 2,
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
           <Stack direction="row" spacing={2} alignItems="center" justifyContent="space-between">
             <Stack direction="row" spacing={2} alignItems="center">
               <Avatar sx={{ bgcolor: 'primary.main' }}>
@@ -91,12 +121,16 @@ function MenuView({
               </Button>
             </Stack>
           </Stack>
-        </Paper>
+        </Box>
 
         <Grid container spacing={3}>
           {/* Game Options */}
           <Grid item xs={12} md={8}>
-            <Card elevation={3}>
+            <Card sx={{ 
+              bgcolor: 'rgba(255, 255, 255, 0.1)', 
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}>
               <CardContent sx={{ p: 4 }}>
                 <Typography variant="h5" gutterBottom>
                   Start New Game
@@ -127,7 +161,11 @@ function MenuView({
           <Grid item xs={12} md={4}>
             <Stack spacing={2}>
               {/* Stats Card */}
-              <Card>
+              <Card sx={{ 
+                bgcolor: 'rgba(255, 255, 255, 0.1)', 
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     Your Stats
@@ -169,7 +207,13 @@ function MenuView({
         </Grid>
 
         {/* Game Rules */}
-        <Paper elevation={1} sx={{ p: 3, bgcolor: 'background.default' }}>
+        <Box sx={{ 
+          p: 3, 
+          bgcolor: 'rgba(255, 255, 255, 0.1)', 
+          backdropFilter: 'blur(10px)',
+          borderRadius: 2,
+          border: '1px solid rgba(255, 255, 255, 0.2)'
+        }}>
           <Typography variant="h6" gutterBottom>
             How to Play
           </Typography>
@@ -195,9 +239,10 @@ function MenuView({
               </Typography>
             </Grid>
           </Grid>
-        </Paper>
+        </Box>
       </Stack>
     </Container>
+    </Box>
   );
 }
 
