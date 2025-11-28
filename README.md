@@ -34,17 +34,19 @@ npm run dev
 - **Routing**: React Router v6
 - **Backend**: Firebase (Auth + Firestore)
 - **Styling**: Emotion (MUI's CSS-in-JS solution)
+- **External APIs**: Wikipedia REST API (multi-source integration)
 
 ## Architecture
 
 Clean separation of concerns following Model-View-Presenter pattern:
 
 - **Persistence Layer**: `src/app/firestoreModel.js` (Firebase operations)
+- **External APIs**: `src/app/mediaWikiModel.js` (Wikipedia REST API integration)
 - **Application State**: Redux slices in `src/app/features/`
 - **Middleware**: `src/app/middleware/persistenceMiddleware.js` (sync state to Firebase)
 - **Containers**: `*Container.jsx` (Redux-connected, side effects)
-- **Presenters**: `*Presenter.jsx` (routing, prop composition)
-- **Views**: Pure presentational components in `src/views/`
+- **Presenters**: App-level `AppPresenter.jsx` (routing only) and per-view presenters (`HomePresenter.jsx`, `LoginPresenter.jsx`) for prop composition and local UI state.
+- **Views**: Pure presentational components in `src/views/` (no logic/state besides rendering props)
 
 ## Third-Party Components (User-Visible)
 
@@ -81,18 +83,23 @@ src/
 │   ├── store.js                    # Redux store configuration
 │   ├── rootReducer.js              # Combine feature reducers
 │   ├── firestoreModel.js           # Centralized Firebase operations
+│   ├── mediaWikiModel.js           # Wikipedia REST API client
 │   ├── features/
 │   │   ├── auth/
 │   │   │   └── authSlice.js        # Authentication state & thunks
-│   │   └── ui/
-│   │       └── uiSlice.js          # UI state slice
+│   │   ├── ui/
+│   │   │   └── uiSlice.js          # UI state slice
+│   │   └── wikipedia/
+│   │       └── wikipediaSlice.js   # Wikipedia data state & thunks
 │   └── middleware/
 │       └── persistenceMiddleware.js # Auto-persist state to Firebase
 ├── components/
 │   └── PrimaryButton.jsx           # Reusable UI components
 ├── presenters/
 │   ├── AppContainer.jsx            # Redux-connected container
-│   └── AppPresenter.jsx            # Routing logic
+│   ├── AppPresenter.jsx            # Routing logic
+│   ├── HomePresenter.jsx           # Presenter for HomeView (UI state + prop composition)
+│   └── LoginPresenter.jsx          # Presenter for LoginView (form state + handlers)
 ├── views/
 │   ├── HomeView.jsx                # Authenticated home view
 │   └── LoginView.jsx               # Login/registration view
@@ -110,6 +117,9 @@ src/
 - Firebase serializable check disabled in Redux (Firestore snapshots)
 - All state changes that need persistence go through Redux middleware
 - No direct Firebase calls in components or slices
+- External API calls centralized in model files (`mediaWikiModel.js`)
+- Wikipedia API integration fetches page summaries and full HTML content
+- HTML content parsed to plain text in slice layer for safe state storage
 
 ## Grade A Target
 
@@ -125,8 +135,9 @@ This project follows DH2642 grade A requirements:
 - ✅ User-specific data storage (`users/{userId}/metrics/clicks`)
 - ✅ Loading states and error handling (auth errors, UI loading states)
 - ✅ Form validation (email/password requirements in LoginView)
+- ✅ Multi-source API integration (Wikipedia REST API in `mediaWikiModel.js`)
+- ✅ Wikipedia page data displayed in HomeView with summary and parsed content
 - 🔄 Live updates via `onSnapshot` (subscribe functions ready, not yet connected)
-- 🔄 Multi-source API integration (to be implemented)
 - 🔄 User consultation documentation (to be added)
 
 See `.github/copilot-instructions.md` for detailed architectural guidelines.
