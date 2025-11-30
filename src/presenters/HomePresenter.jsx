@@ -20,6 +20,14 @@ function HomePresenter({
     navigate("/game");
   };
 
+  const { summary, contentText, contentSections } = useMemo(() => {
+    return {
+      summary: wikipediaData?.summary || null,
+      contentText: wikipediaData?.contentText || null,
+      contentSections: wikipediaData?.contentSections || null,
+    };
+  }, [wikipediaData]);
+
   const handleViewLeaderboard = () => {
     navigate("/leaderboard");
   };

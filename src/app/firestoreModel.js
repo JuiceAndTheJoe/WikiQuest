@@ -36,3 +36,29 @@ export function subscribeGetStartedClicks(userId, callback) {
         if (snap.exists()) callback(snap.data().getStartedClicks || 0);
     });
 }
+
+// Leaderboard functions
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+
+export async function getLeaderboard(maxCount = 10) {
+    try {
+        const leaderboardRef = collection(db, 'users');
+        const q = query(leaderboardRef, orderBy('highScore', 'desc'), limit(maxCount));
+        const snapshot = await getDocs(q);
+        
+        const leaderboard = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            leaderboard.push({
+                userId: doc.id,
+                email: data.email || 'Anonymous',
+                highScore: data.highScore || 0,
+            });
+        });
+        
+        return leaderboard;
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        throw error;
+    }
+}

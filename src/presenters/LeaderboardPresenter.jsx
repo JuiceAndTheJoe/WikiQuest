@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import LeaderboardView from "../views/leaderboardView";
+import LeaderboardView from '../views/LeaderboardView';
 
 // Presenter for LeaderboardView: manages leaderboard data and navigation
 function LeaderboardPresenter({

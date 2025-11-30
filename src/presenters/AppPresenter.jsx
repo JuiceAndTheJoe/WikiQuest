@@ -1,5 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import HomePresenter from "./HomePresenter";
+import UserContainer from "./UserContainer";
+import LevelContainer from "./LevelContainer";
+import LeaderboardContainer from "./LeaderboardContainer";
 import LoginPresenter from "./LoginPresenter";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
@@ -64,17 +67,27 @@ function AppPresenter({
           path="/"
           element={
             user ? (
-              <HomePresenter
-                onGetStarted={onGetStarted}
-                onReset={onReset}
-                clickCount={clickCount}
-                loading={uiLoading}
-                user={user}
-                onLogout={onLogout}
-                wikipediaData={wikipediaData}
-                wikipediaLoading={wikipediaLoading}
-                wikipediaError={wikipediaError}
-              />
+              <UserContainer />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/level"
+          element={
+            user ? (
+              <LevelContainer />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            user ? (
+              <LeaderboardContainer />
             ) : (
               <Navigate to="/login" replace />
             )
