@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import GameView from "../views/gameView";
+import GameView from "../views/GameView";
 
 // Presenter for GameView: manages game logic and Wikipedia data
 function GamePresenter({
