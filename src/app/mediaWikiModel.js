@@ -12,8 +12,8 @@ const WIKIPEDIA_API_BASE = 'https://en.wikipedia.org/api/rest_v1';
  * @param {boolean} expectJson - Whether to parse response as JSON (default true)
  * @returns {Promise<Object|string>} Response data
  */
-async function apiCall(url, expectJson = true) {
-    const response = await fetch(url);
+async function apiCall(url, expectJson = true, signal) {
+    const response = await fetch(url, signal ? { signal } : undefined);
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -32,11 +32,11 @@ async function apiCall(url, expectJson = true) {
  * @param {string} title - The title of the Wikipedia page
  * @returns {Promise<Object>} Page summary data
  */
-export async function getPageSummary(title) {
+export async function getPageSummary(title, signal) {
     try {
         const encodedTitle = encodeURIComponent(title);
         const url = `${WIKIPEDIA_API_BASE}/page/summary/${encodedTitle}`;
-        const data = await apiCall(url);
+        const data = await apiCall(url, true, signal);
         return data;
     } catch (error) {
         console.error('Error fetching Wikipedia page:', error);
@@ -49,12 +49,12 @@ export async function getPageSummary(title) {
  * @param {string} title - The title of the Wikipedia page
  * @returns {Promise<string>} Raw HTML content
  */
-export async function getPageContent(title) {
+export async function getPageContent(title, signal) {
     try {
         const encodedTitle = encodeURIComponent(title);
         // Use the /page/html endpoint which returns HTML text
         const url = `${WIKIPEDIA_API_BASE}/page/html/${encodedTitle}`;
-        const htmlContent = await apiCall(url, false); // Don't parse as JSON, return raw HTML
+        const htmlContent = await apiCall(url, false, signal); // Don't parse as JSON, return raw HTML
         return htmlContent;
     } catch (error) {
         console.error('Error fetching Wikipedia page content:', error);
@@ -68,11 +68,11 @@ export async function getPageContent(title) {
  * @param {number} limit - Maximum number of results
  * @returns {Promise<Object>} Search results
  */
-export async function searchPages(query, limit = 10) {
+export async function searchPages(query, limit = 10, signal) {
     try {
         const encodedQuery = encodeURIComponent(query);
         const url = `${WIKIPEDIA_API_BASE}/page/search/${encodedQuery}?limit=${limit}`;
-        const data = await apiCall(url);
+        const data = await apiCall(url, true, signal);
         return data;
     } catch (error) {
         console.error('Error searching Wikipedia:', error);

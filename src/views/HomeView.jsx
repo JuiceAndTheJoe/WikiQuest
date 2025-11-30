@@ -6,6 +6,19 @@ import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import SvgIcon from '@mui/material/SvgIcon';
+
+// Inline ExpandMore icon to avoid requiring @mui/icons-material package
+function ExpandMoreIcon(props) {
+  return (
+    <SvgIcon {...props} viewBox="0 0 24 24">
+      <path d="M7 10l5 5 5-5z" />
+    </SvgIcon>
+  );
+}
 
 // Pure view: receives interaction handlers & data via props from Presenter.
 function HomeView({
@@ -17,6 +30,7 @@ function HomeView({
   onLogout,
   wikipediaSummary,
   wikipediaContentText,
+  wikipediaSections,
   wikipediaLoading,
   wikipediaError,
   showFullText,
@@ -160,6 +174,23 @@ function HomeView({
               </Paper>
             )}
           </>
+        )}
+        {/* Sections as Accordions (structured content) */}
+        {wikipediaSections && wikipediaSections.length > 0 && (
+          <Box sx={{ width: '100%' }}>
+            {wikipediaSections.map((sec, idx) => (
+              <Accordion key={sec.heading || idx} defaultExpanded={idx === 0}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="subtitle1">{sec.heading}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                    {sec.text}
+                  </Typography>
+                </AccordionDetails>
+              </Accordion>
+            ))}
+          </Box>
         )}
       </Stack>
     </Paper>
