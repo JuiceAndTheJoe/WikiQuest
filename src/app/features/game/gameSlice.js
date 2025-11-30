@@ -1,5 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { EasyCelebs, MediumCelebs, HardCelebs } from '../../game/celebs';
+import { getLeaderboard } from '../../firestoreModel';
 
 function pickRandom(arr) {
   if (!arr || arr.length === 0) return null;
@@ -13,6 +14,14 @@ function poolForLevel(level) {
   return EasyCelebs;
 }
 
+export const fetchLeaderboard = createAsyncThunk(
+  'game/fetchLeaderboard',
+  async () => {
+    const leaderboard = await getLeaderboard();
+    return leaderboard;
+  }
+);
+
 const initialState = {
   inGame: false,
   level: 1,
@@ -21,6 +30,9 @@ const initialState = {
   highScore: 0,
   currentCeleb: null, // string name
   lastGuessResult: null, // 'correct' | 'wrong' | null
+  leaderboardData: [],
+  leaderboardLoading: false,
+  leaderboardError: null,
 };
 
 const gameSlice = createSlice({
@@ -124,6 +136,21 @@ const gameSlice = createSlice({
     resetGameState(state) {
       Object.assign(state, initialState);
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchLeaderboard.pending, (state) => {
+        state.leaderboardLoading = true;
+        state.leaderboardError = null;
+      })
+      .addCase(fetchLeaderboard.fulfilled, (state, action) => {
+        state.leaderboardLoading = false;
+        state.leaderboardData = action.payload || [];
+      })
+      .addCase(fetchLeaderboard.rejected, (state, action) => {
+        state.leaderboardLoading = false;
+        state.leaderboardError = action.error.message || 'Failed to load leaderboard';
+      });
   },
 });
 

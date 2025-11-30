@@ -42,81 +42,6 @@ function LevelPresenter({ level, lives, difficulty, currentCeleb, inGame, lastGu
     navigate('/');
   }, [dispatch, navigate]);
 
-  // Compute hint text based on difficulty and fetched wikipedia data
-  const hintText = useMemo(() => {
-    try {
-      if (!wikipediaSummary && (!wikipediaSections || wikipediaSections.length === 0)) return '';
-
-      // helpers
-      const removeDiacritics = (s) => (s ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : s);
-      const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-      const removeNameFromText = (text, celeb) => {
-        if (!text) return '';
-        if (!celeb) return removeDiacritics(text);
-
-        let normalized = removeDiacritics(text);
-        const name = celeb.replace(/_/g, ' ').trim();
-        if (!name) return normalized;
-
-        const parts = name.split(/\s+/).filter(Boolean);
-        // include full name variant
-        const variants = new Set(parts.concat([name]));
-
-        for (const v of variants) {
-          const vNorm = removeDiacritics(v);
-          if (!vNorm) continue;
-          const re = new RegExp('\\b' + escapeRegExp(vNorm) + '\\b', 'giu');
-          normalized = normalized.replace(re, '');
-        }
-
-        // collapse extra whitespace and trim
-        return normalized.replace(/\s{2,}/g, ' ').trim();
-      };
-
-      const splitSentences = (text) => {
-        if (!text) return [];
-        return text
-          .split(/\.(?:\s+|$)/)
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0);
-      };
-
-      const pickN = (arr, n) => {
-        if (!arr || arr.length === 0) return [];
-        const copy = arr.slice();
-        for (let i = copy.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [copy[i], copy[j]] = [copy[j], copy[i]];
-        }
-        return copy.slice(0, n);
-      };
-
-      const nMap = { HARD: 1, MEDIUM: 2, EASY: 3 };
-      const n = nMap[difficulty] || 1;
-
-      const parts = [];
-      // summary sentences (name-stripped)
-      const summaryText = removeNameFromText(wikipediaSummary?.extract || '', currentCeleb);
-      const summarySentences = splitSentences(summaryText);
-      parts.push(...pickN(summarySentences, n));
-
-      // sections (name-stripped)
-      if (Array.isArray(wikipediaSections)) {
-        for (const sec of wikipediaSections) {
-          const secText = removeNameFromText(sec.text || '', currentCeleb);
-          const sentences = splitSentences(secText);
-          const chosen = pickN(sentences, n);
-          parts.push(...chosen);
-        }
-      }
-
-      return parts.join('.\n') + (parts.length ? '.' : '');
-    } catch (e) {
-      return '';
-    }
-  }, [wikipediaSummary, wikipediaSections, difficulty, currentCeleb]);
-
   // prepare sanitized props for the view (remove celeb forename/surname everywhere)
   const sanitizedSummary = useMemo(() => {
     if (!wikipediaSummary) return null;
@@ -153,6 +78,50 @@ function LevelPresenter({ level, lives, difficulty, currentCeleb, inGame, lastGu
     });
   }, [wikipediaSections, currentCeleb]);
 
+  // Compute three separate hints: HintHARD, HintMEDIUM, HintEASY
+  const { HintHARD, HintMEDIUM, HintEASY } = useMemo(() => {
+    try {
+      if (!sanitizedSummary && (!sanitizedSections || sanitizedSections.length === 0)) {
+        return { HintHARD: '', HintMEDIUM: '', HintEASY: '' };
+      }
+
+      // Helper to extract total N sentences across all sections
+      const extractTotalSentences = (sections, totalCount) => {
+        if (!Array.isArray(sections) || totalCount <= 0) return [];
+        const allSentences = [];
+        
+        for (const sec of sections) {
+          const text = sec?.text || '';
+          // Split by period followed by space or end of string
+          const sectionSentences = text.split(/\.(?:\s+|$)/).filter(s => s.trim().length > 0);
+          for (const sentence of sectionSentences) {
+            if (allSentences.length >= totalCount) break;
+            allSentences.push(sentence.trim() + '.');
+          }
+          if (allSentences.length >= totalCount) break;
+        }
+        
+        return allSentences;
+      };
+
+      // HintHARD: Only wikipedia summary
+      const hard = sanitizedSummary?.extract || '';
+
+      // HintMEDIUM: HintHARD + 1 additional sentence from sections (approx 2x size of HARD)
+      const oneSentence = extractTotalSentences(sanitizedSections, 1);
+      const medium = [hard, ...oneSentence].filter(Boolean).join('\n\n');
+
+      // HintEASY: HintHARD + 2 additional sentences from sections (approx 3x size of HARD)
+      const twoSentences = extractTotalSentences(sanitizedSections, 2);
+      const easy = [hard, ...twoSentences].filter(Boolean).join('\n\n');
+
+      return { HintHARD: hard, HintMEDIUM: medium, HintEASY: easy };
+    } catch (e) {
+      console.error('Error computing hints:', e);
+      return { HintHARD: '', HintMEDIUM: '', HintEASY: '' };
+    }
+  }, [sanitizedSummary, sanitizedSections]);
+
   return (
     <LevelView
       level={level}
@@ -172,10 +141,9 @@ function LevelPresenter({ level, lives, difficulty, currentCeleb, inGame, lastGu
       highScore={highScore}
       wikipediaLoading={wikipediaLoading}
       wikipediaError={wikipediaError}
-      wikipediaSummary={sanitizedSummary}
-      wikipediaSections={sanitizedSections}
-      hintText={hintText}
-      showDebug={true}
+      HintHARD={HintHARD}
+      HintMEDIUM={HintMEDIUM}
+      HintEASY={HintEASY}
     />
   );
 }

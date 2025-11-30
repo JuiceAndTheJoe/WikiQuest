@@ -9,7 +9,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 
-function LevelView({ level, lives, difficulty, inGame, lastGuessResult, guessInput, setGuessInput, onGuess, onReturn = () => {}, wikipediaLoading = false, wikipediaError = null, wikipediaSummary = null, wikipediaSections = null, showGameOver = false, onPlayAgain = () => {}, onGameOverReturn = () => {}, correctCount = 0, highScore = 0 }) {
+function LevelView({ level, lives, difficulty, inGame, lastGuessResult, guessInput, setGuessInput, onGuess, onReturn = () => {}, wikipediaLoading = false, wikipediaError = null, HintHARD = '', HintMEDIUM = '', HintEASY = '', showGameOver = false, onPlayAgain = () => {}, onGameOverReturn = () => {}, correctCount = 0, highScore = 0 }) {
   return (
     <>
       <Paper sx={{ p: 3, maxWidth: 720, m: '2rem auto' }} elevation={2}>
@@ -35,14 +35,29 @@ function LevelView({ level, lives, difficulty, inGame, lastGuessResult, guessInp
           )}
           {!wikipediaLoading && !wikipediaError && (
             <Box sx={{ p: 1, border: '1px solid', borderColor: 'divider', borderRadius: 1, bgcolor: 'background.paper' }}>
-              {difficulty === 'HARD' && wikipediaSummary && (
-                <Typography variant="body2">{wikipediaSummary.extract}</Typography>
+              {difficulty === 'HARD' && (
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main', mb: 1, display: 'block' }}>
+                    HintHARD (3 lives)
+                  </Typography>
+                  <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{HintHARD}</Typography>
+                </Box>
               )}
-              {difficulty === 'MEDIUM' && wikipediaSections && wikipediaSections[0] && (
-                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{wikipediaSections[0].text.split('\n').slice(0,2).join('\n')}</Typography>
+              {difficulty === 'MEDIUM' && (
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'warning.main', mb: 1, display: 'block' }}>
+                    HintMEDIUM (2 lives)
+                  </Typography>
+                  <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{HintMEDIUM}</Typography>
+                </Box>
               )}
-              {difficulty === 'EASY' && wikipediaSections && wikipediaSections[0] && (
-                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{wikipediaSections[0].text}</Typography>
+              {difficulty === 'EASY' && (
+                <Box>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'error.main', mb: 1, display: 'block' }}>
+                    HintEASY (1 life)
+                  </Typography>
+                  <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{HintEASY}</Typography>
+                </Box>
               )}
             </Box>
           )}

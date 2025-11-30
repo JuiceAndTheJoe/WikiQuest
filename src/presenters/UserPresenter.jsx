@@ -16,6 +16,10 @@ function UserPresenter({ level, highScore, lives, inGame, correctCount, onStartN
     navigate('/level');
   }, [onContinue, navigate]);
 
+  const handleViewLeaderboard = useCallback(() => {
+    navigate('/leaderboard');
+  }, [navigate]);
+
   return (
     <UserView
       level={level}
@@ -27,6 +31,7 @@ function UserPresenter({ level, highScore, lives, inGame, correctCount, onStartN
       onContinue={handleContinue}
       user={user}
       onLogout={onLogout}
+      onViewLeaderboard={handleViewLeaderboard}
     />
   );
 }

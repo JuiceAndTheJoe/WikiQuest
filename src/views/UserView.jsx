@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 
-function UserView({ level, highScore, lives, inGame, correctCount, onStartNew, onContinue, user, onLogout }) {
+function UserView({ level, highScore, lives, inGame, correctCount, onStartNew, onContinue, user, onLogout, onViewLeaderboard = () => {} }) {
   return (
     <Paper sx={{ p: 3, maxWidth: 820, m: '2rem auto' }} elevation={2}>
       <Stack spacing={2}>
@@ -23,6 +23,7 @@ function UserView({ level, highScore, lives, inGame, correctCount, onStartNew, o
         <Stack direction="row" spacing={1}>
           <Button variant="contained" color="primary" onClick={onStartNew}>Start New Game</Button>
           <Button variant="outlined" color="secondary" onClick={onContinue} disabled={!inGame}>Continue</Button>
+          <Button variant="outlined" color="info" onClick={onViewLeaderboard}>View Leaderboard</Button>
         </Stack>
       </Stack>
     </Paper>

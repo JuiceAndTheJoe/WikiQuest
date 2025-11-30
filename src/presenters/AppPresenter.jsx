@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import HomePresenter from "./HomePresenter";
 import UserContainer from "./UserContainer";
 import LevelContainer from "./LevelContainer";
+import LeaderboardContainer from "./LeaderboardContainer";
 import LoginPresenter from "./LoginPresenter";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
@@ -72,6 +73,16 @@ function AppPresenter({
           element={
             user ? (
               <LevelContainer />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            user ? (
+              <LeaderboardContainer />
             ) : (
               <Navigate to="/login" replace />
             )
