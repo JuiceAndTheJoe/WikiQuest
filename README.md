@@ -34,7 +34,7 @@ npm run dev
 - **Routing**: React Router v6
 - **Backend**: Firebase (Auth + Firestore)
 - **Styling**: Emotion (MUI's CSS-in-JS solution)
-- **External APIs**: Wikipedia REST API (multi-source integration)
+- **External APIs**: Wikipedia REST API (summary endpoint)
 
 ## Architecture
 
@@ -73,7 +73,7 @@ Firebase is pre-configured in `src/firebaseConfig.js`. The app connects to:
 - **Project ID**: `iprog-project-c443f`
 - **Services**: Authentication (Email/Password), Firestore Database
 - **Authentication Flow**: Managed via `authSlice.js` with `onAuthStateChanged` listener
-- **User Data**: Stored per-user in Firestore at `users/{userId}/metrics/clicks`
+- **User Data**: Stored per-user in Firestore at `users/{userId}` (aggregate stats, leaderboard info)
 
 ## Project Structure
 
@@ -87,10 +87,10 @@ src/
 │   ├── features/
 │   │   ├── auth/
 │   │   │   └── authSlice.js        # Authentication state & thunks
-│   │   ├── ui/
-│   │   │   └── uiSlice.js          # UI state slice
+│   │   ├── game/
+│   │   │   └── gameSlice.js        # Game logic, levels, leaderboard data
 │   │   └── wikipedia/
-│   │       └── wikipediaSlice.js   # Wikipedia data state & thunks
+│   │       └── wikipediaSlice.js   # Wikipedia summary state & thunk
 │   └── middleware/
 │       └── persistenceMiddleware.js # Auto-persist state to Firebase
 ├── components/
@@ -98,11 +98,17 @@ src/
 ├── presenters/
 │   ├── AppContainer.jsx            # Redux-connected container
 │   ├── AppPresenter.jsx            # Routing logic
+│   ├── GameContainer.jsx           # Game state + Wikipedia sync
 │   ├── HomePresenter.jsx           # Presenter for HomeView (UI state + prop composition)
+│   ├── LeaderboardContainer.jsx    # Fetch & present leaderboard
+│   ├── ResultsContainer.jsx        # Present last game summary
 │   └── LoginPresenter.jsx          # Presenter for LoginView (form state + handlers)
 ├── views/
+│   ├── GameView.jsx                # Active quiz interface
 │   ├── HomeView.jsx                # Authenticated home view
-│   └── LoginView.jsx               # Login/registration view
+│   ├── LeaderboardView.jsx         # Global leaderboard UI
+│   ├── LoginView.jsx               # Login/registration view
+│   └── ResultsView.jsx             # Game over summary
 ├── styles/
 │   └── theme.js                    # Material UI theme
 ├── firebaseConfig.js               # Firebase initialization
@@ -118,8 +124,7 @@ src/
 - All state changes that need persistence go through Redux middleware
 - No direct Firebase calls in components or slices
 - External API calls centralized in model files (`mediaWikiModel.js`)
-- Wikipedia API integration fetches page summaries and full HTML content
-- HTML content parsed to plain text in slice layer for safe state storage
+- Wikipedia API integration relies solely on the summary endpoint for lightweight hints
 
 ## Grade A Target
 
@@ -132,11 +137,10 @@ This project follows DH2642 grade A requirements:
 - ✅ Authentication-gated persistence (Firebase Auth with email/password)
 - ✅ Auth state listener (`onAuthStateChanged` in `authSlice.js`)
 - ✅ Protected routes (redirect to `/login` if not authenticated)
-- ✅ User-specific data storage (`users/{userId}/metrics/clicks`)
+- ✅ User-specific data storage (`users/{userId}` documents with stats/leaderboard fields)
 - ✅ Loading states and error handling (auth errors, UI loading states)
 - ✅ Form validation (email/password requirements in LoginView)
-- ✅ Multi-source API integration (Wikipedia REST API in `mediaWikiModel.js`)
-- ✅ Wikipedia page data displayed in HomeView with summary and parsed content
+- ✅ External API integration (Wikipedia REST API summary data surfaced in `GamePresenter`)
 - 🔄 Live updates via `onSnapshot` (subscribe functions ready, not yet connected)
 - 🔄 User consultation documentation (to be added)
 

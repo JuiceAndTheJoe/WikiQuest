@@ -23,25 +23,24 @@
 ## 3. State & Side Effects Rules
 
 - Reducers must remain pure; **no direct Firestore calls inside slices or components**.
-- Remote reads use `createAsyncThunk` (example: `fetchGetStartedClicks` in `uiSlice.js`).
-- Remote writes/persistence occur in `persistenceMiddleware.js` after actions mutate state (example: persisting on `getStartedClicked` and `resetGetStarted`).
+- Remote reads use `createAsyncThunk` (example: `fetchLeaderboard` in `gameSlice.js`).
+- Remote writes/persistence occur in `persistenceMiddleware.js` after actions mutate state (example: persisting `lastGameResult` summaries to Firestore).
 - Disable serializable check already configured (Firestore snapshots may include non-serializable data).
 - **Live updates (grade A+)**: Use `onSnapshot` subscriptions in `firestoreModel.js` to dispatch actions when remote data changes. Users running multiple app instances see the same data in real-time.
 
 ## 4. Firestore Usage Pattern (Grade A Requirements)
 
-- All Firestore document logic lives in `firestoreModel.js` (e.g., `getGetStartedClicks`, `setGetStartedClicks`, `subscribeGetStartedClicks`).
+- All Firestore document logic lives in `firestoreModel.js` (e.g., `saveGameResult`, `getLeaderboard`, `saveUserData`).
 - **Authentication required**: All persisted data must be separated per authenticated user. Use Firebase Auth (`src/firebaseConfig.js`) to get user ID.
-- User-specific data: `users/{userId}/metrics/clicks` collection (currently implemented). Pattern: `users/{userId}/...` for other user data.
-- **Live updates**: `subscribe*` functions implemented using `onSnapshot` for real-time sync (e.g., `subscribeGetStartedClicks`). Ready to connect to Redux via container components.
+- User-specific data: `users/{userId}` documents store aggregated stats (`gamesPlayed`, `totalScore`, `accuracy`, etc.). Pattern: `users/{userId}/...` for related collections if needed.
+- **Live updates**: `subscribe*` functions implemented using `onSnapshot` for real-time sync. Ready to connect to Redux via container components.
 - **Current Firestore functions**:
-  - `getGetStartedClicks(userId)` - Read clicks count
-  - `setGetStartedClicks(userId, count)` - Write clicks count
-  - `subscribeGetStartedClicks(userId, callback)` - Real-time updates
+  - `saveGameResult(userId, summary, profile)` - Transactionally updates leaderboard aggregates per user
+  - `getLeaderboard(maxCount)` - Reads global leaderboard ordered by `highScore`
   - `saveUserData(userId, data)` - Generic user data save
   - `getUserData(userId)` - Generic user data read
   - `subscribeToUserData(userId, callback)` - Generic user data subscription
-- **Multi-source APIs (grade A+)**: When mashing up data from multiple external APIs, centralize each API client in separate model files (e.g., `externalApiModel.js`). **Currently implemented**: `mediaWikiModel.js` provides Wikipedia REST API integration with functions for fetching page summaries, full HTML content, and search results.
+- **External APIs**: Centralize every integration inside dedicated model files (e.g., `mediaWikiModel.js`). Current Wikipedia usage relies solely on the lightweight summary endpoint for hints; add additional sources only when there is a clear UX requirement.
 - **Collaborative features (grade A+)**: For shared state where user actions complement each other, handle conflicts via Firestore transactions or optimistic UI updates with rollback.
 
 ## 5. Adding a New Feature Slice (Example Steps)
@@ -54,8 +53,8 @@
 ### Current Feature Slices
 
 - **`authSlice.js`**: Manages user authentication state (`user`, `loading`, `error`, `isAuthChecked`). Includes async thunks for login, register, logout. Auth listener initialized in `AppContainer`.
-- **`uiSlice.js`**: Manages UI interactions like Get Started button clicks. Includes async thunk for fetching persisted clicks. Persistence handled via middleware.
-- **`wikipediaSlice.js`**: Manages Wikipedia page data (`pageData`, `loading`, `error`, `lastFetchedTitle`). Fetches page summary and full HTML content, parses HTML to plain text. Demonstrates multi-source API integration (Grade A requirement).
+- **`gameSlice.js`**: Owns all gameplay state (levels, lives, scores, hints, per-question logs, leaderboard data). Async thunks fetch leaderboard data; reducers stay pure while middleware handles persistence.
+- **`wikipediaSlice.js`**: Manages Wikipedia summary data (`pageData`, `loading`, `error`). Fetches a single summary payload; presenters split/redact sentences as needed for hints.
 
 ## 6. Presenter / View Convention
 
@@ -83,21 +82,21 @@
 
 ## 9. Example Data Flow
 
-### Get Started Button Flow
-
-User clicks button → `getStartedClicked` reducer increments counter → middleware sees action, persists new count via `setGetStartedClicks` → on page load `fetchGetStartedClicks` thunk retrieves persisted count → state updates → view re-renders.
-
 ### Authentication Flow
 
-App mounts → `initAuthListener` called in `AppContainer` → `onAuthStateChanged` listener fires → `setUser` action dispatched → auth state updated → routes re-render based on `user` state → if authenticated, `fetchGetStartedClicks` thunk dispatched with `userId` → user-specific data loaded.
+App mounts → `initAuthListener` called in `AppContainer` → `onAuthStateChanged` listener fires → `setUser` action dispatched → auth state updated → routes re-render based on `user` state → once authenticated, containers dispatch any required thunks (e.g., `fetchLeaderboard`) using the signed-in user's ID.
 
 ### Login/Registration Flow
 
-User submits form → `LoginView` calls `onLogin`/`onRegister` → `AppContainer` dispatches `loginUser`/`registerUser` thunk → Firebase Auth API called → on success, user object stored in Redux → `onAuthStateChanged` listener fires → routes redirect to home → user-specific data fetched.
+User submits form → `LoginView` calls `onLogin`/`onRegister` → `AppContainer` dispatches `loginUser`/`registerUser` thunk → Firebase Auth API called → on success, user object stored in Redux → `onAuthStateChanged` listener fires → routes redirect to home → containers load user-specific data (leaderboard, saved progress) as needed.
+
+### Game & Leaderboard Flow
+
+User starts a run → `startNewGame` initializes level/lives and requests Wikipedia data for the first celeb via `GameContainer` → each guess dispatches `submitGuess`, which records per-question stats (`scoreDelta`, `hintsUsed`) while keeping reducers pure → when the run ends (`lives` reach 0), `gameSlice` stores `lastGameResult`; middleware detects the new summary and calls `saveGameResult` to update the global leaderboard → `fetchLeaderboard` loads the latest global rankings for `LeaderboardPresenter`.
 
 ### Wikipedia API Flow
 
-App mounts → `AppContainer` dispatches `fetchWikipediaPage` thunk → `getPageSummary` and `getPageContent` called in `mediaWikiModel.js` → Wikipedia REST API returns JSON summary and HTML content → HTML parsed to plain text in slice using `stripHtml()` → state updates with `{ summary, contentText }` → `HomeView` renders Wikipedia data with loading/error states.
+App mounts → `AppContainer` dispatches `fetchWikipediaPage` thunk → `getPageSummary` called in `mediaWikiModel.js` → Wikipedia REST API returns JSON summary data → state updates with `{ summary }` → presenters derive any hint text locally before passing it to the views.
 
 ## 10. Debugging & Tooling
 
