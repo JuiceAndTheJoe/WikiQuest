@@ -20,15 +20,15 @@ import {
   TableRow,
   Avatar,
   Chip,
-  CircularProgress
-} from '@mui/material';
+  CircularProgress,
+} from "@mui/material";
 import {
   ArrowBack,
   EmojiEvents,
   TrendingUp,
   Person,
-  Refresh
-} from '@mui/icons-material';
+  Refresh,
+} from "@mui/icons-material";
 
 function LeaderboardView({
   leaderboardData,
@@ -37,23 +37,31 @@ function LeaderboardView({
   userRank,
   currentUser,
   onBackToMenu,
-  onRefresh
+  onRefresh,
 }) {
   const getRankIcon = (rank) => {
     switch (rank) {
-      case 1: return '🥇';
-      case 2: return '🥈';
-      case 3: return '🥉';
-      default: return `#${rank}`;
+      case 1:
+        return "🥇";
+      case 2:
+        return "🥈";
+      case 3:
+        return "🥉";
+      default:
+        return `#${rank}`;
     }
   };
 
   const getRankColor = (rank) => {
     switch (rank) {
-      case 1: return 'warning.main'; // Gold
-      case 2: return 'grey.500';     // Silver
-      case 3: return 'error.main';   // Bronze
-      default: return 'text.primary';
+      case 1:
+        return "warning.main"; // Gold
+      case 2:
+        return "grey.500"; // Silver
+      case 3:
+        return "error.main"; // Bronze
+      default:
+        return "text.primary";
     }
   };
 
@@ -61,9 +69,17 @@ function LeaderboardView({
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Stack spacing={4}>
         {/* Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <Typography variant="h3" component="h1">
-            <EmojiEvents sx={{ fontSize: 'inherit', mr: 1, color: 'warning.main' }} />
+            <EmojiEvents
+              sx={{ fontSize: "inherit", mr: 1, color: "warning.main" }}
+            />
             Leaderboard
           </Typography>
           <Stack direction="row" spacing={2}>
@@ -87,21 +103,22 @@ function LeaderboardView({
 
         {/* User's Current Rank */}
         {userRank && (
-          <Card elevation={2} sx={{ bgcolor: 'primary.light', color: 'primary.contrastText' }}>
+          <Card
+            elevation={2}
+            sx={{ bgcolor: "primary.light", color: "primary.contrastText" }}
+          >
             <CardContent>
               <Stack direction="row" spacing={2} alignItems="center">
-                <Avatar sx={{ bgcolor: 'primary.main' }}>
+                <Avatar sx={{ bgcolor: "primary.main" }}>
                   <Person />
                 </Avatar>
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="h6">
-                    Your Current Rank
-                  </Typography>
+                  <Typography variant="h6">Your Current Rank</Typography>
                   <Typography variant="body2">
-                    {currentUser?.email || 'You'}
+                    {currentUser?.email || "You"}
                   </Typography>
                 </Box>
-                <Box sx={{ textAlign: 'right' }}>
+                <Box sx={{ textAlign: "right" }}>
                   <Typography variant="h4" fontWeight="bold">
                     {getRankIcon(userRank.rank)}
                   </Typography>
@@ -116,7 +133,7 @@ function LeaderboardView({
 
         {/* Loading State */}
         {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
             <Stack alignItems="center" spacing={2}>
               <CircularProgress size={48} />
               <Typography variant="body1" color="text.secondary">
@@ -128,13 +145,18 @@ function LeaderboardView({
 
         {/* Error State */}
         {error && (
-          <Card elevation={2} sx={{ bgcolor: 'error.light', color: 'error.contrastText' }}>
+          <Card
+            elevation={2}
+            sx={{ bgcolor: "error.light", color: "error.contrastText" }}
+          >
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Unable to load leaderboard
               </Typography>
               <Typography variant="body2">
-                {error.message || 'Please try again later'}
+                {typeof error === "string"
+                  ? error
+                  : error.message || "Please try again later"}
               </Typography>
             </CardContent>
           </Card>
@@ -146,32 +168,46 @@ function LeaderboardView({
             <CardContent sx={{ p: 0 }}>
               <TableContainer component={Paper} elevation={0}>
                 <Table>
-                  <TableHead sx={{ bgcolor: 'grey.100' }}>
+                  <TableHead sx={{ bgcolor: "grey.600" }}>
                     <TableRow>
-                      <TableCell><strong>Rank</strong></TableCell>
-                      <TableCell><strong>Player</strong></TableCell>
-                      <TableCell align="right"><strong>High Score</strong></TableCell>
-                      <TableCell align="right"><strong>Games Played</strong></TableCell>
-                      <TableCell align="right"><strong>Avg Score</strong></TableCell>
-                      <TableCell align="right"><strong>Accuracy</strong></TableCell>
+                      <TableCell>
+                        <strong>Rank</strong>
+                      </TableCell>
+                      <TableCell>
+                        <strong>Player</strong>
+                      </TableCell>
+                      <TableCell align="right">
+                        <strong>High Score</strong>
+                      </TableCell>
+                      <TableCell align="right">
+                        <strong>Games Played</strong>
+                      </TableCell>
+                      <TableCell align="right">
+                        <strong>Avg Score</strong>
+                      </TableCell>
+                      <TableCell align="right">
+                        <strong>Accuracy</strong>
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {leaderboardData.map((player, index) => {
                       const rank = index + 1;
                       const isCurrentUser = player.email === currentUser?.email;
-                      
+
                       return (
-                        <TableRow 
+                        <TableRow
                           key={player.id || index}
-                          sx={{ 
-                            bgcolor: isCurrentUser ? 'action.selected' : 'inherit',
-                            '&:hover': { bgcolor: 'action.hover' }
+                          sx={{
+                            bgcolor: isCurrentUser
+                              ? "action.selected"
+                              : "inherit",
+                            "&:hover": { bgcolor: "action.hover" },
                           }}
                         >
                           <TableCell>
-                            <Typography 
-                              variant="h6" 
+                            <Typography
+                              variant="h6"
                               fontWeight="bold"
                               color={getRankColor(rank)}
                             >
@@ -179,32 +215,61 @@ function LeaderboardView({
                             </Typography>
                           </TableCell>
                           <TableCell>
-                            <Stack direction="row" spacing={2} alignItems="center">
-                              <Avatar sx={{ bgcolor: 'primary.main', width: 32, height: 32 }}>
-                                {player.name ? player.name.charAt(0) : <Person />}
+                            <Stack
+                              direction="row"
+                              spacing={2}
+                              alignItems="center"
+                            >
+                              <Avatar
+                                sx={{
+                                  bgcolor: "primary.main",
+                                  width: 32,
+                                  height: 32,
+                                }}
+                              >
+                                {player.name ? (
+                                  player.name.charAt(0)
+                                ) : (
+                                  <Person />
+                                )}
                               </Avatar>
                               <Box>
-                                <Typography variant="body2" fontWeight={isCurrentUser ? 'bold' : 'normal'}>
-                                  {player.name || player.email || `Player ${rank}`}
+                                <Typography
+                                  variant="body2"
+                                  fontWeight={isCurrentUser ? "bold" : "normal"}
+                                >
+                                  {player.name ||
+                                    player.email ||
+                                    `Player ${rank}`}
                                   {isCurrentUser && (
-                                    <Chip 
-                                      label="You" 
-                                      size="small" 
-                                      color="primary" 
+                                    <Chip
+                                      label="You"
+                                      size="small"
+                                      color="primary"
                                       sx={{ ml: 1 }}
                                     />
                                   )}
                                 </Typography>
                                 {player.lastPlayed && (
-                                  <Typography variant="caption" color="text.secondary">
-                                    Last played: {new Date(player.lastPlayed).toLocaleDateString()}
+                                  <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                  >
+                                    Last played:{" "}
+                                    {new Date(
+                                      player.lastPlayed
+                                    ).toLocaleDateString()}
                                   </Typography>
                                 )}
                               </Box>
                             </Stack>
                           </TableCell>
                           <TableCell align="right">
-                            <Typography variant="h6" fontWeight="bold" color="warning.main">
+                            <Typography
+                              variant="h6"
+                              fontWeight="bold"
+                              color="warning.main"
+                            >
                               {player.highScore?.toLocaleString() || 0}
                             </Typography>
                           </TableCell>
@@ -219,12 +284,15 @@ function LeaderboardView({
                             </Typography>
                           </TableCell>
                           <TableCell align="right">
-                            <Chip 
+                            <Chip
                               label={`${Math.round(player.accuracy || 0)}%`}
                               size="small"
                               color={
-                                (player.accuracy || 0) >= 80 ? 'success' :
-                                (player.accuracy || 0) >= 60 ? 'warning' : 'error'
+                                (player.accuracy || 0) >= 80
+                                  ? "success"
+                                  : (player.accuracy || 0) >= 60
+                                  ? "warning"
+                                  : "error"
                               }
                             />
                           </TableCell>
@@ -239,27 +307,32 @@ function LeaderboardView({
         )}
 
         {/* Empty State */}
-        {leaderboardData && leaderboardData.length === 0 && !loading && (
-          <Card elevation={2}>
-            <CardContent sx={{ textAlign: 'center', py: 6 }}>
-              <TrendingUp sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h5" gutterBottom>
-                No rankings yet
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Be the first to set a high score!
-              </Typography>
-            </CardContent>
-          </Card>
-        )}
+        {leaderboardData &&
+          leaderboardData.length === 0 &&
+          !loading &&
+          !error && (
+            <Card elevation={2}>
+              <CardContent sx={{ textAlign: "center", py: 6 }}>
+                <TrendingUp
+                  sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
+                />
+                <Typography variant="h5" gutterBottom>
+                  No rankings yet
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Be the first to set a high score!
+                </Typography>
+              </CardContent>
+            </Card>
+          )}
 
         {/* Stats Summary */}
         {leaderboardData && leaderboardData.length > 0 && (
-          <Paper elevation={1} sx={{ p: 3, bgcolor: 'background.default' }}>
+          <Paper elevation={1} sx={{ p: 3, bgcolor: "background.default" }}>
             <Typography variant="h6" gutterBottom>
               Community Statistics
             </Typography>
-            <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+            <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
               <Box>
                 <Typography variant="body2" color="text.secondary">
                   Total Players
@@ -273,7 +346,9 @@ function LeaderboardView({
                   Highest Score
                 </Typography>
                 <Typography variant="h5" fontWeight="bold" color="warning.main">
-                  {Math.max(...leaderboardData.map(p => p.highScore || 0)).toLocaleString()}
+                  {Math.max(
+                    ...leaderboardData.map((p) => p.highScore || 0)
+                  ).toLocaleString()}
                 </Typography>
               </Box>
               <Box>
@@ -281,7 +356,9 @@ function LeaderboardView({
                   Total Games Played
                 </Typography>
                 <Typography variant="h5" fontWeight="bold">
-                  {leaderboardData.reduce((sum, p) => sum + (p.gamesPlayed || 0), 0).toLocaleString()}
+                  {leaderboardData
+                    .reduce((sum, p) => sum + (p.gamesPlayed || 0), 0)
+                    .toLocaleString()}
                 </Typography>
               </Box>
               <Box>
@@ -289,7 +366,13 @@ function LeaderboardView({
                   Average Accuracy
                 </Typography>
                 <Typography variant="h5" fontWeight="bold">
-                  {Math.round(leaderboardData.reduce((sum, p) => sum + (p.accuracy || 0), 0) / leaderboardData.length)}%
+                  {Math.round(
+                    leaderboardData.reduce(
+                      (sum, p) => sum + (p.accuracy || 0),
+                      0
+                    ) / leaderboardData.length
+                  )}
+                  %
                 </Typography>
               </Box>
             </Box>

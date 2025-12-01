@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { connect } from 'react-redux';
-import LeaderboardPresenter from './LeaderboardPresenter';
-import { fetchLeaderboard } from '../app/features/game/gameSlice';
+import { useEffect } from "react";
+import { connect } from "react-redux";
+import LeaderboardPresenter from "./LeaderboardPresenter";
+import { fetchLeaderboard } from "../app/features/game/gameSlice";
 
 const LeaderboardContainer = (props) => {
   const { fetchLeaderboard } = props;
@@ -16,6 +16,7 @@ const LeaderboardContainer = (props) => {
 const mapState = (state) => {
   const g = state.game || {};
   return {
+    user: state.auth.user,
     leaderboardData: g.leaderboardData || [],
     loading: g.leaderboardLoading || false,
     error: g.leaderboardError || null,

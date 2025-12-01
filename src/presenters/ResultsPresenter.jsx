@@ -1,70 +1,35 @@
 import { useNavigate } from "react-router-dom";
-import ResultsView from "../views/resultsView";
+import ResultsView from "../views/ResultsView";
 
 // Presenter for ResultsView: manages game results and navigation
 function ResultsPresenter({
-  user,
-  onLogout,
+  gameStats,
+  gameHistory,
+  userStats,
+  newHighScore,
+  onStartNewGame,
 }) {
   const navigate = useNavigate();
-
-  // Mock game stats - will connect to model later
-  const gameStats = {
-    score: 350,
-    totalQuestions: 4,
-    correctAnswers: 3,
-    streak: 2,
-    gameTime: 125000, // 2 minutes 5 seconds in ms
-    difficulty: "easy"
+  const safeGameStats = gameStats || {
+    score: 0,
+    totalQuestions: 0,
+    correctAnswers: 0,
+    streak: 0,
+    gameTime: 0,
+    difficulty: "easy",
   };
-
-  // Mock game history
-  const gameHistory = [
-    {
-      question: "Albert Einstein",
-      userAnswer: "Albert Einstein",
-      correct: true,
-      score: 100,
-      timeSpent: 25000,
-      hintsUsed: 0
-    },
-    {
-      question: "Marie Curie", 
-      userAnswer: "Marie Curie",
-      correct: true,
-      score: 120,
-      timeSpent: 20000,
-      hintsUsed: 1
-    },
-    {
-      question: "Leonardo da Vinci",
-      userAnswer: "Leonardo da Vinci", 
-      correct: true,
-      score: 130,
-      timeSpent: 18000,
-      hintsUsed: 0
-    },
-    {
-      question: "William Shakespeare",
-      userAnswer: "Charles Dickens",
-      correct: false,
-      score: 0,
-      timeSpent: 45000,
-      hintsUsed: 2
-    }
-  ];
-
-  // Mock user stats
-  const userStats = {
-    gamesPlayed: 15,
-    highScore: 420,
-    totalScore: 2850,
-    averageScore: 190
+  const safeHistory = Array.isArray(gameHistory) ? gameHistory : [];
+  const safeUserStats = userStats || {
+    gamesPlayed: 0,
+    highScore: 0,
+    totalScore: 0,
+    averageScore: 0,
   };
-
-  const newHighScore = gameStats.score > userStats.highScore;
 
   const handlePlayAgain = () => {
+    if (typeof onStartNewGame === "function") {
+      onStartNewGame();
+    }
     navigate("/game");
   };
 
@@ -78,9 +43,9 @@ function ResultsPresenter({
 
   return (
     <ResultsView
-      gameStats={gameStats}
-      gameHistory={gameHistory}
-      userStats={userStats}
+      gameStats={safeGameStats}
+      gameHistory={safeHistory}
+      userStats={safeUserStats}
       onPlayAgain={handlePlayAgain}
       onViewLeaderboard={handleViewLeaderboard}
       onBackToMenu={handleBackToMenu}

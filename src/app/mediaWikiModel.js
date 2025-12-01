@@ -44,38 +44,3 @@ export async function getPageSummary(title, signal) {
     }
 }
 
-/**
- * Fetch full page content from Wikipedia using HTML endpoint
- * @param {string} title - The title of the Wikipedia page
- * @returns {Promise<string>} Raw HTML content
- */
-export async function getPageContent(title, signal) {
-    try {
-        const encodedTitle = encodeURIComponent(title);
-        // Use the /page/html endpoint which returns HTML text
-        const url = `${WIKIPEDIA_API_BASE}/page/html/${encodedTitle}`;
-        const htmlContent = await apiCall(url, false, signal); // Don't parse as JSON, return raw HTML
-        return htmlContent;
-    } catch (error) {
-        console.error('Error fetching Wikipedia page content:', error);
-        throw error;
-    }
-}
-
-/**
- * Search Wikipedia pages
- * @param {string} query - Search query
- * @param {number} limit - Maximum number of results
- * @returns {Promise<Object>} Search results
- */
-export async function searchPages(query, limit = 10, signal) {
-    try {
-        const encodedQuery = encodeURIComponent(query);
-        const url = `${WIKIPEDIA_API_BASE}/page/search/${encodedQuery}?limit=${limit}`;
-        const data = await apiCall(url, true, signal);
-        return data;
-    } catch (error) {
-        console.error('Error searching Wikipedia:', error);
-        throw error;
-    }
-}

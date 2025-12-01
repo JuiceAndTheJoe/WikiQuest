@@ -1,36 +1,19 @@
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeView from "../views/HomeView";
 
 // Presenter for MenuView: manages navigation and user stats
-function HomePresenter({
-  user,
-  onLogout,
-  clickCount,
-}) {
+function HomePresenter({ user, userStats, onStartGame, onLogout }) {
   const navigate = useNavigate();
 
-  // Mock user stats for now - will connect to model later
-  const userStats = {
-    gamesPlayed: 0,
-    highScore: 0,
-    totalScore: 0
-  };
-
-  const handleStartGame = () => {
+  const handleStartGame = useCallback(() => {
+    onStartGame?.();
     navigate("/game");
-  };
+  }, [onStartGame, navigate]);
 
-  const { summary, contentText, contentSections } = useMemo(() => {
-    return {
-      summary: wikipediaData?.summary || null,
-      contentText: wikipediaData?.contentText || null,
-      contentSections: wikipediaData?.contentSections || null,
-    };
-  }, [wikipediaData]);
-
-  const handleViewLeaderboard = () => {
+  const handleViewLeaderboard = useCallback(() => {
     navigate("/leaderboard");
-  };
+  }, [navigate]);
 
   return (
     <HomeView

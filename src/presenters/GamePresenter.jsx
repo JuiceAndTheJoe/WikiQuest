@@ -1,78 +1,107 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import GameView from "../views/gameView";
+import GameView from "../views/GameView";
+
+const removeDiacritics = (value) =>
+  value ? value.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : value;
+
+const redactWord = (value) => value.replace(/[^\s]/g, "_");
+
+const stripNameFromText = (text, name) => {
+  if (!text) return "";
+  const normalized = removeDiacritics(text);
+  if (!name) return normalized;
+  const parts = name.replace(/_/g, " ").split(/\s+/).filter(Boolean);
+  let sanitized = normalized;
+  for (const part of parts) {
+    const re = new RegExp(
+      `\\b${part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+      "giu"
+    );
+    sanitized = sanitized.replace(re, (match) => redactWord(match));
+  }
+  return sanitized.replace(/\s{2,}/g, " ").trim();
+};
+
+const splitIntoSentences = (text) => {
+  if (!text) return [];
+  const sentences = text.replace(/\s+/g, " ").match(/[^.!?]+[.!?]?/g);
+  return sentences
+    ? sentences.map((sentence) => sentence.trim()).filter(Boolean)
+    : [];
+};
+
+const computeRevealCount = (hintsUsed, totalSentences) => {
+  if (!totalSentences || hintsUsed <= 0) return 0;
+  if (hintsUsed === 1) return Math.min(1, totalSentences);
+  if (hintsUsed === 2) return Math.min(2, totalSentences);
+  return totalSentences;
+};
 
 // Presenter for GameView: manages game logic and Wikipedia data
 function GamePresenter({
-  user,
-  onLogout,
   wikipediaData,
   wikipediaLoading,
   wikipediaError,
+  currentQuestion,
+  gameState,
+  hints,
+  lastResult,
+  onSubmitGuess,
+  onUseHint,
+  onNextQuestion,
+  gameStatus,
 }) {
   const navigate = useNavigate();
-  const [showFullText, setShowFullText] = useState(false);
   const [userGuess, setUserGuess] = useState("");
-  const [lastResult, setLastResult] = useState(null);
 
-  // Mock game state - will connect to model later
-  const gameState = {
-    score: 0,
-    streak: 0,
-    lives: 3,
-    totalQuestions: 0,
-    correctAnswers: 0
+  useEffect(() => {
+    if (gameStatus === "game_over") {
+      navigate("/results");
+    }
+  }, [gameStatus, navigate]);
+
+  const handleGuessChange = (guess) => setUserGuess(guess);
+
+  const handleSubmitGuess = () => {
+    if (!userGuess?.trim()) return;
+    onSubmitGuess(userGuess.trim());
+    setUserGuess("");
   };
 
-  // Mock current question
-  const currentQuestion = {
-    person: "Albert Einstein",
-    correctAnswer: "Albert Einstein"
+  const handleUseHint = () => {
+    if (!summarySentences.length) return;
+    if (hints?.usedHints >= hints?.availableHints) return;
+    onUseHint();
   };
 
-  // Mock hints
-  const hints = {
-    availableHints: 5,
-    usedHints: 0,
-    currentHints: []
+  const handleNextQuestion = () => {
+    onNextQuestion();
+    setUserGuess("");
   };
 
-  const { summary, contentText } = useMemo(() => {
+  const { summary } = useMemo(() => {
     return {
       summary: wikipediaData?.summary || null,
-      contentText: wikipediaData?.contentText || null,
     };
   }, [wikipediaData]);
 
-  const handleToggleFullText = () => setShowFullText((s) => !s);
-  
-  const handleGuessChange = (guess) => setUserGuess(guess);
-  
-  const handleSubmitGuess = () => {
-    // Mock guess validation - will connect to model later
-    const correct = userGuess.toLowerCase().includes("einstein");
-    setLastResult({
-      correct,
-      correctAnswer: currentQuestion.correctAnswer,
-      finalScore: correct ? 100 : 0,
-      partialMatch: false
-    });
-    setUserGuess("");
-    
-    // Navigate to results if game over
-    if (!correct) {
-      setTimeout(() => navigate("/results"), 2000);
-    }
-  };
-  
-  const handleUseHint = () => {
-    // Mock hint usage - will connect to model later
-    console.log("Using hint");
-  };
-  
-  const handleNextQuestion = () => {
-    navigate("/results");
-  };
+  const sanitizedSummaryText = useMemo(() => {
+    if (!currentQuestion || !summary?.extract) return "";
+    return stripNameFromText(summary.extract, currentQuestion.person);
+  }, [summary, currentQuestion]);
+
+  const summarySentences = useMemo(() => {
+    return splitIntoSentences(sanitizedSummaryText);
+  }, [sanitizedSummaryText]);
+
+  const revealedSummarySentences = useMemo(() => {
+    const revealCount = computeRevealCount(
+      hints?.usedHints || 0,
+      summarySentences.length
+    );
+    return summarySentences.slice(0, revealCount);
+  }, [summarySentences, hints?.usedHints]);
 
   return (
     <GameView
@@ -86,12 +115,11 @@ function GamePresenter({
       onNextQuestion={handleNextQuestion}
       lastResult={lastResult}
       wikipediaSummary={summary}
-      wikipediaContentText={contentText}
+      revealedSummarySentences={revealedSummarySentences}
+      totalSummarySentences={summarySentences.length}
+      hintsUsed={hints?.usedHints || 0}
       wikipediaLoading={wikipediaLoading}
       wikipediaError={wikipediaError}
-      showFullText={showFullText}
-      onToggleFullText={handleToggleFullText}
-      loading={false}
     />
   );
 }
