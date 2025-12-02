@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { MAX_HINTS_PER_QUESTION } from '../app/features/game/gameConstants';
+import {
+  MAX_HINTS_PER_QUESTION,
+  MAX_LIVES,
+} from '../app/features/game/gameConstants';
 import {
   continueGame,
   startNewGame,
@@ -62,7 +65,7 @@ const mapState = (state) => {
   const gameState = {
     score: g.score ?? Math.max(0, (g.level || 1) - 1),
     streak: g.streak || 0,
-    lives: typeof g.lives === "number" ? g.lives : 3,
+    lives: typeof g.lives === 'number' ? g.lives : MAX_LIVES,
     totalQuestions: g.totalQuestions || 0,
     correctAnswers: g.correctAnswers ?? g.correctCount ?? 0,
   };
