@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { startNewGame } from '../app/features/game/gameSlice';
-import { getDifficulty } from '../util/difficulty';
+import { getDifficulty } from '../app/features/game/gameUtils';
 import ResultsPresenter from './ResultsPresenter';
 
 const mapState = (state) => {

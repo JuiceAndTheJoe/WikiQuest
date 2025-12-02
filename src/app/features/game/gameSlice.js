@@ -1,6 +1,4 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getDifficulty } from '../../../util/difficulty';
-import { EasyCelebs, HardCelebs, MediumCelebs } from '../../game/celebs';
 import { getLeaderboard } from '../../models/leaderboardModel';
 import {
   BASE_SCORE,
@@ -10,42 +8,14 @@ import {
   MIN_SCORE,
   WRONG_ANSWER_PENALTY,
 } from './gameConstants';
-
-function pickRandom(arr) {
-  if (!arr || arr.length === 0) return null;
-  const i = Math.floor(Math.random() * arr.length);
-  return arr[i];
-}
-
-function poolForLevel(level) {
-  const difficulty = getDifficulty(level);
-  if (difficulty === 'HARD') return HardCelebs;
-  if (difficulty === 'MEDIUM') return MediumCelebs;
-  return EasyCelebs;
-}
-
-function formatCelebDisplayName(value) {
-  return String(value || '')
-    .replace(/_/g, ' ')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-}
-
-function buildRunSummary(state) {
-  return {
-    finalScore: state.score || 0,
-    levelReached: Math.max(0, (state.level || 1) - 1),
-    highScore: state.highScore || 0,
-    totalQuestions: state.totalQuestions || 0,
-    correctAnswers: state.correctAnswers || state.correctCount || 0,
-    streak: state.streak || 0,
-    bestStreak: state.bestStreak || state.streak || 0,
-    totalHintsUsed: state.totalHintsUsed || 0,
-    difficulty: getDifficulty(state.level || 1),
-    questionLog: [...(state.questionsLog || [])],
-    endedAt: Date.now(),
-  };
-}
+import {
+  buildRunSummary,
+  formatCelebDisplayName,
+  normalizeLetters,
+  pickRandom,
+  poolForLevel,
+  validateGuess,
+} from './gameUtils';
 
 export const fetchLeaderboard = createAsyncThunk(
   'game/fetchLeaderboard',
@@ -125,16 +95,9 @@ const gameSlice = createSlice({
       const guess = rawGuess.toLowerCase();
       const rawTarget = String(state.currentCeleb || '').trim();
 
-      // Helper: normalize name to letters only, remove diacritics, lowercase
-      const normalizeLetters = (s) =>
-        String(s || '')
-          .normalize('NFD')
-          .replace(/\p{Diacritic}/gu, '')
-          .replace(/[_\s\-\d\W]+/g, '')
-          .toLowerCase();
-
       const target = normalizeLetters(rawTarget);
       const guessLetters = normalizeLetters(guess);
+
       if (!state.inGame || !state.currentCeleb) {
         state.lastGuessResult = null;
         state.lastResultDetail = null;
@@ -153,30 +116,7 @@ const gameSlice = createSlice({
         return;
       }
 
-      // Determine acceptance: letter-frequency based allowance of up to 1 missing letter
-      const isAcceptableGuess = (g, t) => {
-        if (!t) return false;
-        // frequency maps
-        const freq = (str) => {
-          const m = Object.create(null);
-          for (const ch of str) {
-            m[ch] = (m[ch] || 0) + 1;
-          }
-          return m;
-        };
-        const tf = freq(t);
-        const gf = freq(g || '');
-        let deficit = 0;
-        for (const k of Object.keys(tf)) {
-          const need = tf[k];
-          const have = gf[k] || 0;
-          if (have < need) deficit += need - have;
-          if (deficit > 1) return false;
-        }
-        return true;
-      };
-
-      const correctGuess = isAcceptableGuess(guessLetters, target);
+      const correctGuess = validateGuess(guessLetters, target);
 
       const now = Date.now();
       const questionNumber = (state.totalQuestions || 0) + 1;
