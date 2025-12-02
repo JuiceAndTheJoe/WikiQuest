@@ -1,6 +1,6 @@
 // Middleware: persists select Redux changes to Firestore.
-import { saveGameResult } from '../firestoreModel';
 import { fetchLeaderboard } from '../features/game/gameSlice';
+import { saveGameResult } from '../models/leaderboardModel';
 
 let lastPersistedRunId = null;
 

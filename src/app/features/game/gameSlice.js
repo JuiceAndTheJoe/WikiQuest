@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getDifficulty } from '../../../util/difficulty';
-import { getLeaderboard } from '../../firestoreModel';
 import { EasyCelebs, HardCelebs, MediumCelebs } from '../../game/celebs';
+import { getLeaderboard } from '../../models/leaderboardModel';
 import {
   BASE_SCORE,
   HINT_PENALTY,
