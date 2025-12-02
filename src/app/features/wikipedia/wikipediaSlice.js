@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getPageSummary, getPageContent } from '../../mediaWikiModel';
-import { stripHtml, htmlToSections, cleanText } from '../../mediaWikiParser';
+import { getPageSummary } from '../../mediaWikiModel';
 
 // Async thunk for fetching Wikipedia page summary + plain-text full content
 export const fetchWikipediaPage = createAsyncThunk(
@@ -8,33 +7,7 @@ export const fetchWikipediaPage = createAsyncThunk(
     async (pageTitle, { rejectWithValue, signal }) => {
         try {
             const summary = await getPageSummary(pageTitle, signal);
-
-            let contentText = null;
-            let contentSections = null;
-            try {
-                // getPageContent now returns raw HTML string
-                const htmlContent = await getPageContent(pageTitle, signal);
-
-                // Parse the HTML to extract readable text
-                contentText = stripHtml(htmlContent);
-                // Also parse into structured sections
-                const rawSections = htmlToSections(htmlContent);
-                contentSections = rawSections.map((s) => ({
-                    heading: cleanText(s.heading),
-                    text: cleanText(s.text),
-                }));
-            } catch (err) {
-                if (err.name === 'AbortError') {
-                    // Pass through abort so caller can ignore
-                    throw err;
-                }
-                // Log and continue — summary is the primary content
-                console.warn('Failed to fetch/parse full page content', err);
-                contentText = null;
-                contentSections = null;
-            }
-
-            return { summary, contentText, contentSections };
+            return { summary };
         } catch (error) {
             if (error.name === 'AbortError') {
                 // Let createAsyncThunk handle cancellation (it sets .meta.aborted)
@@ -48,18 +21,11 @@ export const fetchWikipediaPage = createAsyncThunk(
 const wikipediaSlice = createSlice({
     name: 'wikipedia',
     initialState: {
-        pageData: null, // { summary, contentText }
+        pageData: null, // { summary }
         loading: false,
         error: null,
-        lastFetchedTitle: null,
     },
-    reducers: {
-        clearWikipediaData: (state) => {
-            state.pageData = null;
-            state.error = null;
-            state.lastFetchedTitle = null;
-        },
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
             .addCase(fetchWikipediaPage.pending, (state) => {
@@ -68,8 +34,7 @@ const wikipediaSlice = createSlice({
             })
             .addCase(fetchWikipediaPage.fulfilled, (state, action) => {
                 state.loading = false;
-                state.pageData = action.payload; // { summary, contentText }
-                state.lastFetchedTitle = action.payload.summary?.title || null;
+                state.pageData = action.payload; // { summary }
                 state.error = null;
             })
             .addCase(fetchWikipediaPage.rejected, (state, action) => {
@@ -78,13 +43,5 @@ const wikipediaSlice = createSlice({
             });
     },
 });
-
-export const { clearWikipediaData } = wikipediaSlice.actions;
-
-// Selectors
-export const selectWikipediaPageData = (state) => state.wikipedia.pageData;
-export const selectWikipediaLoading = (state) => state.wikipedia.loading;
-export const selectWikipediaError = (state) => state.wikipedia.error;
-export const selectWikipediaSections = (state) => state.wikipedia.pageData?.contentSections || null;
 
 export default wikipediaSlice.reducer;
