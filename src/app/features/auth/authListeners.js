@@ -1,5 +1,6 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../../firebaseConfig';
+import { setUser } from './authSlice';
 
 /**
  * Initializes the Firebase authentication state listener.
