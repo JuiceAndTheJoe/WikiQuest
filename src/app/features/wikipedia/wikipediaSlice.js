@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { getPageSummary } from '../../mediaWikiModel';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { getPageSummary } from '../../models/wikipediaModel';
 
 // Async thunk for fetching Wikipedia page summary + plain-text full content
 export const fetchWikipediaPage = createAsyncThunk(
