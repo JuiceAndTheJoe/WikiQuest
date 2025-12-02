@@ -1,14 +1,14 @@
-import { useEffect } from "react";
-import { connect } from "react-redux";
-import GamePresenter from "./GamePresenter";
+import { useEffect } from 'react';
+import { connect } from 'react-redux';
+import { MAX_HINTS_PER_QUESTION } from '../app/features/game/gameConstants';
 import {
-  startNewGame,
   continueGame,
+  startNewGame,
   submitGuess,
   useHint,
-  MAX_HINTS_PER_QUESTION,
-} from "../app/features/game/gameSlice";
-import { fetchWikipediaPage } from "../app/features/wikipedia/wikipediaSlice";
+} from '../app/features/game/gameSlice';
+import { fetchWikipediaPage } from '../app/features/wikipedia/wikipediaSlice';
+import GamePresenter from './GamePresenter';
 
 const formatDisplayName = (value) =>
   String(value || "")

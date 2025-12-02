@@ -2,8 +2,14 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getDifficulty } from '../../../util/difficulty';
 import { getLeaderboard } from '../../firestoreModel';
 import { EasyCelebs, HardCelebs, MediumCelebs } from '../../game/celebs';
-
-const MAX_HINTS_PER_QUESTION = 3;
+import {
+  BASE_SCORE,
+  HINT_PENALTY,
+  MAX_HINTS_PER_QUESTION,
+  MAX_LIVES,
+  MIN_SCORE,
+  WRONG_ANSWER_PENALTY,
+} from './gameConstants';
 
 function pickRandom(arr) {
   if (!arr || arr.length === 0) return null;
@@ -85,7 +91,7 @@ const gameSlice = createSlice({
       state.inGame = true;
       state.status = 'playing';
       state.level = 1;
-      state.lives = 3;
+      state.lives = MAX_LIVES;
       state.correctCount = 0;
       state.correctAnswers = 0;
       state.totalQuestions = 0;
@@ -181,10 +187,10 @@ const gameSlice = createSlice({
       const hintsUsedThisAttempt = state.hintsUsedThisQuestion || 0;
 
       const baseScoreDelta = Math.max(
-        40,
-        120 - (state.hintsUsedThisQuestion || 0) * 20
+        MIN_SCORE,
+        BASE_SCORE - (state.hintsUsedThisQuestion || 0) * HINT_PENALTY
       );
-      const scoreDelta = correctGuess ? baseScoreDelta : -10;
+      const scoreDelta = correctGuess ? baseScoreDelta : WRONG_ANSWER_PENALTY;
 
       const questionEntry = {
         id: `${questionNumber}-${now}`,
@@ -285,7 +291,5 @@ const gameSlice = createSlice({
 
 export const { startNewGame, continueGame, submitGuess, useHint } =
   gameSlice.actions;
-
-export { MAX_HINTS_PER_QUESTION };
 
 export default gameSlice.reducer;
