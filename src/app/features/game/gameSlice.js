@@ -14,7 +14,7 @@ function pickRandom(arr) {
 function poolForLevel(level) {
   const difficulty = getDifficulty(level);
   if (difficulty === 'HARD') return HardCelebs;
-  if (level === 'MEDIUM') return MediumCelebs;
+  if (difficulty === 'MEDIUM') return MediumCelebs;
   return EasyCelebs;
 }
 
