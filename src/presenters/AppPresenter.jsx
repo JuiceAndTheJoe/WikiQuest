@@ -7,6 +7,11 @@ import LoginPresenter from "./LoginPresenter";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
+// Import placeholder presenters (will create these next)
+import GamePresenter from "./GamePresenter";
+import ResultsPresenter from "./ResultsPresenter";
+import LeaderboardPresenter from "./LeaderboardPresenter";
+
 // Pure presentational component: receives all data & handlers via props.
 function AppPresenter({
   user,
@@ -83,6 +88,48 @@ function AppPresenter({
           element={
             user ? (
               <LeaderboardContainer />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/game"
+          element={
+            user ? (
+              <GamePresenter
+                user={user}
+                onLogout={onLogout}
+                wikipediaData={wikipediaData}
+                wikipediaLoading={wikipediaLoading}
+                wikipediaError={wikipediaError}
+              />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/results"
+          element={
+            user ? (
+              <ResultsPresenter
+                user={user}
+                onLogout={onLogout}
+              />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            user ? (
+              <LeaderboardPresenter
+                user={user}
+                onLogout={onLogout}
+              />
             ) : (
               <Navigate to="/login" replace />
             )
