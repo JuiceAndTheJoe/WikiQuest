@@ -1,13 +1,13 @@
-import { useEffect } from "react";
-import { connect } from "react-redux";
-import AppPresenter from "./AppPresenter";
+import { useEffect } from 'react';
+import { connect } from 'react-redux';
+import { initAuthListener } from '../app/features/auth/authListeners';
 import {
-  loginUser,
-  registerUser,
-  logoutUser,
   clearError,
-  initAuthListener,
-} from "../app/features/auth/authSlice";
+  loginUser,
+  logoutUser,
+  registerUser,
+} from '../app/features/auth/authSlice';
+import AppPresenter from './AppPresenter';
 
 function AppContainer({
   user,

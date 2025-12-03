@@ -1,12 +1,7 @@
-import { connect } from "react-redux";
-import ResultsPresenter from "./ResultsPresenter";
-import { startNewGame } from "../app/features/game/gameSlice";
-
-const difficultyForLevel = (level) => {
-  if (level >= 11) return "hard";
-  if (level >= 6) return "medium";
-  return "easy";
-};
+import { connect } from 'react-redux';
+import { startNewGame } from '../app/features/game/gameSlice';
+import { getDifficulty } from '../app/features/game/gameUtils';
+import ResultsPresenter from './ResultsPresenter';
 
 const mapState = (state) => {
   const g = state.game || {};
@@ -16,7 +11,7 @@ const mapState = (state) => {
     correctAnswers: g.correctAnswers || g.correctCount || 0,
     streak: g.streak || 0,
     totalHintsUsed: g.totalHintsUsed || 0,
-    difficulty: difficultyForLevel(g.level || 1),
+    difficulty: getDifficulty(g.level || 1).toLowerCase(),
     questionLog: g.questionsLog || [],
   };
 
@@ -33,20 +28,20 @@ const mapState = (state) => {
       run.correctAnswers || questionLog.filter((q) => q.correct).length,
     streak: run.bestStreak ?? g.bestStreak ?? run.streak ?? g.streak ?? 0,
     gameTime: totalTime,
-    difficulty: run.difficulty || difficultyForLevel(g.level || 1),
+    difficulty: run.difficulty || getDifficulty(g.level || 1).toLowerCase(),
     totalHintsUsed: run.totalHintsUsed || 0,
   };
 
   const gameHistory = questionLog.map((entry) => ({
-    question: entry.displayName || entry.celeb || "Unknown",
-    userAnswer: entry.guess || "—",
+    question: entry.displayName || entry.celeb || 'Unknown',
+    userAnswer: entry.guess || '—',
     correct: Boolean(entry.correct),
     score:
-      typeof entry.scoreDelta === "number"
+      typeof entry.scoreDelta === 'number'
         ? entry.scoreDelta
         : entry.correct
-        ? 100
-        : 0,
+          ? 100
+          : 0,
     timeSpent: entry.timeTakenMs || 0,
     hintsUsed: entry.hintsUsed || 0,
   }));

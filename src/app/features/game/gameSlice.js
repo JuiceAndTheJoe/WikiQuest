@@ -1,49 +1,21 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { EasyCelebs, MediumCelebs, HardCelebs } from '../../game/celebs';
-import { getLeaderboard } from '../../firestoreModel';
-
-const MAX_HINTS_PER_QUESTION = 3;
-
-function pickRandom(arr) {
-  if (!arr || arr.length === 0) return null;
-  const i = Math.floor(Math.random() * arr.length);
-  return arr[i];
-}
-
-function poolForLevel(level) {
-  if (level >= 11) return HardCelebs;
-  if (level >= 6) return MediumCelebs;
-  return EasyCelebs;
-}
-
-function formatCelebDisplayName(value) {
-  return String(value || '')
-    .replace(/_/g, ' ')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-}
-
-function difficultyLabel(level) {
-  if (level >= 11) return 'HARD';
-  if (level >= 6) return 'MEDIUM';
-  return 'EASY';
-}
-
-function buildRunSummary(state) {
-  return {
-    finalScore: state.score || 0,
-    levelReached: Math.max(0, (state.level || 1) - 1),
-    highScore: state.highScore || 0,
-    totalQuestions: state.totalQuestions || 0,
-    correctAnswers: state.correctAnswers || state.correctCount || 0,
-    streak: state.streak || 0,
-    bestStreak: state.bestStreak || state.streak || 0,
-    totalHintsUsed: state.totalHintsUsed || 0,
-    difficulty: difficultyLabel(state.level || 1),
-    questionLog: [...(state.questionsLog || [])],
-    endedAt: Date.now(),
-  };
-}
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { getLeaderboard } from '../../models/leaderboardModel';
+import {
+  BASE_SCORE,
+  HINT_PENALTY,
+  MAX_HINTS_PER_QUESTION,
+  MAX_LIVES,
+  MIN_SCORE,
+  WRONG_ANSWER_PENALTY,
+} from './gameConstants';
+import {
+  buildRunSummary,
+  formatCelebDisplayName,
+  normalizeLetters,
+  pickRandom,
+  poolForLevel,
+  validateGuess,
+} from './gameUtils';
 
 export const fetchLeaderboard = createAsyncThunk(
   'game/fetchLeaderboard',
@@ -89,7 +61,7 @@ const gameSlice = createSlice({
       state.inGame = true;
       state.status = 'playing';
       state.level = 1;
-      state.lives = 3;
+      state.lives = MAX_LIVES;
       state.correctCount = 0;
       state.correctAnswers = 0;
       state.totalQuestions = 0;
@@ -112,7 +84,8 @@ const gameSlice = createSlice({
       state.status = 'playing';
       state.lastGuessResult = null;
       state.lastResultDetail = null;
-      if (!state.currentCeleb) state.currentCeleb = pickRandom(poolForLevel(state.level));
+      if (!state.currentCeleb)
+        state.currentCeleb = pickRandom(poolForLevel(state.level));
       if (!state.currentQuestionStartTime) {
         state.currentQuestionStartTime = Date.now();
       }
@@ -122,16 +95,9 @@ const gameSlice = createSlice({
       const guess = rawGuess.toLowerCase();
       const rawTarget = String(state.currentCeleb || '').trim();
 
-      // Helper: normalize name to letters only, remove diacritics, lowercase
-      const normalizeLetters = (s) =>
-        String(s || '')
-          .normalize('NFD')
-          .replace(/\p{Diacritic}/gu, '')
-          .replace(/[_\s\-\d\W]+/g, '')
-          .toLowerCase();
-
       const target = normalizeLetters(rawTarget);
       const guessLetters = normalizeLetters(guess);
+
       if (!state.inGame || !state.currentCeleb) {
         state.lastGuessResult = null;
         state.lastResultDetail = null;
@@ -150,30 +116,7 @@ const gameSlice = createSlice({
         return;
       }
 
-      // Determine acceptance: letter-frequency based allowance of up to 1 missing letter
-      const isAcceptableGuess = (g, t) => {
-        if (!t) return false;
-        // frequency maps
-        const freq = (str) => {
-          const m = Object.create(null);
-          for (const ch of str) {
-            m[ch] = (m[ch] || 0) + 1;
-          }
-          return m;
-        };
-        const tf = freq(t);
-        const gf = freq(g || '');
-        let deficit = 0;
-        for (const k of Object.keys(tf)) {
-          const need = tf[k];
-          const have = gf[k] || 0;
-          if (have < need) deficit += need - have;
-          if (deficit > 1) return false;
-        }
-        return true;
-      };
-
-      const correctGuess = isAcceptableGuess(guessLetters, target);
+      const correctGuess = validateGuess(guessLetters, target);
 
       const now = Date.now();
       const questionNumber = (state.totalQuestions || 0) + 1;
@@ -183,8 +126,11 @@ const gameSlice = createSlice({
 
       const hintsUsedThisAttempt = state.hintsUsedThisQuestion || 0;
 
-      const baseScoreDelta = Math.max(40, 120 - (state.hintsUsedThisQuestion || 0) * 20);
-      const scoreDelta = correctGuess ? baseScoreDelta : -10;
+      const baseScoreDelta = Math.max(
+        MIN_SCORE,
+        BASE_SCORE - (state.hintsUsedThisQuestion || 0) * HINT_PENALTY
+      );
+      const scoreDelta = correctGuess ? baseScoreDelta : WRONG_ANSWER_PENALTY;
 
       const questionEntry = {
         id: `${questionNumber}-${now}`,
@@ -234,7 +180,9 @@ const gameSlice = createSlice({
           state.status = 'game_over';
           state.lastGameResult = buildRunSummary(state);
           state.completedRuns = (state.completedRuns || 0) + 1;
-          state.totalScoreAcrossRuns = (state.totalScoreAcrossRuns || 0) + (state.lastGameResult?.finalScore || 0);
+          state.totalScoreAcrossRuns =
+            (state.totalScoreAcrossRuns || 0) +
+            (state.lastGameResult?.finalScore || 0);
           // keep currentCeleb for review
         } else {
           state.lastAnsweredCeleb = rawTarget;
@@ -246,7 +194,9 @@ const gameSlice = createSlice({
 
       state.lastResultDetail = {
         correct: correctGuess,
-        correctAnswer: formatCelebDisplayName(correctGuess ? state.lastAnsweredCeleb || rawTarget : rawTarget),
+        correctAnswer: formatCelebDisplayName(
+          correctGuess ? state.lastAnsweredCeleb || rawTarget : rawTarget
+        ),
         guess: rawGuess,
         scoreDelta,
         finalScore: state.score || 0,
@@ -273,18 +223,13 @@ const gameSlice = createSlice({
       })
       .addCase(fetchLeaderboard.rejected, (state, action) => {
         state.leaderboardLoading = false;
-        state.leaderboardError = action.error.message || 'Failed to load leaderboard';
+        state.leaderboardError =
+          action.error.message || 'Failed to load leaderboard';
       });
   },
 });
 
-export const {
-  startNewGame,
-  continueGame,
-  submitGuess,
-  useHint,
-} = gameSlice.actions;
-
-export { MAX_HINTS_PER_QUESTION };
+export const { startNewGame, continueGame, submitGuess, useHint } =
+  gameSlice.actions;
 
 export default gameSlice.reducer;
