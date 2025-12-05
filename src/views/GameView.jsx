@@ -3,7 +3,7 @@
  * Pure component for displaying biography, hints, guess input, and score
  */
 
-import { Lightbulb, Send, Timer } from '@mui/icons-material';
+import { Lightbulb, Send, Timer, Home } from '@mui/icons-material';
 import {
   Alert,
   Box,
@@ -29,6 +29,7 @@ function GameView({
   onSubmitGuess,
   onUseHint,
   onNextQuestion,
+  onBackToHome,
   lastResult,
   wikipediaSummary,
   revealedSummarySentences,
@@ -276,11 +277,13 @@ function GameView({
                   </Stack>
 
                   <Button
-                    variant='outlined'
+                    variant='contained'
+                    color='error'
                     startIcon={<Lightbulb />}
                     onClick={onUseHint}
                     disabled={!canUseHint || isGameOver}
                     fullWidth
+                    sx={{ fontWeight: 'bold' }}
                   >
                     Use Hint ({hints?.availableHints - hints?.usedHints || 0}{' '}
                     left)
@@ -330,6 +333,16 @@ function GameView({
                     %
                   </Typography>
                 </Stack>
+                <Button
+                  variant='outlined'
+                  size='medium'
+                  startIcon={<Home />}
+                  onClick={onBackToHome}
+                  sx={{ mt: 2, fontWeight: 'bold' }}
+                  fullWidth
+                >
+                  Back to Home
+                </Button>
               </CardContent>
             </Card>
           </Box>

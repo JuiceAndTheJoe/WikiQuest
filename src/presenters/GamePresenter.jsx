@@ -82,6 +82,10 @@ function GamePresenter({
     setUserGuess('');
   };
 
+  const handleBackToHome = () => {
+    navigate('/');
+  };
+
   const { summary } = useMemo(() => {
     return {
       summary: wikipediaData?.summary || null,
@@ -119,6 +123,7 @@ function GamePresenter({
       onSubmitGuess={handleSubmitGuess}
       onUseHint={handleUseHint}
       onNextQuestion={handleNextQuestion}
+      onBackToHome={handleBackToHome}
       lastResult={lastResult}
       wikipediaSummary={summary}
       revealedSummarySentences={revealedSummarySentences}
