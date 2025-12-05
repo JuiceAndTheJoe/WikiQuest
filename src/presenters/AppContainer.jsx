@@ -6,11 +6,9 @@ import {
   loginUser,
   logoutUser,
   registerUser,
-  convertGuestToAccount,
 } from '../app/features/auth/authSlice';
 import { setSavedGameFlag } from '../app/features/game/gameSlice';
 import { hasSavedGame } from '../app/models/gameProgressModel';
-import { hasGuestSavedGame } from '../app/models/guestStorageModel';
 import AppPresenter from './AppPresenter';
 
 function AppContainer({
@@ -22,7 +20,6 @@ function AppContainer({
   onRegister,
   onLogout,
   onClearError,
-  onConvertGuest,
   dispatch,
 }) {
   // Initialize auth listener on mount
@@ -34,11 +31,7 @@ function AppContainer({
   // Check for saved game when user changes
   useEffect(() => {
     if (user?.uid) {
-      const checkSavedGame = user.isGuest 
-        ? hasGuestSavedGame(user.uid)
-        : hasSavedGame(user.uid);
-      
-      checkSavedGame
+      hasSavedGame(user.uid)
         .then((exists) => {
           dispatch(setSavedGameFlag(exists));
         })
@@ -46,7 +39,7 @@ function AppContainer({
           console.warn('Failed to check saved game', err);
         });
     }
-  }, [user?.uid, user?.isGuest, dispatch]);
+  }, [user?.uid, dispatch]);
 
   return (
     <AppPresenter
@@ -58,7 +51,6 @@ function AppContainer({
       onRegister={onRegister}
       onLogout={onLogout}
       onClearError={onClearError}
-      onConvertGuest={onConvertGuest}
     />
   );
 }
@@ -75,7 +67,6 @@ const mapDispatchToProps = (dispatch) => ({
   onRegister: (credentials) => dispatch(registerUser(credentials)),
   onLogout: () => dispatch(logoutUser()),
   onClearError: () => dispatch(clearError()),
-  onConvertGuest: (credentials) => dispatch(convertGuestToAccount(credentials)),
   dispatch,
 });
 

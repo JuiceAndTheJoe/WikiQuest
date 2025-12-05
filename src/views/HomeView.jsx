@@ -31,11 +31,9 @@ function MenuView({
   onStartGame,
   onResumeGame,
   onViewLeaderboard,
-  onCreateAccount,
   hasSavedGame = false,
   userStats = { gamesPlayed: 0, highScore: 0, totalScore: 0 },
 }) {
-  const isGuest = user?.isGuest || false;
   return (
     <Box sx={{ position: 'relative', minHeight: '100vh' }}>
       {/* Animated Background */}
@@ -108,45 +106,28 @@ function MenuView({
                 </Avatar>
                 <Box>
                   <Typography variant='h6'>
-                    {isGuest ? 'Guest Player' : user?.email || 'Player'}
+                    {user?.email || 'Player'}
                   </Typography>
                   <Typography variant='body2' color='text.secondary'>
-                    {isGuest 
-                      ? 'Playing as guest - create account to save progress'
-                      : `Games Played: ${userStats.gamesPlayed}`
-                    }
+                    Games Played: {userStats.gamesPlayed}
                   </Typography>
                 </Box>
               </Stack>
               <Stack alignItems='flex-end' spacing={1}>
-                {!isGuest && (
-                  <Stack direction='row' spacing={1} alignItems='center'>
-                    <EmojiEvents color='warning' />
-                    <Typography variant='h6'>
-                      High Score: {userStats.highScore}
-                    </Typography>
-                  </Stack>
-                )}
-                <Stack direction='row' spacing={1}>
-                  {isGuest ? (
-                    <Button
-                      variant='contained'
-                      size='small'
-                      onClick={onCreateAccount}
-                    >
-                      Sign In or Create Account
-                    </Button>
-                  ) : (
-                    <Button
-                      variant='outlined'
-                      size='small'
-                      startIcon={<ExitToApp />}
-                      onClick={onLogout}
-                    >
-                      Logout
-                    </Button>
-                  )}
+                <Stack direction='row' spacing={1} alignItems='center'>
+                  <EmojiEvents color='warning' />
+                  <Typography variant='h6'>
+                    High Score: {userStats.highScore}
+                  </Typography>
                 </Stack>
+                <Button
+                  variant='outlined'
+                  size='small'
+                  startIcon={<ExitToApp />}
+                  onClick={onLogout}
+                >
+                  Logout
+                </Button>
               </Stack>
             </Stack>
           </Box>

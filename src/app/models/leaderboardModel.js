@@ -57,56 +57,45 @@ export async function getLeaderboard(maxCount = 10) {
  * @returns {Promise<void>}
  */
 export async function saveGameResult(userId, summary = {}, userProfile = {}) {
-  if (!userId || !summary) {
-    return;
-  }
-  
+  if (!userId || !summary) return;
   const userRef = doc(db, USER_COLLECTION, userId);
 
-  try {
-    await runTransaction(db, async (transaction) => {
-      const snap = await transaction.get(userRef);
-      const existing = snap.exists() ? snap.data() : {};
+  await runTransaction(db, async (transaction) => {
+    const snap = await transaction.get(userRef);
+    const existing = snap.exists() ? snap.data() : {};
 
-      const safeScore = summary.finalScore || 0;
-      const safeCorrect = summary.correctAnswers || 0;
-      const safeQuestions = summary.totalQuestions || 0;
+    const safeScore = summary.finalScore || 0;
+    const safeCorrect = summary.correctAnswers || 0;
+    const safeQuestions = summary.totalQuestions || 0;
 
-      const totalScore = (existing.totalScore || 0) + safeScore;
-      const gamesPlayed = (existing.gamesPlayed || 0) + 1;
-      const totalCorrectAnswers =
-        (existing.totalCorrectAnswers || 0) + safeCorrect;
-      const totalQuestions = (existing.totalQuestions || 0) + safeQuestions;
-      const accuracy =
-        totalQuestions > 0
-          ? Math.round((totalCorrectAnswers / totalQuestions) * 100)
-          : 0;
-      const averageScore =
-        gamesPlayed > 0 ? Math.round(totalScore / gamesPlayed) : safeScore;
+    const totalScore = (existing.totalScore || 0) + safeScore;
+    const gamesPlayed = (existing.gamesPlayed || 0) + 1;
+    const totalCorrectAnswers =
+      (existing.totalCorrectAnswers || 0) + safeCorrect;
+    const totalQuestions = (existing.totalQuestions || 0) + safeQuestions;
+    const accuracy =
+      totalQuestions > 0
+        ? Math.round((totalCorrectAnswers / totalQuestions) * 100)
+        : 0;
+    const averageScore =
+      gamesPlayed > 0 ? Math.round(totalScore / gamesPlayed) : safeScore;
 
-      transaction.set(
-        userRef,
-        {
-          email: userProfile.email || existing.email || null,
-          displayName: userProfile.displayName || existing.displayName || null,
-          photoURL: userProfile.photoURL || existing.photoURL || null,
-          highScore: Math.max(existing.highScore || 0, safeScore),
-          gamesPlayed,
-          totalScore,
-          averageScore,
-          totalCorrectAnswers,
-          totalQuestions,
-          accuracy,
-          lastPlayed: summary.endedAt || Date.now(),
-        },
-        { merge: true }
-      );
-    });
-  } catch (error) {
-    if (error.code === 'resource-exhausted') {
-      console.warn('Firestore quota exceeded. Score will not be saved. Try again later.');
-    } else {
-      throw error;
-    }
-  }
+    transaction.set(
+      userRef,
+      {
+        email: userProfile.email || existing.email || null,
+        displayName: userProfile.displayName || existing.displayName || null,
+        photoURL: userProfile.photoURL || existing.photoURL || null,
+        highScore: Math.max(existing.highScore || 0, safeScore),
+        gamesPlayed,
+        totalScore,
+        averageScore,
+        totalCorrectAnswers,
+        totalQuestions,
+        accuracy,
+        lastPlayed: summary.endedAt || Date.now(),
+      },
+      { merge: true }
+    );
+  });
 }

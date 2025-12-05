@@ -5,10 +5,6 @@ import {
   signOut,
 } from 'firebase/auth';
 import { auth } from '../../../firebaseConfig';
-import { getAllGuestData, clearAllGuestData } from '../../models/guestStorageModel';
-import { saveCurrentGameState } from '../../models/gameProgressModel';
-import { saveGameResult } from '../../models/leaderboardModel';
-import { isGuestUser, createNewGuestSession, createGuestUserObject } from './guestUtils';
 
 // Async thunks for Firebase auth operations
 export const loginUser = createAsyncThunk(
@@ -49,80 +45,15 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { getState }) => {
-  const state = getState();
-  const currentUser = state.auth.user;
-  
-  // Only sign out from Firebase if user is authenticated (not guest)
-  if (currentUser && !currentUser.isGuest) {
-    await signOut(auth);
-  }
-  
-  // Create a new guest session after logout
-  const newGuestId = createNewGuestSession();
-  return createGuestUserObject(newGuestId);
+export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
+  await signOut(auth);
 });
-
-// Convert guest account to authenticated account
-export const convertGuestToAccount = createAsyncThunk(
-  'auth/convertGuestToAccount',
-  async ({ email, password, isLogin }, { getState, rejectWithValue }) => {
-    try {
-      const state = getState();
-      const currentUser = state.auth.user;
-      
-      // Verify current user is a guest
-      if (!currentUser || !currentUser.isGuest) {
-        throw new Error('Can only convert guest accounts');
-      }
-      
-      const guestId = currentUser.uid;
-      
-      // Get all guest data before creating account
-      const guestData = await getAllGuestData(guestId);
-      
-      // Create or sign in to Firebase account
-      let userCredential;
-      if (isLogin) {
-        userCredential = await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      }
-      
-      const newUserId = userCredential.user.uid;
-      
-      // Migrate guest data to Firestore
-      if (guestData.gameState) {
-        await saveCurrentGameState(newUserId, guestData.gameState);
-      }
-      
-      if (guestData.gameResult) {
-        await saveGameResult(newUserId, guestData.gameResult, {
-          email: userCredential.user.email,
-          displayName: userCredential.user.displayName || null,
-          photoURL: userCredential.user.photoURL || null,
-        });
-      }
-      
-      // Clear guest data from localStorage
-      await clearAllGuestData(guestId);
-      
-      return {
-        uid: newUserId,
-        email: userCredential.user.email,
-        migratedFromGuest: true,
-      };
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
 
 // Auth slice
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user: null, // { uid, email, isGuest? }
+    user: null, // { uid, email }
     loading: false,
     error: null,
     isAuthChecked: false, // Track if initial auth check completed
@@ -134,10 +65,6 @@ const authSlice = createSlice({
     },
     clearError(state) {
       state.error = null;
-    },
-    setGuestUser(state, action) {
-      state.user = action.payload;
-      state.isAuthChecked = true;
     },
   },
   extraReducers: (builder) => {
@@ -171,25 +98,11 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
       // Logout
-      .addCase(logoutUser.fulfilled, (state, action) => {
-        state.user = action.payload; // Set new guest user
-        state.loading = false;
-      })
-      // Convert guest to account
-      .addCase(convertGuestToAccount.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(convertGuestToAccount.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-      })
-      .addCase(convertGuestToAccount.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
       });
   },
 });
 
-export const { setUser, clearError, setGuestUser } = authSlice.actions;
+export const { setUser, clearError } = authSlice.actions;
 export default authSlice.reducer;

@@ -12,13 +12,6 @@ function LeaderboardPresenter({
 }) {
   const navigate = useNavigate();
 
-  // Redirect guests to login
-  const isGuest = user?.isGuest || false;
-  if (isGuest) {
-    navigate('/login');
-    return null;
-  }
-
   const normalizedData = useMemo(() => {
     if (!Array.isArray(leaderboardData)) return [];
     return leaderboardData.map((entry, index) => ({
