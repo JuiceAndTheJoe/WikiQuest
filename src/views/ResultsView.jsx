@@ -21,8 +21,6 @@ import {
   Leaderboard,
   Home,
   EmojiEvents,
-  Timer,
-  TrendingUp,
   CheckCircle,
   Cancel,
 } from "@mui/icons-material";
