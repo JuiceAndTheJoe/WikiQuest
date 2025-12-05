@@ -1,147 +1,109 @@
 # DH2642 Interactive Programming Project
 
-React + Vite application with Redux Toolkit state management and Firebase backend.
+## Project description
 
-## Setup
+WikiQuest is a quiz game that tests your knowledge of famous people using real content from Wikipedia. Each round, you are shown a short, progressively revealing summary of a celebrity's article. Your goal is to guess the name of the person.
 
-### Prerequisites
+Your score depends on how many celebrities you identify correctly in a single run, how many hints you use, and how long you survive before losing all your lives. The game tracks advanced statistics across runs (such as total score and best streak) and features a global leaderboard so you can compare your performance with other players. Since the game requires login, users also benefit from automatic save/resume: you can leave mid-game and continue later from where you left off.
 
-- Node.js (v16+)
-- Firebase CLI (for deployment): `npm install -g firebase-tools`
+## What we have done
 
-### Installation
+- Implemented the full WikiQuest gameplay loop:
+  - Progressive guessing game based on Wikipedia biography text.
+  - Hint system that reveals more information at a score penalty.
+  - Life system and game-over state with a detailed results screen.
+- Set up user authentication using Firebase Authentication (email/password).
+- Implemented per-user persistence in Firestore:
+  - Global leaderboard with aggregated scores per user.
+  - Per-run summaries stored when a game ends.
+  - Automatic save/resume of an in-progress game per user.
+- Built a structured front-end architecture with React + Vite:
+  - Redux Toolkit for application state, including separate slices for auth, game logic, and Wikipedia data.
+  - Custom persistence middleware for all Firestore writes (game progress and leaderboard updates).
+  - Clear separation between containers, presenters, and views.
+- Designed a responsive UI using Material UI (MUI):
+  - Themed typography, buttons, cards, and layouts.
+  - Animated background for a more engaging experience. Currently very subtle, will be improved on later.
+- Added a global leaderboard view that displays top players based on their scores.
+- Added a results view that summarizes each finished run (score, streaks, and basic stats).
 
-```bash
-# Install dependencies
-npm install
+## What we still plan to do
 
-# Start development server (runs on http://localhost:8080)
-npm run dev
-```
+- Allow playing as a guest, with the option to save progress later by creating an account.
+- Add live leaderboard updates using Firestore `onSnapshot` so changes appear in real time.
+- Refine game balance, for example by adjusting when images and specific types of hints are shown. Currently the images make the game too easy.
+- Add a larger pool of celebrities and prevent getting the same celebrity more than once in a single run.
+- Improve the visual design further with additional animations and polished graphics.
+- Conduct user testing sessions and incorporate structured user feedback into the design and game mechanics.
 
-### Available Scripts
+## Project file structure
 
-- `npm run dev` - Start Vite development server with HMR
-- `npm run build` - Create production build in `dist/`
-- `npm run serve` - Preview production build locally
-- `firebase deploy` - Deploy to Firebase Hosting
+High-level structure of the project (only key files and folders are listed):
 
-## Tech Stack
+- `package.json` – Project metadata, scripts (`dev`, `build`, `serve`), and dependencies.
+- `vite.config.js` – Vite configuration for the React app.
+- `firebase.json` – Firebase Hosting configuration for deployment.
 
-- **Framework**: React 18 with Vite
-- **State Management**: Redux Toolkit with custom persistence middleware
-- **UI Library**: Material UI (MUI) v7
-- **Routing**: React Router v6
-- **Backend**: Firebase (Auth + Firestore)
-- **Styling**: Emotion (MUI's CSS-in-JS solution)
-- **External APIs**: Wikipedia REST API (summary endpoint)
+### Source code (`src/`)
 
-## Architecture
+- `src/index.jsx` – Entry point that renders the React application into the DOM.
+- `src/ReactRoot.jsx` – Wraps the app with React Router, Redux Provider, and the Material UI theme.
+- `src/firebaseConfig.js` – Initializes Firebase (Auth and Firestore) and exports configured instances.
 
-Clean separation of concerns following Model-View-Presenter pattern:
+#### Application state and models (`src/app/`)
 
-- **Persistence Layer**: `src/app/firestoreModel.js` (Firebase operations)
-- **External APIs**: `src/app/mediaWikiModel.js` (Wikipedia REST API integration)
-- **Application State**: Redux slices in `src/app/features/`
-- **Middleware**: `src/app/middleware/persistenceMiddleware.js` (sync state to Firebase)
-- **Containers**: `*Container.jsx` (Redux-connected, side effects)
-- **Presenters**: App-level `AppPresenter.jsx` (routing only) and per-view presenters (`HomePresenter.jsx`, `LoginPresenter.jsx`) for prop composition and local UI state.
-- **Views**: Pure presentational components in `src/views/` (no logic/state besides rendering props)
+- `src/app/store.js` – Configures the Redux store and applies middleware.
+- `src/app/rootReducer.js` – Combines all Redux slices (auth, game, Wikipedia).
+- `src/app/api.js` – Shared helpers for making external API requests.
 
-## Third-Party Components (User-Visible)
+**Models (`src/app/models/`)**
 
-The project uses **Material UI** components throughout for grade A compliance. Locations:
+- `src/app/models/constants.js` – Shared Firestore collection/document name constants.
+- `src/app/models/leaderboardModel.js` – Reads and writes leaderboard data in Firestore (e.g., `saveGameResult`, `getLeaderboard`).
+- `src/app/models/gameProgressModel.js` – Handles saving, loading, and clearing a user's in-progress game at `users/{uid}/sessions/game`.
+- `src/app/models/userModel.js` – Generic per-user data operations (read, write, subscribe).
+- `src/app/models/wikipediaModel.js` – Fetches summaries from the Wikipedia REST API used for hints and question text.
 
-### Material UI Components
+**Features (`src/app/features/`)**
 
-- **`src/ReactRoot.jsx`**: `ThemeProvider`, `CssBaseline`
-- **`src/views/HomeView.jsx`**: `Paper`, `Stack`, `Typography`, `Button`, `CircularProgress`, `Box`, `Divider`
-- **`src/views/LoginView.jsx`**: `Paper`, `Stack`, `Typography`, `TextField`, `Alert`, `Button`
-- **`src/components/PrimaryButton.jsx`**: `Button` (wrapped in custom component)
-- **`src/presenters/AppPresenter.jsx`**: `CircularProgress`, `Box` (auth loading state)
-- **`src/styles/theme.js`**: `createTheme` (theme configuration)
+- `src/app/features/auth/authSlice.js` – Redux slice for authentication state, including login, registration, logout, and status flags.
+- `src/app/features/auth/authListeners.js` – Sets up the Firebase `onAuthStateChanged` listener and dispatches auth actions.
+- `src/app/features/game/gameSlice.js` – Core game logic and state, including levels, lives, scoring, hints, saved games, and run summaries.
+- `src/app/features/game/gameConstants.js` – Constants for game configuration (scores, penalties, maximum lives, etc.).
+- `src/app/features/game/gameUtils.js` – Pure helper functions for game logic (picking celebrities, normalizing guesses, building summaries).
+- `src/app/features/wikipedia/wikipediaSlice.js` – Redux slice handling Wikipedia page data, loading states, and errors.
 
-### React Router Components
+**Middleware (`src/app/middleware/`)**
 
-- **`src/ReactRoot.jsx`**: `BrowserRouter`
-- **`src/presenters/AppPresenter.jsx`**: `Routes`, `Route`, `Navigate`
+- `src/app/middleware/persistenceMiddleware.js` – Observes Redux actions and persists game progress and results to Firestore (auto-save and leaderboard updates).
 
-## Firebase Configuration
+#### UI components (`src/components/`)
 
-Firebase is pre-configured in `src/firebaseConfig.js`. The app connects to:
+- `src/components/PrimaryButton.jsx` – Reusable button component styled with the project theme.
+- `src/components/background/ColorBends.jsx` – Animated background component that creates a dynamic visual effect.
 
-- **Project ID**: `iprog-project-c443f`
-- **Services**: Authentication (Email/Password), Firestore Database
-- **Authentication Flow**: Managed via `authSlice.js` with `onAuthStateChanged` listener
-- **User Data**: Stored per-user in Firestore at `users/{userId}` (aggregate stats, leaderboard info)
+#### Presenters and containers (`src/presenters/`)
 
-## Project Structure
+- `src/presenters/AppContainer.jsx` – Connects the root app to Redux and initializes global listeners (such as auth).
+- `src/presenters/AppPresenter.jsx` – Defines the main route structure (home, game, login, leaderboard, results) and route guards.
+- `src/presenters/HomeContainer.jsx` – Connects home view to Redux (user stats, saved game flag) and triggers loading of saved games.
+- `src/presenters/HomePresenter.jsx` – Maps home data and callbacks to `HomeView` (start game, resume game, view leaderboard, logout).
+- `src/presenters/GameContainer.jsx` – Connects game state to Redux, manages initial loading of saved game or new game, and fetches Wikipedia content.
+- `src/presenters/GamePresenter.jsx` – Prepares data and handlers for `GameView` (guesses, hints, navigation between questions).
+- `src/presenters/LeaderboardContainer.jsx` – Fetches leaderboard data from Redux and passes it to the leaderboard view.
+- `src/presenters/LeaderboardPresenter.jsx` – Shapes leaderboard data and interactions for `LeaderboardView`.
+- `src/presenters/ResultsContainer.jsx` – Connects the last game result stored in Redux to the results view.
+- `src/presenters/ResultsPresenter.jsx` – Prepares results data (score, stats) and navigation callbacks for `ResultsView`.
+- `src/presenters/LoginPresenter.jsx` – Manages login and registration interactions for the login view.
 
-```text
-src/
-├── app/
-│   ├── store.js                    # Redux store configuration
-│   ├── rootReducer.js              # Combine feature reducers
-│   ├── firestoreModel.js           # Centralized Firebase operations
-│   ├── mediaWikiModel.js           # Wikipedia REST API client
-│   ├── features/
-│   │   ├── auth/
-│   │   │   └── authSlice.js        # Authentication state & thunks
-│   │   ├── game/
-│   │   │   └── gameSlice.js        # Game logic, levels, leaderboard data
-│   │   └── wikipedia/
-│   │       └── wikipediaSlice.js   # Wikipedia summary state & thunk
-│   └── middleware/
-│       └── persistenceMiddleware.js # Auto-persist state to Firebase
-├── components/
-│   └── PrimaryButton.jsx           # Reusable UI components
-├── presenters/
-│   ├── AppContainer.jsx            # Redux-connected container
-│   ├── AppPresenter.jsx            # Routing logic
-│   ├── GameContainer.jsx           # Game state + Wikipedia sync
-│   ├── HomePresenter.jsx           # Presenter for HomeView (UI state + prop composition)
-│   ├── LeaderboardContainer.jsx    # Fetch & present leaderboard
-│   ├── ResultsContainer.jsx        # Present last game summary
-│   └── LoginPresenter.jsx          # Presenter for LoginView (form state + handlers)
-├── views/
-│   ├── GameView.jsx                # Active quiz interface
-│   ├── HomeView.jsx                # Authenticated home view
-│   ├── LeaderboardView.jsx         # Global leaderboard UI
-│   ├── LoginView.jsx               # Login/registration view
-│   └── ResultsView.jsx             # Game over summary
-├── styles/
-│   └── theme.js                    # Material UI theme
-├── firebaseConfig.js               # Firebase initialization
-├── ReactRoot.jsx                   # App root with providers
-└── index.jsx                       # Entry point
-```
+#### Views (`src/views/`)
 
-## Development Notes
+- `src/views/HomeView.jsx` – Main menu and dashboard for authenticated users, including stats, start/resume game actions, and leaderboard access.
+- `src/views/GameView.jsx` – Core gameplay interface where users read clues, enter guesses, and request hints.
+- `src/views/LeaderboardView.jsx` – Displays the global leaderboard with top players and their scores.
+- `src/views/LoginView.jsx` – Login and registration screen with email/password form and validation.
+- `src/views/ResultsView.jsx` – Game-over summary showing final score, streaks, and navigation back to the main menu or leaderboard.
 
-- Port `8080` is used for local development (configured in `vite.config.js`)
-- Sourcemaps enabled for debugging (`minify: false` in build)
-- Firebase serializable check disabled in Redux (Firestore snapshots)
-- All state changes that need persistence go through Redux middleware
-- No direct Firebase calls in components or slices
-- External API calls centralized in model files (`mediaWikiModel.js`)
-- Wikipedia API integration relies solely on the summary endpoint for lightweight hints
+#### Styling (`src/styles/`)
 
-## Grade A Target
-
-This project follows DH2642 grade A requirements:
-
-- ✅ State manager (Redux Toolkit) with middleware
-- ✅ Zero concern mixing (strict layer separation)
-- ✅ Framework-independent Redux (`connect()` instead of hooks)
-- ✅ User-visible third-party components (Material UI in all views)
-- ✅ Authentication-gated persistence (Firebase Auth with email/password)
-- ✅ Auth state listener (`onAuthStateChanged` in `authSlice.js`)
-- ✅ Protected routes (redirect to `/login` if not authenticated)
-- ✅ User-specific data storage (`users/{userId}` documents with stats/leaderboard fields)
-- ✅ Loading states and error handling (auth errors, UI loading states)
-- ✅ Form validation (email/password requirements in LoginView)
-- ✅ External API integration (Wikipedia REST API summary data surfaced in `GamePresenter`)
-- 🔄 Live updates via `onSnapshot` (subscribe functions ready, not yet connected)
-- 🔄 User consultation documentation (to be added)
-
-See `.github/copilot-instructions.md` for detailed architectural guidelines.
+- `src/styles/theme.js` – Material UI theme configuration (colors, typography, component overrides).
