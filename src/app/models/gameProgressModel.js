@@ -1,11 +1,16 @@
 import {
-  addDoc,
-  collection,
+  deleteDoc,
   doc,
+  getDoc,
   runTransaction,
   serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+import {
+  SESSION_COLLECTION,
+  SESSION_GAME_DOC_ID,
+  USER_COLLECTION,
+} from './constants';
 
 /**
  * Updates user stats after each guess (incremental updates).
@@ -20,7 +25,7 @@ import { db } from '../../firebaseConfig';
 export async function updateUserStatsAfterGuess(userId, guessData) {
   if (!userId || !guessData) return;
 
-  const userRef = doc(db, 'users', userId);
+  const userRef = doc(db, USER_COLLECTION, userId);
 
   await runTransaction(db, async (transaction) => {
     const snap = await transaction.get(userRef);
@@ -58,27 +63,62 @@ export async function updateUserStatsAfterGuess(userId, guessData) {
   });
 }
 
-/**
- * Saves detailed guess history under a specific game run.
- *
- * @param {string} userId
- * @param {string} gameId
- * @param {object} guessData
- * @returns {Promise<void>}
- */
-export async function saveGuessToHistory(userId, gameId, guessData) {
-  if (!userId || !gameId || !guessData) return;
+export async function saveCurrentGameState(userId, gameState) {
+  if (!userId || !gameState) return;
 
-  const guessesRef = collection(
+  const userRef = doc(
     db,
-    'users',
+    USER_COLLECTION,
     userId,
-    'gameHistory',
-    gameId,
-    'guesses'
+    SESSION_COLLECTION,
+    SESSION_GAME_DOC_ID
   );
-  await addDoc(guessesRef, {
-    ...guessData,
-    timestamp: serverTimestamp(),
+
+  await runTransaction(db, async (transaction) => {
+    transaction.set(userRef, {
+      ...gameState,
+      savedAt: serverTimestamp(),
+    });
   });
+}
+
+export async function loadSavedGameState(userId) {
+  if (!userId) return null;
+
+  const userRef = doc(
+    db,
+    USER_COLLECTION,
+    userId,
+    SESSION_COLLECTION,
+    SESSION_GAME_DOC_ID
+  );
+  const snap = await getDoc(userRef);
+  return snap.exists() ? snap.data() : null;
+}
+
+export async function clearSavedGameState(userId) {
+  if (!userId) return;
+
+  const gameStateRef = doc(
+    db,
+    USER_COLLECTION,
+    userId,
+    SESSION_COLLECTION,
+    SESSION_GAME_DOC_ID
+  );
+  await deleteDoc(gameStateRef);
+}
+
+export async function hasSavedGame(userId) {
+  if (!userId) return false;
+
+  const userRef = doc(
+    db,
+    USER_COLLECTION,
+    userId,
+    SESSION_COLLECTION,
+    SESSION_GAME_DOC_ID
+  );
+  const snap = await getDoc(userRef);
+  return snap.exists();
 }

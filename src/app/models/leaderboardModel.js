@@ -8,6 +8,7 @@ import {
   runTransaction,
 } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+import { USER_COLLECTION } from './constants';
 
 /**
  * Fetches the leaderboard data from Firestore.
@@ -17,7 +18,7 @@ import { db } from '../../firebaseConfig';
  */
 export async function getLeaderboard(maxCount = 10) {
   try {
-    const leaderboardRef = collection(db, 'users');
+    const leaderboardRef = collection(db, USER_COLLECTION);
     const q = query(
       leaderboardRef,
       orderBy('highScore', 'desc'),
@@ -57,7 +58,7 @@ export async function getLeaderboard(maxCount = 10) {
  */
 export async function saveGameResult(userId, summary = {}, userProfile = {}) {
   if (!userId || !summary) return;
-  const userRef = doc(db, 'users', userId);
+  const userRef = doc(db, USER_COLLECTION, userId);
 
   await runTransaction(db, async (transaction) => {
     const snap = await transaction.get(userRef);

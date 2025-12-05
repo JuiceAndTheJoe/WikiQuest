@@ -1,5 +1,6 @@
 import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+import { USER_COLLECTION } from './constants';
 
 /**
  * Save user data to Firestore
@@ -9,7 +10,7 @@ import { db } from '../../firebaseConfig';
  * @returns {Promise<void>}
  */
 export function saveUserData(userId, data) {
-  return setDoc(doc(db, 'users', userId), data, { merge: true });
+  return setDoc(doc(db, USER_COLLECTION, userId), data, { merge: true });
 }
 
 /**
@@ -19,7 +20,7 @@ export function saveUserData(userId, data) {
  * @returns inferred Promise<DocumentSnapshot<DocumentData, DocumentData>>
  */
 export function getUserData(userId) {
-  return getDoc(doc(db, 'users', userId));
+  return getDoc(doc(db, USER_COLLECTION, userId));
 }
 
 /**
@@ -30,7 +31,7 @@ export function getUserData(userId) {
  * @returns inferred unsubscribe function
  */
 export function subscribeToUserData(userId, callback) {
-  return onSnapshot(doc(db, 'users', userId), (doc) => {
+  return onSnapshot(doc(db, USER_COLLECTION, userId), (doc) => {
     callback(doc.data());
   });
 }

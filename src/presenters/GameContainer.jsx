@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import {
   MAX_HINTS_PER_QUESTION,
   MAX_LIVES,
 } from '../app/features/game/gameConstants';
 import {
-  continueGame,
+  loadSavedGame,
   startNewGame,
   submitGuess,
   useHint,
@@ -14,9 +14,9 @@ import { fetchWikipediaPage } from '../app/features/wikipedia/wikipediaSlice';
 import GamePresenter from './GamePresenter';
 
 const formatDisplayName = (value) =>
-  String(value || "")
-    .replace(/_/g, " ")
-    .replace(/\s{2,}/g, " ")
+  String(value || '')
+    .replace(/_/g, ' ')
+    .replace(/\s{2,}/g, ' ')
     .trim();
 
 const GameContainer = (props) => {
@@ -25,42 +25,70 @@ const GameContainer = (props) => {
     fetchPage,
     inGame,
     startNewGame,
-    continueExistingGame,
+    loadSavedGame,
+    loadingGameState,
+    hasSavedGame,
     wikipediaLoading,
     gameStatus,
   } = props;
 
+  const [hasAttemptedLoad, setHasAttemptedLoad] = useState(false);
+
+  // Load previous game or start new game on mount
   useEffect(() => {
-    if (!inGame && gameStatus !== "game_over") {
-      startNewGame();
-    } else if (inGame && !currentCelebRaw) {
-      continueExistingGame();
+    if (
+      props.user?.uid &&
+      !inGame &&
+      gameStatus !== 'game_over' &&
+      !hasAttemptedLoad
+    ) {
+      loadSavedGame(props.user.uid);
+      setHasAttemptedLoad(true);
     }
-  }, [inGame, currentCelebRaw, startNewGame, continueExistingGame, gameStatus]);
+  }, [props.user?.uid, loadSavedGame, inGame, gameStatus]);
 
   useEffect(() => {
-    if (!currentCelebRaw) return undefined;
+    if (
+      hasAttemptedLoad &&
+      !loadingGameState &&
+      !hasSavedGame &&
+      !inGame &&
+      gameStatus !== 'game_over'
+    ) {
+      startNewGame();
+    }
+  }, [loadingGameState, hasSavedGame, inGame, gameStatus, startNewGame]);
+
+  useEffect(() => {
+    if (!currentCelebRaw || loadingGameState || !inGame) return;
 
     let running;
     try {
       running = fetchPage(currentCelebRaw);
     } catch (err) {
-      console.warn("Failed to fetch Wikipedia page", err);
+      console.warn('Failed to fetch Wikipedia page', err);
     }
 
     return () => {
-      if (running && typeof running.abort === "function") {
+      if (running && typeof running.abort === 'function') {
         running.abort();
       }
     };
-  }, [currentCelebRaw, fetchPage]);
+  }, [currentCelebRaw, fetchPage, loadingGameState, inGame]);
 
-  return <GamePresenter {...props} loading={wikipediaLoading} />;
+  return (
+    <GamePresenter
+      {...props}
+      hasAttemptedLoad={hasAttemptedLoad}
+      loadingGameState={loadingGameState}
+      loading={wikipediaLoading}
+    />
+  );
 };
 
 const mapState = (state) => {
   const g = state.game || {};
-  const displayName = g.currentCeleb ? formatDisplayName(g.currentCeleb) : "";
+  const displayName = g.currentCeleb ? formatDisplayName(g.currentCeleb) : '';
 
   const gameState = {
     score: g.score ?? Math.max(0, (g.level || 1) - 1),
@@ -101,7 +129,7 @@ const mapDispatch = (dispatch) => ({
   onUseHint: () => dispatch(useHint()),
   onNextQuestion: () => dispatch(startNewGame()),
   startNewGame: () => dispatch(startNewGame()),
-  continueExistingGame: () => dispatch(continueGame()),
+  loadSavedGame: (userId) => dispatch(loadSavedGame(userId)),
   fetchPage: (title) => dispatch(fetchWikipediaPage(title)),
 });
 

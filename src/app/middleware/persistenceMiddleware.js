@@ -1,12 +1,17 @@
-import { fetchLeaderboard, submitGuess } from '../features/game/gameSlice';
 import {
-  saveGuessToHistory,
-  updateUserStatsAfterGuess,
+  fetchLeaderboard,
+  setSavedGameFlag,
+  startNewGame,
+  submitGuess,
+  useHint,
+} from '../features/game/gameSlice';
+import {
+  clearSavedGameState,
+  saveCurrentGameState,
 } from '../models/gameProgressModel';
 import { saveGameResult } from '../models/leaderboardModel';
 
 let lastPersistedRunId = null;
-let currentGameId = null;
 
 const persistenceMiddleware = (store) => (next) => (action) => {
   const result = next(action);
@@ -14,8 +19,20 @@ const persistenceMiddleware = (store) => (next) => (action) => {
   const userId = state.auth.user?.uid;
 
   // Watch for game start to generate a gameId
-  if (action.type === 'game/startNewGame' && userId) {
-    currentGameId = `game_${Date.now()}_${userId}`;
+  if (action.type === startNewGame.type && userId && !state.game.hasSavedGame) {
+    saveCurrentGameState(userId, { ...state.game })
+      .then(() => {
+        store.dispatch(setSavedGameFlag(true));
+      })
+      .catch((err) => {
+        console.warn('Failed to save initial game state', err);
+      });
+  }
+
+  if (action.type === useHint.type && userId) {
+    saveCurrentGameState(userId, { ...state.game }).catch((err) => {
+      console.warn('Failed to save game state after hint', err);
+    });
   }
 
   // After each guess, update user stats and save guess history
@@ -23,26 +40,9 @@ const persistenceMiddleware = (store) => (next) => (action) => {
     const lastResult = state.game?.lastResultDetail;
 
     if (lastResult) {
-      const guessData = {
-        correct: lastResult.correct,
-        scoreDelta: lastResult.scoreDelta,
-        hintsUsed: lastResult.hintsUsed || 0,
-        level: state.game.level,
-        lives: state.game.lives,
-        celeb: lastResult.correctAnswer,
-        guess: lastResult.guess,
-        timeTakenMs: lastResult.timeTakenMs,
-      };
-
-      updateUserStatsAfterGuess(userId, guessData).catch((err) => {
-        console.warn('Failed to update user stats after guess', err);
+      saveCurrentGameState(userId, { ...state.game }).catch((err) => {
+        console.warn('Failed to save current game state', err);
       });
-
-      if (currentGameId) {
-        saveGuessToHistory(userId, currentGameId, guessData).catch((err) => {
-          console.warn('Failed to save guess to history', err);
-        });
-      }
     }
   }
 
@@ -53,7 +53,12 @@ const persistenceMiddleware = (store) => (next) => (action) => {
     runSummary.endedAt !== lastPersistedRunId
   ) {
     lastPersistedRunId = runSummary.endedAt;
-    currentGameId = null; // Reset game ID
+
+    clearSavedGameState(userId).catch((err) => {
+      console.warn('Failed to clear saved game state', err);
+    });
+
+    store.dispatch(setSavedGameFlag(false));
 
     saveGameResult(userId, runSummary, {
       email: state.auth.user?.email || null,
