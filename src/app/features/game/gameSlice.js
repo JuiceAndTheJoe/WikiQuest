@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { loadSavedGameState } from '../../models/gameProgressModel';
 import { getLeaderboard } from '../../models/leaderboardModel';
 import {
   BASE_SCORE,
@@ -22,6 +23,14 @@ export const fetchLeaderboard = createAsyncThunk(
   async () => {
     const leaderboard = await getLeaderboard();
     return leaderboard;
+  }
+);
+
+export const loadSavedGame = createAsyncThunk(
+  'game/loadSavedGame',
+  async (userId) => {
+    const savedState = await loadSavedGameState(userId);
+    return savedState;
   }
 );
 
@@ -51,6 +60,8 @@ const initialState = {
   leaderboardData: [],
   leaderboardLoading: false,
   leaderboardError: null,
+  hasSavedGame: false,
+  loadingGameState: false,
 };
 
 const gameSlice = createSlice({
@@ -76,19 +87,25 @@ const gameSlice = createSlice({
       state.hintsUsedThisQuestion = 0;
       state.totalHintsUsed = 0;
       state.lastGameResult = null;
+      state.hasSavedGame = false;
       const pool = poolForLevel(state.level);
       state.currentCeleb = pickRandom(pool);
     },
-    continueGame(state) {
+    resumeGame(state, action) {
+      const savedState = action.payload;
+      Object.assign(state, savedState);
       state.inGame = true;
       state.status = 'playing';
-      state.lastGuessResult = null;
-      state.lastResultDetail = null;
-      if (!state.currentCeleb)
-        state.currentCeleb = pickRandom(poolForLevel(state.level));
       if (!state.currentQuestionStartTime) {
         state.currentQuestionStartTime = Date.now();
       }
+    },
+    continueGame(state) {
+      const savedState = action.payload;
+      if (savedState) return;
+
+      Object.assign(state, savedState);
+      state.hasSavedGame = false;
     },
     submitGuess(state, action) {
       const rawGuess = String(action.payload || '').trim();
@@ -210,6 +227,9 @@ const gameSlice = createSlice({
       state.hintsUsedThisQuestion += 1;
       state.totalHintsUsed = (state.totalHintsUsed || 0) + 1;
     },
+    setSavedGameFlag(state, action) {
+      state.hasSavedGame = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -225,11 +245,34 @@ const gameSlice = createSlice({
         state.leaderboardLoading = false;
         state.leaderboardError =
           action.error.message || 'Failed to load leaderboard';
+      })
+      .addCase(loadSavedGame.pending, (state) => {
+        state.loadingGameState = true;
+      })
+      .addCase(loadSavedGame.fulfilled, (state, action) => {
+        state.loadingGameState = false;
+        const savedState = action.payload;
+        if (savedState) {
+          Object.assign(state, savedState);
+          state.hasSavedGame = true;
+        } else {
+          state.hasSavedGame = false;
+        }
+      })
+      .addCase(loadSavedGame.rejected, (state) => {
+        state.loadingGameState = false;
+        state.hasSavedGame = false;
       });
   },
 });
 
-export const { startNewGame, continueGame, submitGuess, useHint } =
-  gameSlice.actions;
+export const {
+  startNewGame,
+  continueGame,
+  submitGuess,
+  useHint,
+  setSavedGameFlag,
+  resumeGame,
+} = gameSlice.actions;
 
 export default gameSlice.reducer;

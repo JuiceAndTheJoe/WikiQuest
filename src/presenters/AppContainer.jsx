@@ -7,6 +7,8 @@ import {
   logoutUser,
   registerUser,
 } from '../app/features/auth/authSlice';
+import { setSavedGameFlag } from '../app/features/game/gameSlice';
+import { hasSavedGame } from '../app/models/gameProgressModel';
 import AppPresenter from './AppPresenter';
 
 function AppContainer({
@@ -25,6 +27,19 @@ function AppContainer({
     const unsubscribe = initAuthListener(dispatch);
     return () => unsubscribe();
   }, [dispatch]);
+
+  // Check for saved game when user changes
+  useEffect(() => {
+    if (user?.uid) {
+      hasSavedGame(user.uid)
+        .then((exists) => {
+          dispatch(setSavedGameFlag(exists));
+        })
+        .catch((err) => {
+          console.warn('Failed to check saved game', err);
+        });
+    }
+  }, [user?.uid, dispatch]);
 
   return (
     <AppPresenter

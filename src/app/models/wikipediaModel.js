@@ -5,8 +5,7 @@
  */
 
 import { apiCall } from '../api';
-
-const WIKIPEDIA_API_BASE = 'https://en.wikipedia.org/api/rest_v1';
+import { WIKIPEDIA_API_BASE } from './constants';
 
 /**
  * Fetch page summary from Wikipedia
