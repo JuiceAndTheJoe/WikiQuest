@@ -8,6 +8,7 @@ function ResultsPresenter({
   userStats,
   newHighScore,
   onStartNewGame,
+  user,
 }) {
   const navigate = useNavigate();
   const safeGameStats = gameStats || {
@@ -41,6 +42,10 @@ function ResultsPresenter({
     navigate("/");
   };
 
+  const handleCreateAccount = () => {
+    navigate("/login");
+  };
+
   return (
     <ResultsView
       gameStats={safeGameStats}
@@ -49,6 +54,8 @@ function ResultsPresenter({
       onPlayAgain={handlePlayAgain}
       onViewLeaderboard={handleViewLeaderboard}
       onBackToMenu={handleBackToMenu}
+      onCreateAccount={handleCreateAccount}
+      user={user}
       newHighScore={newHighScore}
     />
   );

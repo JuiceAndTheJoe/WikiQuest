@@ -28,9 +28,15 @@ export const fetchLeaderboard = createAsyncThunk(
 
 export const loadSavedGame = createAsyncThunk(
   'game/loadSavedGame',
-  async (userId) => {
-    const savedState = await loadSavedGameState(userId);
-    return savedState;
+  async ({ userId, isGuest }) => {
+    if (isGuest) {
+      const { loadGuestGameState } = await import('../../models/guestStorageModel');
+      const savedState = await loadGuestGameState(userId);
+      return savedState;
+    } else {
+      const savedState = await loadSavedGameState(userId);
+      return savedState;
+    }
   }
 );
 

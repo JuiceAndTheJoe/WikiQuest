@@ -234,22 +234,23 @@ function LeaderboardView({
                                 )}
                               </Avatar>
                               <Box>
-                                <Typography
-                                  variant="body2"
-                                  fontWeight={isCurrentUser ? "bold" : "normal"}
-                                >
-                                  {player.name ||
-                                    player.email ||
-                                    `Player ${rank}`}
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                  <Typography
+                                    variant="body2"
+                                    fontWeight={isCurrentUser ? "bold" : "normal"}
+                                  >
+                                    {player.name ||
+                                      player.email ||
+                                      `Player ${rank}`}
+                                  </Typography>
                                   {isCurrentUser && (
                                     <Chip
                                       label="You"
                                       size="small"
                                       color="primary"
-                                      sx={{ ml: 1 }}
                                     />
                                   )}
-                                </Typography>
+                                </Stack>
                                 {player.lastPlayed && (
                                   <Typography
                                     variant="caption"

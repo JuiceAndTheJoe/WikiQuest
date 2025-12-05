@@ -15,6 +15,7 @@ import {
   LinearProgress,
   Chip,
   Divider,
+  Alert,
 } from "@mui/material";
 import {
   PlayArrow,
@@ -23,6 +24,7 @@ import {
   EmojiEvents,
   CheckCircle,
   Cancel,
+  AccountCircle,
 } from "@mui/icons-material";
 
 function ResultsView({
@@ -32,8 +34,11 @@ function ResultsView({
   onPlayAgain,
   onViewLeaderboard,
   onBackToMenu,
+  onCreateAccount,
+  user,
   newHighScore = false,
 }) {
+  const isGuest = user?.isGuest || false;
   const accuracy =
     gameStats?.totalQuestions > 0
       ? Math.round((gameStats.correctAnswers / gameStats.totalQuestions) * 100)
@@ -303,6 +308,31 @@ function ResultsView({
                   </Box>
                 </CardContent>
               </Card>
+
+              {/* Guest Conversion Prompt */}
+              {isGuest && (
+                <Alert
+                  severity="info"
+                  action={
+                    <Button
+                      color="inherit"
+                      size="small"
+                      onClick={onCreateAccount}
+                      startIcon={<AccountCircle />}
+                    >
+                      Sign In
+                    </Button>
+                  }
+                  sx={{ mb: 2 }}
+                >
+                  <Typography variant="body2" fontWeight="bold">
+                    Save Your Progress!
+                  </Typography>
+                  <Typography variant="caption">
+                    Create an account or sign in to save this score permanently
+                  </Typography>
+                </Alert>
+              )}
 
               {/* Action Buttons */}
               <Stack spacing={2}>

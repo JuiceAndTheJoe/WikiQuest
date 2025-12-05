@@ -10,9 +10,9 @@ const HomeContainer = (props) => {
   // Check for saved game on mount
   useEffect(() => {
     if (user?.uid && !loadingGameState) {
-      loadSavedGame(user.uid);
+      loadSavedGame({ userId: user.uid, isGuest: user.isGuest || false });
     }
-  }, [user?.uid, loadSavedGame, loadingGameState]);
+  }, [user?.uid, user?.isGuest, loadSavedGame, loadingGameState]);
 
   return <HomePresenter {...props} />;
 };
@@ -33,7 +33,7 @@ const mapState = (state) => {
 
 const mapDispatch = (dispatch) => ({
   onStartGame: () => dispatch(startNewGame()),
-  loadSavedGame: (userId) => dispatch(loadSavedGame(userId)),
+  loadSavedGame: (params) => dispatch(loadSavedGame(params)),
   onLogout: () => dispatch(logoutUser()),
 });
 
