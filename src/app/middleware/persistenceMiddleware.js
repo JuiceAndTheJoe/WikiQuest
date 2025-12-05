@@ -29,6 +29,7 @@ const persistenceMiddleware = (store) => (next) => (action) => {
       });
   }
 
+  // On hint usage, save current game state
   if (action.type === useHint.type && userId) {
     saveCurrentGameState(userId, { ...state.game }).catch((err) => {
       console.warn('Failed to save game state after hint', err);
@@ -46,6 +47,7 @@ const persistenceMiddleware = (store) => (next) => (action) => {
     }
   }
 
+  // On game end, persist results and clear saved state
   const runSummary = state.game?.lastGameResult;
   if (
     userId &&

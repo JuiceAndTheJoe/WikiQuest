@@ -63,6 +63,13 @@ export async function updateUserStatsAfterGuess(userId, guessData) {
   });
 }
 
+/**
+ * Saves the current game state for the user.
+ *
+ * @param {string} userId - User ID
+ * @param {object} gameState - Current game state to save
+ * @returns {Promise<void>}
+ */
 export async function saveCurrentGameState(userId, gameState) {
   if (!userId || !gameState) return;
 
@@ -82,6 +89,12 @@ export async function saveCurrentGameState(userId, gameState) {
   });
 }
 
+/**
+ * Loads the saved game state for the user.
+ *
+ * @param {string} userId - User ID
+ * @returns {Promise<object|null>} - Loaded game state or null if none exists
+ */
 export async function loadSavedGameState(userId) {
   if (!userId) return null;
 
@@ -96,6 +109,12 @@ export async function loadSavedGameState(userId) {
   return snap.exists() ? snap.data() : null;
 }
 
+/**
+ * Clears the saved game state for the user.
+ *
+ * @param {string} userId - User ID
+ * @returns {Promise<void>}
+ */
 export async function clearSavedGameState(userId) {
   if (!userId) return;
 
@@ -109,6 +128,12 @@ export async function clearSavedGameState(userId) {
   await deleteDoc(gameStateRef);
 }
 
+/**
+ * Checks if a saved game exists for the user.
+ *
+ * @param {string} userId - User ID
+ * @returns {Promise<boolean>} - True if a saved game exists, false otherwise
+ */
 export async function hasSavedGame(userId) {
   if (!userId) return false;
 

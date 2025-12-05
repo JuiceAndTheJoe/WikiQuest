@@ -28,6 +28,7 @@ function AppContainer({
     return () => unsubscribe();
   }, [dispatch]);
 
+  // Check for saved game when user changes
   useEffect(() => {
     if (user?.uid) {
       hasSavedGame(user.uid)
