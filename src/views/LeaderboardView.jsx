@@ -257,7 +257,7 @@ function LeaderboardView({
                                   >
                                     Last played:{" "}
                                     {new Date(
-                                      player.lastPlayed
+                                      player.lastPlayed,
                                     ).toLocaleDateString()}
                                   </Typography>
                                 )}
@@ -291,8 +291,8 @@ function LeaderboardView({
                                 (player.accuracy || 0) >= 80
                                   ? "success"
                                   : (player.accuracy || 0) >= 60
-                                  ? "warning"
-                                  : "error"
+                                    ? "warning"
+                                    : "error"
                               }
                             />
                           </TableCell>
@@ -347,7 +347,7 @@ function LeaderboardView({
                 </Typography>
                 <Typography variant="h5" fontWeight="bold" color="warning.main">
                   {Math.max(
-                    ...leaderboardData.map((p) => p.highScore || 0)
+                    ...leaderboardData.map((p) => p.highScore || 0),
                   ).toLocaleString()}
                 </Typography>
               </Box>
@@ -369,8 +369,8 @@ function LeaderboardView({
                   {Math.round(
                     leaderboardData.reduce(
                       (sum, p) => sum + (p.accuracy || 0),
-                      0
-                    ) / leaderboardData.length
+                      0,
+                    ) / leaderboardData.length,
                   )}
                   %
                 </Typography>

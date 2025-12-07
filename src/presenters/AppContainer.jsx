@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { initAuthListener } from '../app/features/auth/authListeners';
+import { useEffect } from "react";
+import { connect } from "react-redux";
+import { initAuthListener } from "../app/features/auth/authListeners";
 import {
   clearError,
   loginUser,
   logoutUser,
   registerUser,
-} from '../app/features/auth/authSlice';
-import { setSavedGameFlag } from '../app/features/game/gameSlice';
-import { hasSavedGame } from '../app/models/gameProgressModel';
-import AppPresenter from './AppPresenter';
+} from "../app/features/auth/authSlice";
+import { setSavedGameFlag } from "../app/features/game/gameSlice";
+import { hasSavedGame } from "../app/models/gameProgressModel";
+import AppPresenter from "./AppPresenter";
 
 function AppContainer({
   user,
@@ -36,7 +36,7 @@ function AppContainer({
           dispatch(setSavedGameFlag(exists));
         })
         .catch((err) => {
-          console.warn('Failed to check saved game', err);
+          console.warn("Failed to check saved game", err);
         });
     }
   }, [user?.uid, dispatch]);

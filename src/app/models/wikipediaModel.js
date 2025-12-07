@@ -4,8 +4,8 @@
  * Grade A requirement: Multi-source API integration
  */
 
-import { apiCall } from '../api';
-import { WIKIPEDIA_API_BASE } from './constants';
+import { apiCall } from "../api";
+import { WIKIPEDIA_API_BASE } from "./constants";
 
 /**
  * Fetch page summary from Wikipedia
@@ -23,7 +23,7 @@ export async function getPageSummary(title, signal) {
     const data = await apiCall(url, true, signal);
     return data;
   } catch (error) {
-    console.error('Error fetching Wikipedia page:', error);
+    console.error("Error fetching Wikipedia page:", error);
     throw error;
   }
 }

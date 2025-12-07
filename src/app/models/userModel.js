@@ -1,6 +1,6 @@
-import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
-import { USER_COLLECTION } from './constants';
+import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
+import { db } from "../../firebaseConfig";
+import { USER_COLLECTION } from "./constants";
 
 /**
  * Save user data to Firestore

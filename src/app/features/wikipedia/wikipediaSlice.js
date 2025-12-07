@@ -1,25 +1,25 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getPageSummary } from '../../models/wikipediaModel';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getPageSummary } from "../../models/wikipediaModel";
 
 // Async thunk for fetching Wikipedia page summary + plain-text full content
 export const fetchWikipediaPage = createAsyncThunk(
-  'wikipedia/fetchPage',
+  "wikipedia/fetchPage",
   async (pageTitle, { rejectWithValue, signal }) => {
     try {
       const summary = await getPageSummary(pageTitle, signal);
       return { summary };
     } catch (error) {
-      if (error.name === 'AbortError') {
+      if (error.name === "AbortError") {
         // Let createAsyncThunk handle cancellation (it sets .meta.aborted)
         throw error;
       }
-      return rejectWithValue(error.message || 'Failed to fetch Wikipedia page');
+      return rejectWithValue(error.message || "Failed to fetch Wikipedia page");
     }
-  }
+  },
 );
 
 const wikipediaSlice = createSlice({
-  name: 'wikipedia',
+  name: "wikipedia",
   initialState: {
     pageData: null, // { summary }
     loading: false,
@@ -42,7 +42,7 @@ const wikipediaSlice = createSlice({
         state.error =
           action.payload ||
           action.error?.message ||
-          'Failed to fetch Wikipedia page';
+          "Failed to fetch Wikipedia page";
       });
   },
 });

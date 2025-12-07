@@ -166,7 +166,7 @@ function ResultsView({
                           <Typography variant="h6" fontWeight="bold">
                             {gameHistory?.reduce(
                               (total, q) => total + (q.hintsUsed || 0),
-                              0
+                              0,
                             ) || 0}
                           </Typography>
                         </Box>
