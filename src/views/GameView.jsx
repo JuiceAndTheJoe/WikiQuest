@@ -136,11 +136,18 @@ function GameView({
                             component='img'
                             src={wikipediaSummary.thumbnail.source}
                             alt='Person'
+                            onContextMenu={(e) => e.preventDefault()}
+                            onDragStart={(e) => e.preventDefault()}
                             sx={{
                               maxWidth: '220px',
                               borderRadius: 1,
                               mx: 'auto',
                               display: 'block',
+                              pointerEvents: 'auto',
+                              userSelect: 'none',
+                              WebkitUserSelect: 'none',
+                              MozUserSelect: 'none',
+                              msUserSelect: 'none',
                             }}
                           />
                         )}
