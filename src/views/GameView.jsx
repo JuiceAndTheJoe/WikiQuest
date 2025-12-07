@@ -43,6 +43,13 @@ function GameView({
     hasSummary && hints && hints.availableHints > hints.usedHints;
   const isGameOver = gameState?.lives <= 0;
 
+  const getBlurAmount = () => {
+    if (hintsUsed === 0) return 8;
+    if (hintsUsed === 1) return 5;
+    if (hintsUsed === 2) return 2;
+    return 0;
+  };
+
   return (
     <Container maxWidth='lg' sx={{ py: 3 }}>
       <Stack spacing={3}>
@@ -148,6 +155,8 @@ function GameView({
                               WebkitUserSelect: 'none',
                               MozUserSelect: 'none',
                               msUserSelect: 'none',
+                              filter: `blur(${getBlurAmount()}px)`,
+                              transition: 'filter 0.3s ease',
                             }}
                           />
                         )}
