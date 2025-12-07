@@ -16,7 +16,6 @@
     "@mui/material": "^7.3.5",
     "@reduxjs/toolkit": "latest",
     "firebase": "latest",
-    "firebaseui": "^6.1.0",
     "react": "latest",
     "react-dom": "latest",
     "react-redux": "latest",
