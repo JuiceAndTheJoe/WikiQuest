@@ -35,6 +35,10 @@ function LoginPresenter({ onLogin, onRegister, onConvertGuest, loading, error, o
     if (error) onClearError();
   };
 
+  const handleContinueAsGuest = () => {
+    navigate('/');
+  };
+
   return (
     <LoginView
       email={email}
@@ -47,6 +51,7 @@ function LoginPresenter({ onLogin, onRegister, onConvertGuest, loading, error, o
       onToggleMode={handleToggleMode}
       onSubmit={handleSubmit}
       onClearError={onClearError}
+      onContinueAsGuest={handleContinueAsGuest}
       isAnonymous={user?.isAnonymous || false}
     />
   );

@@ -18,6 +18,7 @@ function LoginView({
   onToggleMode,
   onSubmit,
   onClearError,
+  onContinueAsGuest,
   isAnonymous = false,
 }) {
   return (
@@ -81,6 +82,17 @@ function LoginView({
             ? "Already have an account? Login"
             : "Don't have an account? Register"}
         </Button>
+        
+        {isAnonymous && (
+          <Button
+            variant="outlined"
+            onClick={onContinueAsGuest}
+            disabled={loading}
+            sx={{ textTransform: "none" }}
+          >
+            Continue as Guest
+          </Button>
+        )}
       </Stack>
     </Paper>
   );
