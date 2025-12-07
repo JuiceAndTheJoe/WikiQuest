@@ -38,7 +38,7 @@ function ResultsView({
   user,
   newHighScore = false,
 }) {
-  const isGuest = user?.isGuest || false;
+  const isAnonymous = user?.isAnonymous || false;
   const accuracy =
     gameStats?.totalQuestions > 0
       ? Math.round((gameStats.correctAnswers / gameStats.totalQuestions) * 100)
@@ -309,8 +309,8 @@ function ResultsView({
                 </CardContent>
               </Card>
 
-              {/* Guest Conversion Prompt */}
-              {isGuest && (
+              {/* Anonymous User Conversion Prompt */}
+              {isAnonymous && (
                 <Alert
                   severity="info"
                   action={

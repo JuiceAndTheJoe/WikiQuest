@@ -115,7 +115,7 @@ function LeaderboardView({
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="h6">Your Current Rank</Typography>
                   <Typography variant="body2">
-                    {currentUser?.email || "You"}
+                    {currentUser?.isAnonymous ? "Guest Player" : (currentUser?.email || "You")}
                   </Typography>
                 </Box>
                 <Box sx={{ textAlign: "right" }}>

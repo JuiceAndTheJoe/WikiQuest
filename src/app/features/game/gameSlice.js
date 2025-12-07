@@ -28,15 +28,10 @@ export const fetchLeaderboard = createAsyncThunk(
 
 export const loadSavedGame = createAsyncThunk(
   'game/loadSavedGame',
-  async ({ userId, isGuest }) => {
-    if (isGuest) {
-      const { loadGuestGameState } = await import('../../models/guestStorageModel');
-      const savedState = await loadGuestGameState(userId);
-      return savedState;
-    } else {
-      const savedState = await loadSavedGameState(userId);
-      return savedState;
-    }
+  async ({ userId }) => {
+    // All users (anonymous and authenticated) load from Firestore
+    const savedState = await loadSavedGameState(userId);
+    return savedState;
   }
 );
 

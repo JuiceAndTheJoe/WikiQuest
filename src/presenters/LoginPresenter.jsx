@@ -9,9 +9,9 @@ function LoginPresenter({ onLogin, onRegister, onConvertGuest, loading, error, o
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const navigate = useNavigate();
 
-  // Redirect authenticated (non-guest) users to home
+  // Redirect authenticated (non-anonymous) users to home
   useEffect(() => {
-    if (user && !user.isGuest) {
+    if (user && !user.isAnonymous) {
       navigate('/');
     }
   }, [user, navigate]);
@@ -20,8 +20,8 @@ function LoginPresenter({ onLogin, onRegister, onConvertGuest, loading, error, o
     e.preventDefault();
     const payload = { email, password };
     
-    // If user is a guest, convert their account
-    if (user?.isGuest) {
+    // If user is anonymous, convert their account
+    if (user?.isAnonymous) {
       onConvertGuest({ ...payload, isLogin: !isRegisterMode });
     } else {
       // Normal login/register
@@ -47,7 +47,7 @@ function LoginPresenter({ onLogin, onRegister, onConvertGuest, loading, error, o
       onToggleMode={handleToggleMode}
       onSubmit={handleSubmit}
       onClearError={onClearError}
-      isGuest={user?.isGuest || false}
+      isAnonymous={user?.isAnonymous || false}
     />
   );
 }

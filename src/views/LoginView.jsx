@@ -18,19 +18,19 @@ function LoginView({
   onToggleMode,
   onSubmit,
   onClearError,
-  isGuest = false,
+  isAnonymous = false,
 }) {
   return (
     <Paper elevation={3} sx={{ p: 3, maxWidth: 480, m: "2rem auto" }}>
       <Stack spacing={2} component="form" onSubmit={onSubmit}>
         <Typography variant="h4" component="h1">
-          {isGuest 
+          {isAnonymous 
             ? (isRegisterMode ? "Create Account" : "Sign In")
             : (isRegisterMode ? "Register" : "Login")
           }
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {isGuest
+          {isAnonymous
             ? (isRegisterMode 
                 ? "Create an account to save your guest progress permanently"
                 : "Sign in to merge your guest progress with your account")

@@ -35,7 +35,7 @@ function MenuView({
   hasSavedGame = false,
   userStats = { gamesPlayed: 0, highScore: 0, totalScore: 0 },
 }) {
-  const isGuest = user?.isGuest || false;
+  const isAnonymous = user?.isAnonymous || false;
   return (
     <Box sx={{ position: 'relative', minHeight: '100vh' }}>
       {/* Animated Background */}
@@ -108,10 +108,10 @@ function MenuView({
                 </Avatar>
                 <Box>
                   <Typography variant='h6'>
-                    {isGuest ? 'Guest Player' : user?.email || 'Player'}
+                    {isAnonymous ? 'Guest Player' : user?.email || 'Player'}
                   </Typography>
                   <Typography variant='body2' color='text.secondary'>
-                    {isGuest 
+                    {isAnonymous 
                       ? 'Playing as guest - create account to save progress'
                       : `Games Played: ${userStats.gamesPlayed}`
                     }
@@ -119,7 +119,7 @@ function MenuView({
                 </Box>
               </Stack>
               <Stack alignItems='flex-end' spacing={1}>
-                {!isGuest && (
+                {!isAnonymous && (
                   <Stack direction='row' spacing={1} alignItems='center'>
                     <EmojiEvents color='warning' />
                     <Typography variant='h6'>
@@ -128,7 +128,7 @@ function MenuView({
                   </Stack>
                 )}
                 <Stack direction='row' spacing={1}>
-                  {isGuest ? (
+                  {isAnonymous ? (
                     <Button
                       variant='contained'
                       size='small'

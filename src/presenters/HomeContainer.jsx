@@ -7,12 +7,12 @@ import HomePresenter from './HomePresenter';
 const HomeContainer = (props) => {
   const { user, loadSavedGame, loadingGameState } = props;
 
-  // Check for saved game on mount
+  // Check for saved game on mount (works for anonymous and authenticated users)
   useEffect(() => {
     if (user?.uid && !loadingGameState) {
-      loadSavedGame({ userId: user.uid, isGuest: user.isGuest || false });
+      loadSavedGame({ userId: user.uid });
     }
-  }, [user?.uid, user?.isGuest, loadSavedGame, loadingGameState]);
+  }, [user?.uid, loadSavedGame, loadingGameState]);
 
   return <HomePresenter {...props} />;
 };

@@ -3,12 +3,12 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  EmailAuthProvider,
+  linkWithCredential,
+  signInAnonymously,
 } from 'firebase/auth';
 import { auth } from '../../../firebaseConfig';
-import { getAllGuestData, clearAllGuestData } from '../../models/guestStorageModel';
-import { saveCurrentGameState } from '../../models/gameProgressModel';
-import { saveGameResult } from '../../models/leaderboardModel';
-import { isGuestUser, createNewGuestSession, createGuestUserObject } from './guestUtils';
+import { migrateAnonymousData } from '../../models/leaderboardModel';
 
 // Async thunks for Firebase auth operations
 export const loginUser = createAsyncThunk(
@@ -23,6 +23,7 @@ export const loginUser = createAsyncThunk(
       return {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
+        isAnonymous: false,
       };
     } catch (error) {
       return rejectWithValue(error.message);
@@ -42,6 +43,7 @@ export const registerUser = createAsyncThunk(
       return {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
+        isAnonymous: false,
       };
     } catch (error) {
       return rejectWithValue(error.message);
@@ -49,69 +51,72 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { getState }) => {
-  const state = getState();
-  const currentUser = state.auth.user;
-  
-  // Only sign out from Firebase if user is authenticated (not guest)
-  if (currentUser && !currentUser.isGuest) {
-    await signOut(auth);
-  }
-  
-  // Create a new guest session after logout
-  const newGuestId = createNewGuestSession();
-  return createGuestUserObject(newGuestId);
+export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
+  // Sign out from Firebase
+  await signOut(auth);
+  // onAuthStateChanged will trigger and create a new anonymous user automatically
 });
 
-// Convert guest account to authenticated account
+// Convert anonymous account to permanent account using Firebase account linking
 export const convertGuestToAccount = createAsyncThunk(
   'auth/convertGuestToAccount',
-  async ({ email, password, isLogin }, { getState, rejectWithValue }) => {
+  async ({ email, password, isLogin }, { rejectWithValue }) => {
     try {
-      const state = getState();
-      const currentUser = state.auth.user;
+      const currentUser = auth.currentUser;
       
-      // Verify current user is a guest
-      if (!currentUser || !currentUser.isGuest) {
-        throw new Error('Can only convert guest accounts');
+      // Verify current user is anonymous
+      if (!currentUser || !currentUser.isAnonymous) {
+        throw new Error('Can only convert anonymous accounts');
       }
       
-      const guestId = currentUser.uid;
+      const anonymousUserId = currentUser.uid;
       
-      // Get all guest data before creating account
-      const guestData = await getAllGuestData(guestId);
-      
-      // Create or sign in to Firebase account
-      let userCredential;
       if (isLogin) {
-        userCredential = await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      }
-      
-      const newUserId = userCredential.user.uid;
-      
-      // Migrate guest data to Firestore
-      if (guestData.gameState) {
-        await saveCurrentGameState(newUserId, guestData.gameState);
-      }
-      
-      if (guestData.gameResult) {
-        await saveGameResult(newUserId, guestData.gameResult, {
+        // Sign in to existing account - migrate anonymous data
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        
+        // Migrate anonymous user data to authenticated account
+        try {
+          await migrateAnonymousData(
+            anonymousUserId,
+            userCredential.user.uid,
+            {
+              email: userCredential.user.email,
+              displayName: userCredential.user.displayName,
+              photoURL: userCredential.user.photoURL,
+            }
+          );
+          console.log('Data migration completed successfully');
+        } catch (migrationError) {
+          console.error('Failed to migrate data, but login succeeded:', migrationError);
+        }
+        
+        return {
+          uid: userCredential.user.uid,
           email: userCredential.user.email,
-          displayName: userCredential.user.displayName || null,
-          photoURL: userCredential.user.photoURL || null,
+          isAnonymous: false,
+        };
+      } else {
+        // Link anonymous account with email/password credential
+        const credential = EmailAuthProvider.credential(email, password);
+        const userCredential = await linkWithCredential(currentUser, credential);
+        
+        // When linking, the UID stays the same, but we need to update Firestore with the email
+        // Import dynamically to avoid circular dependency
+        const { updateUserProfile } = await import('../../models/leaderboardModel');
+        await updateUserProfile(userCredential.user.uid, {
+          email: userCredential.user.email,
+          displayName: userCredential.user.displayName,
+          photoURL: userCredential.user.photoURL,
         });
+        
+        return {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          isAnonymous: false,
+          linkedFromAnonymous: true,
+        };
       }
-      
-      // Clear guest data from localStorage
-      await clearAllGuestData(guestId);
-      
-      return {
-        uid: newUserId,
-        email: userCredential.user.email,
-        migratedFromGuest: true,
-      };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -122,7 +127,7 @@ export const convertGuestToAccount = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
-    user: null, // { uid, email, isGuest? }
+    user: null, // { uid, email, isAnonymous }
     loading: false,
     error: null,
     isAuthChecked: false, // Track if initial auth check completed
@@ -134,10 +139,6 @@ const authSlice = createSlice({
     },
     clearError(state) {
       state.error = null;
-    },
-    setGuestUser(state, action) {
-      state.user = action.payload;
-      state.isAuthChecked = true;
     },
   },
   extraReducers: (builder) => {
@@ -171,11 +172,11 @@ const authSlice = createSlice({
         state.error = action.payload;
       })
       // Logout
-      .addCase(logoutUser.fulfilled, (state, action) => {
-        state.user = action.payload; // Set new guest user
+      .addCase(logoutUser.fulfilled, (state) => {
+        // User will be set via onAuthStateChanged listener
         state.loading = false;
       })
-      // Convert guest to account
+      // Convert anonymous to account
       .addCase(convertGuestToAccount.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -191,5 +192,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setUser, clearError, setGuestUser } = authSlice.actions;
+export const { setUser, clearError } = authSlice.actions;
 export default authSlice.reducer;

@@ -12,9 +12,9 @@ function LeaderboardPresenter({
 }) {
   const navigate = useNavigate();
 
-  // Redirect guests to login
-  const isGuest = user?.isGuest || false;
-  if (isGuest) {
+  // Redirect anonymous users to login
+  const isAnonymous = user?.isAnonymous || false;
+  if (isAnonymous) {
     navigate('/login');
     return null;
   }
