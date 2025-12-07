@@ -1,14 +1,21 @@
 import { useEffect } from "react";
 import { connect } from "react-redux";
 import LeaderboardPresenter from "./LeaderboardPresenter";
-import { fetchLeaderboard } from "../app/features/game/gameSlice";
+import { updateLeaderboard } from "../app/features/game/gameSlice";
+import { subscribeToLeaderboard } from "../app/models/leaderboardModel";
 
 const LeaderboardContainer = (props) => {
-  const { fetchLeaderboard } = props;
+  const { dispatch } = props;
 
   useEffect(() => {
-    fetchLeaderboard();
-  }, [fetchLeaderboard]);
+    // Subscribe to real-time leaderboard updates
+    const unsubscribe = subscribeToLeaderboard((leaderboardData) => {
+      dispatch(updateLeaderboard(leaderboardData));
+    });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [dispatch]);
 
   return <LeaderboardPresenter {...props} />;
 };
@@ -23,8 +30,4 @@ const mapState = (state) => {
   };
 };
 
-const mapDispatch = (dispatch) => ({
-  fetchLeaderboard: () => dispatch(fetchLeaderboard()),
-});
-
-export default connect(mapState, mapDispatch)(LeaderboardContainer);
+export default connect(mapState)(LeaderboardContainer);

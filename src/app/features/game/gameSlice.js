@@ -263,6 +263,9 @@ const gameSlice = createSlice({
     setSavedGameFlag(state, action) {
       state.hasSavedGame = action.payload;
     },
+    updateLeaderboard(state, action) {
+      state.leaderboardData = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -309,6 +312,7 @@ export const {
   useHint,
   setSavedGameFlag,
   resumeGame,
+  updateLeaderboard,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

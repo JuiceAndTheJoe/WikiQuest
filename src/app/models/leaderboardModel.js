@@ -8,6 +8,7 @@ import {
   runTransaction,
   deleteDoc,
   getDoc,
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
 import { USER_COLLECTION } from './constants';
@@ -55,6 +56,50 @@ export async function getLeaderboard(maxCount = 10) {
     console.error('Error fetching leaderboard:', error);
     throw error;
   }
+}
+
+/**
+ * Subscribe to real-time leaderboard updates.
+ *
+ * @param {function} callback - Callback function to handle leaderboard updates
+ * @param {number} maxCount - Maximum number of leaderboard entries
+ * @returns {function} Unsubscribe function
+ */
+export function subscribeToLeaderboard(callback, maxCount = 10) {
+  const leaderboardRef = collection(db, USER_COLLECTION);
+  const q = query(
+    leaderboardRef,
+    orderBy('highScore', 'desc'),
+    limit(maxCount * 2) // Fetch more to account for filtering
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const leaderboard = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      
+      // Skip anonymous users (those without email) and migrated users
+      if (!data.email || data.migrated) {
+        return;
+      }
+      
+      leaderboard.push({
+        userId: doc.id,
+        email: data.email,
+        name: data.displayName || data.email || 'Player',
+        highScore: data.highScore || 0,
+        gamesPlayed: data.gamesPlayed || 0,
+        averageScore: data.averageScore || 0,
+        accuracy: data.accuracy || 0,
+        lastPlayed: data.lastPlayed || null,
+      });
+    });
+
+    // Limit to requested count after filtering
+    callback(leaderboard.slice(0, maxCount));
+  }, (error) => {
+    console.error('Error in leaderboard subscription:', error);
+  });
 }
 
 /**

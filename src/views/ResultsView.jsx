@@ -64,18 +64,22 @@ function ResultsView({
             gutterBottom
             color={newHighScore ? "success.main" : "inherit"}
           >
-            {newHighScore ? "🎉 New High Score! 🎉" : "Game Over"}
+            {newHighScore ? "🎉 New Personal Best! 🎉" : "Good Job! 👏"}
           </Typography>
           <Typography variant="h4" color="primary" gutterBottom>
             Final Score: {gameStats?.score || 0}
           </Typography>
-          {newHighScore && (
+          {newHighScore ? (
             <Chip
               icon={<EmojiEvents />}
-              label="Personal Best!"
+              label="New High Score!"
               color="warning"
               sx={{ fontSize: "1rem", py: 2 }}
             />
+          ) : (
+            <Typography variant="body1" color="text.secondary">
+              Play again to beat your high score!
+            </Typography>
           )}
         </Box>
 
