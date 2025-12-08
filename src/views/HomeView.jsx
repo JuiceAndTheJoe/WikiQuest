@@ -123,53 +123,8 @@ function MenuView({
                   startIcon={<Leaderboard />}
                   onClick={onViewLeaderboard}
                 >
-                  See Who's Best
+                  All top players →
                 </Button>
-              </Stack>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Avatar sx={{ bgcolor: "primary.main" }}>
-                  <Person />
-                </Avatar>
-                <Box>
-                  <Typography variant="h6">
-                    {isAnonymous ? "Guest Player" : user?.email || "Player"}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {isAnonymous
-                      ? "Playing as guest - create account to save progress"
-                      : `Games Played: ${userStats.gamesPlayed}`}
-                  </Typography>
-                </Box>
-              </Stack>
-              <Stack alignItems="flex-end" spacing={1}>
-                {!isAnonymous && (
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <EmojiEvents color="warning" />
-                    <Typography variant="h6">
-                      High Score: {userStats.highScore}
-                    </Typography>
-                  </Stack>
-                )}
-                <Stack direction="row" spacing={1}>
-                  {isAnonymous ? (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={onCreateAccount}
-                    >
-                      Sign In or Create Account
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      startIcon={<ExitToApp />}
-                      onClick={onLogout}
-                    >
-                      Logout
-                    </Button>
-                  )}
-                </Stack>
               </Stack>
               <Stack spacing={1.5}>
                 {leaderboardData.slice(0, 3).map((player, index) => (
@@ -266,40 +221,61 @@ function MenuView({
                         <Person />
                       </Avatar>
                       <Stack direction="column" spacing={0.5}>
-                        <Stack direction="row" spacing={2} alignItems="center">
-                          <Typography variant="h6">
-                            {user?.email || "Player"}
-                          </Typography>
-                          <Stack
-                            direction="row"
-                            spacing={0.5}
-                            alignItems="center"
-                          >
-                            <Typography variant="body2" color="text.secondary">
-                              High Score:
-                            </Typography>
-                            <Typography variant="body2" fontWeight="bold">
-                              {userStats.highScore}
-                            </Typography>
-                            <EmojiEvents
-                              fontSize="small"
-                              sx={{ color: "warning.main" }}
-                            />
-                          </Stack>
-                        </Stack>
-                        <Typography variant="body2" color="text.secondary">
-                          Games Played: {userStats.gamesPlayed}
+                        <Typography variant="h6">
+                          {isAnonymous
+                            ? "Guest Player"
+                            : user?.email || "Player"}
                         </Typography>
+                        {isAnonymous ? (
+                          <Typography variant="body2" color="text.secondary">
+                            Playing as guest - create account to save progress
+                          </Typography>
+                        ) : (
+                          <>
+                            <Stack
+                              direction="row"
+                              spacing={0.5}
+                              alignItems="center"
+                            >
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                High Score:
+                              </Typography>
+                              <Typography variant="body2" fontWeight="bold">
+                                {userStats.highScore}
+                              </Typography>
+                              <EmojiEvents
+                                fontSize="small"
+                                sx={{ color: "warning.main" }}
+                              />
+                            </Stack>
+                            <Typography variant="body2" color="text.secondary">
+                              Games Played: {userStats.gamesPlayed}
+                            </Typography>
+                          </>
+                        )}
                       </Stack>
                     </Stack>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      startIcon={<ExitToApp />}
-                      onClick={onLogout}
-                    >
-                      Logout
-                    </Button>
+                    {isAnonymous ? (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={onCreateAccount}
+                      >
+                        Sign In or Create Account
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<ExitToApp />}
+                        onClick={onLogout}
+                      >
+                        Logout
+                      </Button>
+                    )}
                   </Stack>
                 </Stack>
               </Box>

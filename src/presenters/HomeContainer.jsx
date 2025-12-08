@@ -5,19 +5,33 @@ import {
   loadSavedGame,
   startNewGame,
   fetchUserStats,
+  fetchLeaderboard,
 } from "../app/features/game/gameSlice";
 import HomePresenter from "./HomePresenter";
 
 const HomeContainer = (props) => {
-  const { user, loadSavedGame, fetchUserStats, loadingGameState } = props;
+  const {
+    user,
+    loadSavedGame,
+    fetchUserStats,
+    fetchLeaderboard,
+    loadingGameState,
+  } = props;
 
-  // Check for saved game and fetch user stats on mount
+  // Check for saved game, fetch user stats, and load leaderboard on mount
   useEffect(() => {
     if (user?.uid && !loadingGameState) {
       loadSavedGame({ userId: user.uid });
       fetchUserStats(user.uid);
+      fetchLeaderboard();
     }
-  }, [user?.uid, loadSavedGame, fetchUserStats, loadingGameState]);
+  }, [
+    user?.uid,
+    loadSavedGame,
+    fetchUserStats,
+    fetchLeaderboard,
+    loadingGameState,
+  ]);
 
   return <HomePresenter {...props} />;
 };
@@ -40,6 +54,7 @@ const mapDispatch = (dispatch) => ({
   onStartGame: () => dispatch(startNewGame()),
   loadSavedGame: (params) => dispatch(loadSavedGame(params)),
   fetchUserStats: (userId) => dispatch(fetchUserStats(userId)),
+  fetchLeaderboard: () => dispatch(fetchLeaderboard()),
   onLogout: () => dispatch(logoutUser()),
 });
 
