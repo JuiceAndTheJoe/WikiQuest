@@ -98,7 +98,7 @@ function MenuView({
           <Stack
             direction={{ xs: "column", md: "row" }}
             spacing={3}
-            alignItems="flex-start"
+            alignItems="stretch"
           >
             {/* Mini Leaderboard */}
             <Box
@@ -108,6 +108,8 @@ function MenuView({
                 borderRadius: 2,
                 border: "1px solid rgba(255, 255, 255, 0.2)",
                 flex: { xs: 1, md: 0.5 },
+                display: "flex",
+                flexDirection: "column",
               }}
             >
               <Stack
@@ -123,7 +125,7 @@ function MenuView({
                   startIcon={<Leaderboard />}
                   onClick={onViewLeaderboard}
                 >
-                  All top players →
+                  All top players
                 </Button>
               </Stack>
               <Stack spacing={1.5}>
@@ -174,7 +176,11 @@ function MenuView({
             </Box>
 
             {/* Action Buttons & User Info */}
-            <Stack spacing={2} sx={{ flex: { xs: 1, md: 0.5 }, width: "100%" }}>
+            <Stack
+              spacing={2}
+              sx={{ flex: { xs: 1, md: 0.5 }, width: "100%" }}
+              justifyContent="space-between"
+            >
               <Button
                 variant="contained"
                 size="large"
@@ -183,6 +189,7 @@ function MenuView({
                 sx={{
                   py: 1.5,
                   fontSize: "1.1rem",
+                  flex: 1,
                 }}
               >
                 Start Quiz
@@ -191,7 +198,7 @@ function MenuView({
                 variant="outlined"
                 startIcon={<Help />}
                 onClick={() => setOpenHowToPlay(true)}
-                sx={{ py: 1.5 }}
+                sx={{ py: 1.5, flex: 1 }}
               >
                 How to Play
               </Button>

@@ -114,7 +114,7 @@ function LeaderboardView({
           <Stack
             direction={{ xs: "column", md: "row" }}
             spacing={3}
-            alignItems="flex-start"
+            alignItems="stretch"
           >
             {/* Community Statistics - Left Half */}
             {leaderboardData && leaderboardData.length > 0 && (
@@ -200,8 +200,20 @@ function LeaderboardView({
                   width: "100%",
                 }}
               >
-                <CardContent>
-                  <Stack direction="row" spacing={2} alignItems="center">
+                <CardContent
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "100%",
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    alignItems="center"
+                    sx={{ width: "100%" }}
+                  >
                     <Avatar sx={{ bgcolor: "primary.main" }}>
                       <Person />
                     </Avatar>
