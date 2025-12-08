@@ -4,12 +4,12 @@ import {
   startNewGame,
   submitGuess,
   useHint,
-} from '../features/game/gameSlice';
+} from "../features/game/gameSlice";
 import {
   clearSavedGameState,
   saveCurrentGameState,
-} from '../models/gameProgressModel';
-import { saveGameResult } from '../models/leaderboardModel';
+} from "../models/gameProgressModel";
+import { saveGameResult } from "../models/leaderboardModel";
 
 let lastPersistedRunId = null;
 
@@ -25,14 +25,14 @@ const persistenceMiddleware = (store) => (next) => (action) => {
         store.dispatch(setSavedGameFlag(true));
       })
       .catch((err) => {
-        console.warn('Failed to save initial game state', err);
+        console.warn("Failed to save initial game state", err);
       });
   }
 
   // On hint usage, save current game state
   if (action.type === useHint.type && userId) {
     saveCurrentGameState(userId, { ...state.game }).catch((err) => {
-      console.warn('Failed to save game state after hint', err);
+      console.warn("Failed to save game state after hint", err);
     });
   }
 
@@ -42,7 +42,7 @@ const persistenceMiddleware = (store) => (next) => (action) => {
 
     if (lastResult) {
       saveCurrentGameState(userId, { ...state.game }).catch((err) => {
-        console.warn('Failed to save current game state', err);
+        console.warn("Failed to save current game state", err);
       });
     }
   }
@@ -57,7 +57,7 @@ const persistenceMiddleware = (store) => (next) => (action) => {
     lastPersistedRunId = runSummary.endedAt;
 
     clearSavedGameState(userId).catch((err) => {
-      console.warn('Failed to clear saved game state', err);
+      console.warn("Failed to clear saved game state", err);
     });
 
     store.dispatch(setSavedGameFlag(false));
@@ -71,7 +71,7 @@ const persistenceMiddleware = (store) => (next) => (action) => {
         store.dispatch(fetchLeaderboard());
       })
       .catch((err) => {
-        console.warn('Failed to persist game result', err);
+        console.warn("Failed to persist game result", err);
       });
   }
 

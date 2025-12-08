@@ -4,13 +4,13 @@ import {
   getDoc,
   runTransaction,
   serverTimestamp,
-} from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+} from "firebase/firestore";
+import { db } from "../../firebaseConfig";
 import {
   SESSION_COLLECTION,
   SESSION_GAME_DOC_ID,
   USER_COLLECTION,
-} from './constants';
+} from "./constants";
 
 /**
  * Updates user stats after each guess (incremental updates).
@@ -58,7 +58,7 @@ export async function updateUserStatsAfterGuess(userId, guessData) {
             (currentGameStats.correctCount || 0) + (guessData.correct ? 1 : 0),
         },
       },
-      { merge: true }
+      { merge: true },
     );
   });
 }
@@ -78,7 +78,7 @@ export async function saveCurrentGameState(userId, gameState) {
     USER_COLLECTION,
     userId,
     SESSION_COLLECTION,
-    SESSION_GAME_DOC_ID
+    SESSION_GAME_DOC_ID,
   );
 
   await runTransaction(db, async (transaction) => {
@@ -103,7 +103,7 @@ export async function loadSavedGameState(userId) {
     USER_COLLECTION,
     userId,
     SESSION_COLLECTION,
-    SESSION_GAME_DOC_ID
+    SESSION_GAME_DOC_ID,
   );
   const snap = await getDoc(userRef);
   return snap.exists() ? snap.data() : null;
@@ -123,7 +123,7 @@ export async function clearSavedGameState(userId) {
     USER_COLLECTION,
     userId,
     SESSION_COLLECTION,
-    SESSION_GAME_DOC_ID
+    SESSION_GAME_DOC_ID,
   );
   await deleteDoc(gameStateRef);
 }
@@ -142,7 +142,7 @@ export async function hasSavedGame(userId) {
     USER_COLLECTION,
     userId,
     SESSION_COLLECTION,
-    SESSION_GAME_DOC_ID
+    SESSION_GAME_DOC_ID,
   );
   const snap = await getDoc(userRef);
   return snap.exists();

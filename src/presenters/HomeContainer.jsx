@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { logoutUser } from '../app/features/auth/authSlice';
-import { loadSavedGame, startNewGame } from '../app/features/game/gameSlice';
-import HomePresenter from './HomePresenter';
+import { useEffect } from "react";
+import { connect } from "react-redux";
+import { logoutUser } from "../app/features/auth/authSlice";
+import { loadSavedGame, startNewGame } from "../app/features/game/gameSlice";
+import HomePresenter from "./HomePresenter";
 
 const HomeContainer = (props) => {
   const { user, loadSavedGame, loadingGameState } = props;

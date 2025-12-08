@@ -31,7 +31,7 @@ function LeaderboardPresenter({
   const userRank = useMemo(() => {
     if (!user) return null;
     const idx = normalizedData.findIndex(
-      (entry) => entry.email === user.email || entry.id === user.uid
+      (entry) => entry.email === user.email || entry.id === user.uid,
     );
     if (idx === -1) return null;
     return {

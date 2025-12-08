@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import HomeView from '../views/HomeView';
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import HomeView from "../views/HomeView";
 
 // Presenter for MenuView: manages navigation and user stats
 function HomePresenter({
@@ -14,15 +14,15 @@ function HomePresenter({
 
   const handleStartGame = useCallback(() => {
     onStartGame?.();
-    navigate('/game');
+    navigate("/game");
   }, [onStartGame, navigate]);
 
   const handleResumeGame = useCallback(() => {
-    navigate('/game');
+    navigate("/game");
   }, [navigate]);
 
   const handleViewLeaderboard = useCallback(() => {
-    navigate('/leaderboard');
+    navigate("/leaderboard");
   }, [navigate]);
 
   return (

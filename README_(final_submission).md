@@ -25,6 +25,8 @@ npm run dev
 - `npm run build` - Create production build in `dist/`
 - `npm run serve` - Preview production build locally
 - `firebase deploy` - Deploy to Firebase Hosting
+- `npm run lint` - Run ESLint on the project
+- `npm run format` - Format source files with Prettier
 
 ## Tech Stack
 

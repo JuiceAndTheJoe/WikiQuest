@@ -6,9 +6,9 @@ import {
   orderBy,
   query,
   runTransaction,
-} from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
-import { USER_COLLECTION } from './constants';
+} from "firebase/firestore";
+import { db } from "../../firebaseConfig";
+import { USER_COLLECTION } from "./constants";
 
 /**
  * Fetches the leaderboard data from Firestore.
@@ -21,8 +21,8 @@ export async function getLeaderboard(maxCount = 10) {
     const leaderboardRef = collection(db, USER_COLLECTION);
     const q = query(
       leaderboardRef,
-      orderBy('highScore', 'desc'),
-      limit(maxCount)
+      orderBy("highScore", "desc"),
+      limit(maxCount),
     );
     const snapshot = await getDocs(q);
 
@@ -31,8 +31,8 @@ export async function getLeaderboard(maxCount = 10) {
       const data = doc.data();
       leaderboard.push({
         userId: doc.id,
-        email: data.email || 'Anonymous',
-        name: data.displayName || data.email || 'Player',
+        email: data.email || "Anonymous",
+        name: data.displayName || data.email || "Player",
         highScore: data.highScore || 0,
         gamesPlayed: data.gamesPlayed || 0,
         averageScore: data.averageScore || 0,
@@ -43,7 +43,7 @@ export async function getLeaderboard(maxCount = 10) {
 
     return leaderboard;
   } catch (error) {
-    console.error('Error fetching leaderboard:', error);
+    console.error("Error fetching leaderboard:", error);
     throw error;
   }
 }
@@ -95,7 +95,7 @@ export async function saveGameResult(userId, summary = {}, userProfile = {}) {
         accuracy,
         lastPlayed: summary.endedAt || Date.now(),
       },
-      { merge: true }
+      { merge: true },
     );
   });
 }
