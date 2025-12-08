@@ -189,11 +189,22 @@ export async function saveGameResult(userId, summary = {}, userProfile = {}) {
  * @param {object} userProfile - User profile data (email, displayName, etc.)
  * @returns {Promise<void>}
  */
-export async function migrateAnonymousData(anonymousUserId, authenticatedUserId, userProfile = {}) {
-  console.log('🔄 Starting data migration:', { anonymousUserId, authenticatedUserId });
-  
-  if (!anonymousUserId || !authenticatedUserId || anonymousUserId === authenticatedUserId) {
-    console.log('⚠️ Migration skipped - invalid IDs or same user');
+export async function migrateAnonymousData(
+  anonymousUserId,
+  authenticatedUserId,
+  userProfile = {},
+) {
+  console.log("🔄 Starting data migration:", {
+    anonymousUserId,
+    authenticatedUserId,
+  });
+
+  if (
+    !anonymousUserId ||
+    !authenticatedUserId ||
+    anonymousUserId === authenticatedUserId
+  ) {
+    console.log("⚠️ Migration skipped - invalid IDs or same user");
     return;
   }
 
@@ -206,30 +217,39 @@ export async function migrateAnonymousData(anonymousUserId, authenticatedUserId,
     const authSnap = await getDoc(authRef);
 
     if (!anonSnap.exists()) {
-      console.log('⚠️ No anonymous data found to migrate');
+      console.log("⚠️ No anonymous data found to migrate");
       return;
     }
 
     const anonData = anonSnap.data();
     const authData = authSnap.exists() ? authSnap.data() : {};
-    
-    console.log('📊 Anonymous data:', anonData);
-    console.log('📊 Authenticated data (before merge):', authData);
+
+    console.log("📊 Anonymous data:", anonData);
+    console.log("📊 Authenticated data (before merge):", authData);
 
     // Merge the data - taking the best of both
     const totalScore = (authData.totalScore || 0) + (anonData.totalScore || 0);
-    const gamesPlayed = (authData.gamesPlayed || 0) + (anonData.gamesPlayed || 0);
-    const totalCorrectAnswers = (authData.totalCorrectAnswers || 0) + (anonData.totalCorrectAnswers || 0);
-    const totalQuestions = (authData.totalQuestions || 0) + (anonData.totalQuestions || 0);
-    const accuracy = totalQuestions > 0 
-      ? Math.round((totalCorrectAnswers / totalQuestions) * 100)
-      : 0;
-    const averageScore = gamesPlayed > 0 
-      ? Math.round(totalScore / gamesPlayed)
-      : 0;
-    const highScore = Math.max(authData.highScore || 0, anonData.highScore || 0);
-    const lastPlayed = Math.max(authData.lastPlayed || 0, anonData.lastPlayed || 0);
-    
+    const gamesPlayed =
+      (authData.gamesPlayed || 0) + (anonData.gamesPlayed || 0);
+    const totalCorrectAnswers =
+      (authData.totalCorrectAnswers || 0) + (anonData.totalCorrectAnswers || 0);
+    const totalQuestions =
+      (authData.totalQuestions || 0) + (anonData.totalQuestions || 0);
+    const accuracy =
+      totalQuestions > 0
+        ? Math.round((totalCorrectAnswers / totalQuestions) * 100)
+        : 0;
+    const averageScore =
+      gamesPlayed > 0 ? Math.round(totalScore / gamesPlayed) : 0;
+    const highScore = Math.max(
+      authData.highScore || 0,
+      anonData.highScore || 0,
+    );
+    const lastPlayed = Math.max(
+      authData.lastPlayed || 0,
+      anonData.lastPlayed || 0,
+    );
+
     const mergedData = {
       email: userProfile.email || authData.email || null,
       displayName: userProfile.displayName || authData.displayName || null,
@@ -243,18 +263,22 @@ export async function migrateAnonymousData(anonymousUserId, authenticatedUserId,
       accuracy,
       lastPlayed,
     };
-    
-    console.log('✅ Merged data:', mergedData);
+
+    console.log("✅ Merged data:", mergedData);
 
     // Step 2: Update authenticated user with merged data using transaction
     await runTransaction(db, async (transaction) => {
       transaction.set(authRef, mergedData, { merge: true });
     });
 
-    console.log('✅ Successfully migrated anonymous data to authenticated account');
-    console.log('ℹ️ Anonymous data will be filtered from leaderboard automatically');
+    console.log(
+      "✅ Successfully migrated anonymous data to authenticated account",
+    );
+    console.log(
+      "ℹ️ Anonymous data will be filtered from leaderboard automatically",
+    );
   } catch (error) {
-    console.error('❌ Error migrating anonymous data:', error);
+    console.error("❌ Error migrating anonymous data:", error);
     throw error;
   }
 }
@@ -267,8 +291,8 @@ export async function migrateAnonymousData(anonymousUserId, authenticatedUserId,
  * @returns {Promise<void>}
  */
 export async function updateUserProfile(userId, userProfile = {}) {
-  console.log('📝 Updating user profile:', { userId, userProfile });
-  
+  console.log("📝 Updating user profile:", { userId, userProfile });
+
   if (!userId) {
     return;
   }
@@ -279,22 +303,22 @@ export async function updateUserProfile(userId, userProfile = {}) {
     await runTransaction(db, async (transaction) => {
       const snap = await transaction.get(userRef);
       const existing = snap.exists() ? snap.data() : {};
-      
+
       const updatedData = {
         ...existing,
         email: userProfile.email || existing.email || null,
         displayName: userProfile.displayName || existing.displayName || null,
         photoURL: userProfile.photoURL || existing.photoURL || null,
       };
-      
-      console.log('✅ Updated profile data:', updatedData);
-      
+
+      console.log("✅ Updated profile data:", updatedData);
+
       transaction.set(userRef, updatedData, { merge: true });
     });
 
-    console.log('✅ Successfully updated user profile');
+    console.log("✅ Successfully updated user profile");
   } catch (error) {
-    console.error('❌ Error updating user profile:', error);
+    console.error("❌ Error updating user profile:", error);
     throw error;
   }
 }

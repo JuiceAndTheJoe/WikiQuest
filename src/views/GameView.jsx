@@ -350,11 +350,11 @@ function GameView({
                   </Typography>
                 </Stack>
                 <Button
-                  variant='outlined'
-                  size='medium'
+                  variant="outlined"
+                  size="medium"
                   startIcon={<Home />}
                   onClick={onBackToHome}
-                  sx={{ mt: 2, fontWeight: 'bold' }}
+                  sx={{ mt: 2, fontWeight: "bold" }}
                   fullWidth
                 >
                   Back to Home

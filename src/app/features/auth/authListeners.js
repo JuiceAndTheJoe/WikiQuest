@@ -26,7 +26,9 @@ export function initAuthListener(dispatch) {
         // onAuthStateChanged will trigger again with the anonymous user
       } catch (error) {
         console.error("Failed to sign in anonymously:", error);
-        console.error("Please enable Anonymous Authentication in Firebase Console:");
+        console.error(
+          "Please enable Anonymous Authentication in Firebase Console:",
+        );
         console.error("Authentication → Sign-in method → Anonymous → Enable");
         // Create a local anonymous-like user as fallback
         dispatch(

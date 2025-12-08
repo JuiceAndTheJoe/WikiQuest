@@ -102,13 +102,15 @@ export const convertGuestToAccount = createAsyncThunk(
       } else {
         // Link anonymous account with email/password credential
         const credential = EmailAuthProvider.credential(email, password);
-        const userCredential = await linkWithCredential(currentUser, credential);
+        const userCredential = await linkWithCredential(
+          currentUser,
+          credential,
+        );
 
         // When linking, the UID stays the same, but we need to update Firestore with the email
         // Import dynamically to avoid circular dependency
-        const { updateUserProfile } = await import(
-          "../../models/leaderboardModel"
-        );
+        const { updateUserProfile } =
+          await import("../../models/leaderboardModel");
         await updateUserProfile(userCredential.user.uid, {
           email: userCredential.user.email,
           displayName: userCredential.user.displayName,

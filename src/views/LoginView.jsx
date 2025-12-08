@@ -84,7 +84,7 @@ function LoginView({
             ? "Already have an account? Login"
             : "Don't have an account? Register"}
         </Button>
-        
+
         {isAnonymous && (
           <Button
             variant="outlined"

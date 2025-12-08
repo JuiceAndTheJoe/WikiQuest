@@ -83,7 +83,7 @@ function GamePresenter({
   };
 
   const handleBackToHome = () => {
-    navigate('/');
+    navigate("/");
   };
 
   const { summary } = useMemo(() => {

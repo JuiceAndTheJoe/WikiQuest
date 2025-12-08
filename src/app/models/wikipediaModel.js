@@ -24,7 +24,7 @@ async function convertImageToBase64(imageUrl) {
       reader.readAsDataURL(blob);
     });
   } catch (error) {
-    console.error('Error converting image to Base64:', error);
+    console.error("Error converting image to Base64:", error);
     return null;
   }
 }
@@ -43,7 +43,7 @@ export async function getPageSummary(title, signal) {
     const encodedTitle = encodeURIComponent(title);
     const url = `${WIKIPEDIA_API_BASE}/page/summary/${encodedTitle}`;
     const data = await apiCall(url, true, signal);
-    
+
     // Convert thumbnail to Base64 to prevent URL inspection cheating
     if (data.thumbnail && data.thumbnail.source) {
       const base64Image = await convertImageToBase64(data.thumbnail.source);
@@ -51,7 +51,7 @@ export async function getPageSummary(title, signal) {
         data.thumbnail.source = base64Image;
       }
     }
-    
+
     return data;
   } catch (error) {
     console.error("Error fetching Wikipedia page:", error);
