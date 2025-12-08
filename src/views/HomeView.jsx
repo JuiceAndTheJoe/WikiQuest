@@ -3,12 +3,16 @@
  * Pure component for game start, leaderboard access, and user info display
  */
 
+import { useState } from "react";
 import {
   Box,
   Button,
   Card,
   CardContent,
   Container,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Paper,
   Stack,
   Typography,
@@ -21,6 +25,8 @@ import {
   Quiz,
   ExitToApp,
   EmojiEvents,
+  Help,
+  Close,
 } from "@mui/icons-material";
 import ColorBends from "../components/background/ColorBends";
 
@@ -33,6 +39,8 @@ function MenuView({
   userStats = { gamesPlayed: 0, highScore: 0 },
   leaderboardData = [],
 }) {
+  const [openHowToPlay, setOpenHowToPlay] = useState(false);
+
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
       {/* Animated Background */}
@@ -84,197 +92,278 @@ function MenuView({
             </Typography>
           </Box>
 
-          {/* User Info & Stats */}
-          <Box
-            sx={{
-              p: 3,
-              bgcolor: "rgba(255, 255, 255, 0.1)",
-              borderRadius: 2,
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-            }}
+          {/* Top Players Mini Leaderboard & Action Buttons */}
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={3}
+            alignItems="flex-start"
           >
-            <Stack spacing={3}>
-              {/* User Profile Row */}
+            {/* Mini Leaderboard */}
+            <Box
+              sx={{
+                p: 3,
+                bgcolor: "rgba(255, 255, 255, 0.1)",
+                borderRadius: 2,
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                flex: { xs: 1, md: 0.5 },
+              }}
+            >
               <Stack
-                direction={{ xs: "column", md: "row" }}
-                spacing={2}
-                alignItems={{ xs: "flex-start", md: "center" }}
+                direction="row"
                 justifyContent="space-between"
+                alignItems="center"
+                sx={{ mb: 2 }}
               >
-                <Stack direction="row" spacing={3} alignItems="center">
-                  <Avatar
-                    sx={{ bgcolor: "primary.main", width: 48, height: 48 }}
-                  >
-                    <Person />
-                  </Avatar>
-                  <Stack direction="column" spacing={0.5}>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Typography variant="h6">
-                        {user?.email || "Player"}
-                      </Typography>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="body2" color="text.secondary">
-                          High Score:
-                        </Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {userStats.highScore}
-                        </Typography>
-                        <EmojiEvents
-                          fontSize="small"
-                          sx={{ color: "warning.main" }}
-                        />
-                      </Stack>
-                    </Stack>
-                    <Typography variant="body2" color="text.secondary">
-                      Games Played: {userStats.gamesPlayed}
-                    </Typography>
-                  </Stack>
-                </Stack>
+                <Typography variant="h6">🏆 Top Players</Typography>
                 <Button
                   variant="outlined"
                   size="small"
-                  startIcon={<ExitToApp />}
-                  onClick={onLogout}
+                  startIcon={<Leaderboard />}
+                  onClick={onViewLeaderboard}
                 >
-                  Logout
+                  See Who's Best
                 </Button>
               </Stack>
-
-              {/* Stats Row */}
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={2}
-                justifyContent="center"
-              ></Stack>
-            </Stack>
-          </Box>
-
-          {/* Top Players Mini Leaderboard */}
-          <Box
-            sx={{
-              p: 3,
-              bgcolor: "rgba(255, 255, 255, 0.1)",
-              borderRadius: 2,
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-            }}
-          >
-            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-              🏆 Top Players
-            </Typography>
-            <Stack spacing={1.5}>
-              {leaderboardData.slice(0, 3).map((player, index) => (
-                <Box
-                  key={player.uid || index}
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  sx={{
-                    p: 1.5,
-                    bgcolor: "rgba(255, 255, 255, 0.05)",
-                    borderRadius: 1,
-                  }}
-                >
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Typography
-                      variant="h6"
-                      fontWeight="bold"
-                      sx={{ minWidth: 30 }}
-                    >
-                      #{index + 1}
+              <Stack spacing={1.5}>
+                {leaderboardData.slice(0, 3).map((player, index) => (
+                  <Box
+                    key={player.uid || index}
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{
+                      p: 1.5,
+                      bgcolor: "rgba(255, 255, 255, 0.05)",
+                      borderRadius: 1,
+                    }}
+                  >
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                      <Typography
+                        variant="h6"
+                        fontWeight="bold"
+                        sx={{ minWidth: 30 }}
+                      >
+                        #{index + 1}
+                      </Typography>
+                      <Box>
+                        <Typography variant="body2" fontWeight="bold">
+                          {player.displayName || player.email || "Anonymous"}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {player.gamesPlayed || 0} games
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Typography variant="body2" fontWeight="bold">
+                      {player.highScore || 0}
                     </Typography>
-                    <Box>
-                      <Typography variant="body2" fontWeight="bold">
-                        {player.displayName || player.email || "Anonymous"}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {player.gamesPlayed || 0} games
-                      </Typography>
-                    </Box>
-                  </Stack>
-                  <Typography variant="body2" fontWeight="bold">
-                    {player.highScore || 0}
+                  </Box>
+                ))}
+                {leaderboardData.length === 0 && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    align="center"
+                  >
+                    No scores yet. Be the first!
                   </Typography>
-                </Box>
-              ))}
-              {leaderboardData.length === 0 && (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  align="center"
-                >
-                  No scores yet. Be the first!
-                </Typography>
-              )}
-            </Stack>
-          </Box>
+                )}
+              </Stack>
+            </Box>
 
-          {/* Action Buttons */}
-          <Stack spacing={2} sx={{ maxWidth: 300, mx: "auto" }}>
-            <Button
-              variant="outlined"
-              startIcon={<Leaderboard />}
-              onClick={onViewLeaderboard}
-              sx={{ py: 1.5 }}
-            >
-              See Who's Best
-            </Button>
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<PlayArrow />}
-              onClick={onStartGame}
-              sx={{
-                py: 1.5,
-                fontSize: "1.1rem",
-              }}
-            >
-              Start Quiz
-            </Button>
+            {/* Action Buttons & User Info */}
+            <Stack spacing={2} sx={{ flex: { xs: 1, md: 0.5 }, width: "100%" }}>
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<PlayArrow />}
+                onClick={onStartGame}
+                sx={{
+                  py: 1.5,
+                  fontSize: "1.1rem",
+                }}
+              >
+                Start Quiz
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<Help />}
+                onClick={() => setOpenHowToPlay(true)}
+                sx={{ py: 1.5 }}
+              >
+                How to Play
+              </Button>
+
+              {/* User Info & Stats Card */}
+              <Box
+                sx={{
+                  p: 3,
+                  bgcolor: "rgba(255, 255, 255, 0.1)",
+                  borderRadius: 2,
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  mt: 2,
+                }}
+              >
+                <Stack spacing={3}>
+                  {/* User Profile Row */}
+                  <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    spacing={2}
+                    alignItems={{ xs: "flex-start", md: "center" }}
+                    justifyContent="space-between"
+                  >
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Avatar
+                        sx={{ bgcolor: "primary.main", width: 48, height: 48 }}
+                      >
+                        <Person />
+                      </Avatar>
+                      <Stack direction="column" spacing={0.5}>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Typography variant="h6">
+                            {user?.email || "Player"}
+                          </Typography>
+                          <Stack
+                            direction="row"
+                            spacing={0.5}
+                            alignItems="center"
+                          >
+                            <Typography variant="body2" color="text.secondary">
+                              High Score:
+                            </Typography>
+                            <Typography variant="body2" fontWeight="bold">
+                              {userStats.highScore}
+                            </Typography>
+                            <EmojiEvents
+                              fontSize="small"
+                              sx={{ color: "warning.main" }}
+                            />
+                          </Stack>
+                        </Stack>
+                        <Typography variant="body2" color="text.secondary">
+                          Games Played: {userStats.gamesPlayed}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<ExitToApp />}
+                      onClick={onLogout}
+                    >
+                      Logout
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Box>
+            </Stack>
           </Stack>
 
-          {/* Game Rules */}
-          <Box
-            sx={{
-              p: 3,
-              bgcolor: "rgba(255, 255, 255, 0.1)",
-              borderRadius: 2,
-              border: "1px solid rgba(255, 255, 255, 0.2)",
+          {/* How to Play Modal */}
+          <Dialog
+            open={openHowToPlay}
+            onClose={() => setOpenHowToPlay(false)}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{
+              sx: {
+                bgcolor: "rgba(20, 20, 20, 0.9)",
+
+                borderRadius: 2,
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                animation: openHowToPlay
+                  ? "slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
+                  : "slideOutDown 0.3s ease-in",
+                "@keyframes slideInUp": {
+                  from: {
+                    opacity: 0,
+                    transform: "translateY(40px) scale(0.95) rotateX(-10deg)",
+                  },
+                  to: {
+                    opacity: 1,
+                    transform: "translateY(0) scale(1) rotateX(0deg)",
+                  },
+                },
+                "@keyframes slideOutDown": {
+                  from: {
+                    opacity: 1,
+                    transform: "translateY(0) scale(1) rotateX(0deg)",
+                  },
+                  to: {
+                    opacity: 0,
+                    transform: "translateY(40px) scale(0.95) rotateX(-10deg)",
+                  },
+                },
+                perspective: "1000px",
+                transformStyle: "preserve-3d",
+                boxShadow: openHowToPlay
+                  ? "0 20px 60px rgba(0, 0, 0, 0.4)"
+                  : "0 5px 15px rgba(0, 0, 0, 0.2)",
+                transition: "box-shadow 0.4s ease-out",
+              },
+            }}
+            TransitionProps={{
+              timeout: 400,
             }}
           >
-            <Typography variant="h6" gutterBottom>
-              How to Play:
-            </Typography>
-            <Box
+            <DialogTitle
               sx={{
-                display: "grid",
-                gap: 2,
-                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                color: "white",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                animation: openHowToPlay
+                  ? "fadeInDown 0.4s ease-out 0.05s both"
+                  : "none",
+                "@keyframes fadeInDown": {
+                  from: {
+                    opacity: 0,
+                    transform: "translateY(-10px)",
+                  },
+                  to: {
+                    opacity: 1,
+                    transform: "translateY(0)",
+                  },
+                },
               }}
             >
-              <Box>
-                <Typography variant="body2" component="div">
-                  <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
-                    <li>Read the biographical clues about a famous person</li>
-                    <li>Type your guess for who it is</li>
-                    <li>
-                      You can use hints if you're stuck! at the cost of your
-                      score...)
-                    </li>
-                  </ul>
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" component="div">
-                  <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
-                    <li>Correct answers increase your streak</li>
-                    <li>3 wrong answers end the game</li>
-                    <li>Challenge yourself and your peers!</li>
-                    <li>Compete for the highest score!</li>
-                  </ul>
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
+              How to Play:
+              <Button
+                onClick={() => setOpenHowToPlay(false)}
+                sx={{
+                  minWidth: "auto",
+                  color: "white",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    transform: "rotate(90deg) scale(1.1)",
+                  },
+                }}
+              >
+                <Close />
+              </Button>
+            </DialogTitle>
+            <DialogContent>
+              <Typography
+                variant="body2"
+                sx={{ lineHeight: 1.8, color: "white", mt: 2 }}
+              >
+                We'll give you some biographical clues about a random celebrity,
+                and you'll guess who it is.
+                <strong>Type your best guess and see if you're right!</strong>
+                <br />
+                <br />
+                Stuck? No worries, use a hint! Just know that hints come at a
+                cost to your score. 💡
+                <br />
+                <br />
+                <strong>The goal:</strong> Get as many correct as you can! But
+                be careful... 3 wrong answers means your game is over. Build
+                your streak, climb the leaderboard, and prove you're a true
+                WikiQuest champion! 🏆
+              </Typography>
+            </DialogContent>
+          </Dialog>
         </Stack>
       </Container>
     </Box>
