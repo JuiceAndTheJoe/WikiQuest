@@ -4,8 +4,9 @@ import { initAuthListener } from "../app/features/auth/authListeners";
 import {
   clearError,
   loginUser,
-  logoutUser,
   registerUser,
+  loginAsGuest,
+  convertGuestToAccount,
 } from "../app/features/auth/authSlice";
 import { setSavedGameFlag } from "../app/features/game/gameSlice";
 import { hasSavedGame } from "../app/models/gameProgressModel";
@@ -18,8 +19,9 @@ function AppContainer({
   isAuthChecked,
   onLogin,
   onRegister,
-  onLogout,
   onClearError,
+  onGuestLogin,
+  onConvertGuest,
   dispatch,
 }) {
   // Initialize auth listener on mount
@@ -28,7 +30,7 @@ function AppContainer({
     return () => unsubscribe();
   }, [dispatch]);
 
-  // Check for saved game when user changes
+  // Check for saved game when user changes (works for both anonymous and authenticated users)
   useEffect(() => {
     if (user?.uid) {
       hasSavedGame(user.uid)
@@ -49,8 +51,9 @@ function AppContainer({
       authError={authError}
       onLogin={onLogin}
       onRegister={onRegister}
-      onLogout={onLogout}
       onClearError={onClearError}
+      onGuestLogin={onGuestLogin}
+      onConvertGuest={onConvertGuest}
     />
   );
 }
@@ -65,7 +68,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   onLogin: (credentials) => dispatch(loginUser(credentials)),
   onRegister: (credentials) => dispatch(registerUser(credentials)),
-  onLogout: () => dispatch(logoutUser()),
+  onGuestLogin: () => dispatch(loginAsGuest()),
+  onConvertGuest: (credentials) => dispatch(convertGuestToAccount(credentials)),
   onClearError: () => dispatch(clearError()),
   dispatch,
 });

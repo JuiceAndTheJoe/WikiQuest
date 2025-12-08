@@ -3,13 +3,7 @@ import { useNavigate } from "react-router-dom";
 import LeaderboardView from "../views/LeaderboardView";
 
 // Presenter for LeaderboardView: manages leaderboard data and navigation
-function LeaderboardPresenter({
-  user,
-  leaderboardData,
-  loading,
-  error,
-  fetchLeaderboard,
-}) {
+function LeaderboardPresenter({ user, leaderboardData, loading, error }) {
   const navigate = useNavigate();
 
   const normalizedData = useMemo(() => {
@@ -44,10 +38,6 @@ function LeaderboardPresenter({
     navigate("/");
   };
 
-  const handleRefresh = () => {
-    fetchLeaderboard();
-  };
-
   return (
     <LeaderboardView
       leaderboardData={normalizedData}
@@ -56,7 +46,6 @@ function LeaderboardPresenter({
       userRank={userRank}
       currentUser={user}
       onBackToMenu={handleBackToMenu}
-      onRefresh={handleRefresh}
     />
   );
 }

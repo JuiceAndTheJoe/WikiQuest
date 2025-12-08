@@ -36,11 +36,13 @@ function MenuView({
   onLogout,
   onStartGame,
   onViewLeaderboard,
+  onCreateAccount,
+  hasSavedGame = false,
   userStats = { gamesPlayed: 0, highScore: 0 },
   leaderboardData = [],
 }) {
   const [openHowToPlay, setOpenHowToPlay] = useState(false);
-
+  const isAnonymous = user?.isAnonymous || false;
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
       {/* Animated Background */}
@@ -123,6 +125,50 @@ function MenuView({
                 >
                   See Who's Best
                 </Button>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Avatar sx={{ bgcolor: "primary.main" }}>
+                  <Person />
+                </Avatar>
+                <Box>
+                  <Typography variant="h6">
+                    {isAnonymous ? "Guest Player" : user?.email || "Player"}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {isAnonymous
+                      ? "Playing as guest - create account to save progress"
+                      : `Games Played: ${userStats.gamesPlayed}`}
+                  </Typography>
+                </Box>
+              </Stack>
+              <Stack alignItems="flex-end" spacing={1}>
+                {!isAnonymous && (
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <EmojiEvents color="warning" />
+                    <Typography variant="h6">
+                      High Score: {userStats.highScore}
+                    </Typography>
+                  </Stack>
+                )}
+                <Stack direction="row" spacing={1}>
+                  {isAnonymous ? (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={onCreateAccount}
+                    >
+                      Sign In or Create Account
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<ExitToApp />}
+                      onClick={onLogout}
+                    >
+                      Logout
+                    </Button>
+                  )}
+                </Stack>
               </Stack>
               <Stack spacing={1.5}>
                 {leaderboardData.slice(0, 3).map((player, index) => (

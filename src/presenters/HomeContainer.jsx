@@ -1,18 +1,23 @@
 import { useEffect } from "react";
 import { connect } from "react-redux";
 import { logoutUser } from "../app/features/auth/authSlice";
-import { loadSavedGame, startNewGame } from "../app/features/game/gameSlice";
+import {
+  loadSavedGame,
+  startNewGame,
+  fetchUserStats,
+} from "../app/features/game/gameSlice";
 import HomePresenter from "./HomePresenter";
 
 const HomeContainer = (props) => {
-  const { user, loadSavedGame, loadingGameState } = props;
+  const { user, loadSavedGame, fetchUserStats, loadingGameState } = props;
 
-  // Check for saved game on mount
+  // Check for saved game and fetch user stats on mount
   useEffect(() => {
     if (user?.uid && !loadingGameState) {
-      loadSavedGame(user.uid);
+      loadSavedGame({ userId: user.uid });
+      fetchUserStats(user.uid);
     }
-  }, [user?.uid, loadSavedGame, loadingGameState]);
+  }, [user?.uid, loadSavedGame, fetchUserStats, loadingGameState]);
 
   return <HomePresenter {...props} />;
 };
@@ -23,9 +28,9 @@ const mapState = (state) => {
     user: state.auth.user,
     hasSavedGame: g.hasSavedGame || false,
     loadingGameState: g.loadingGameState || false,
-    userStats: {
-      gamesPlayed: g.completedRuns || 0,
-      highScore: g.highScore || 0,
+    userStats: g.userStats || {
+      gamesPlayed: 0,
+      highScore: 0,
     },
     leaderboardData: g.leaderboardData || [],
   };
@@ -33,7 +38,8 @@ const mapState = (state) => {
 
 const mapDispatch = (dispatch) => ({
   onStartGame: () => dispatch(startNewGame()),
-  loadSavedGame: (userId) => dispatch(loadSavedGame(userId)),
+  loadSavedGame: (params) => dispatch(loadSavedGame(params)),
+  fetchUserStats: (userId) => dispatch(fetchUserStats(userId)),
   onLogout: () => dispatch(logoutUser()),
 });
 

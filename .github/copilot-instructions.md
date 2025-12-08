@@ -8,11 +8,11 @@
 - **State Manager**: Redux Toolkit (`src/app/store.js`) with combined reducers in `rootReducer.js`. All application state side effects (persistence) go through Redux middleware.
 - **Zero concern mixing**: Persistence → Application State (Redux) → Presenter/Container → View. Each layer is strictly separated.
 - Pattern: **Slice (state + pure reducers) → Async thunk (reads) → Middleware (writes/persistence) → View (pure UI)**.
-- Firebase (Auth + Firestore) initialized in `src/firebaseConfig.js`. All Firestore access is centralized in `src/app/models/` (`firestoreModel.js`, `leaderboardModel.js`, `gameProgressModel.js`, `userModel.js`).
+- Firebase (Auth + Firestore) initialized in `src/firebaseConfig.js`. All Firestore access is centralized in `src/app/models/` (`firestoreModel.js`, `leaderboardModel.js`, `gameProgressModel.js`, `userModel.js`). Auth supports email/password and opt-in guest (anonymous) sessions; the auth listener only forwards state (no automatic guest sign-in).
 - **Framework-independent Redux**: Use `connect()` for Redux mappings instead of custom hooks (`useSelector`, `useDispatch`).
 - **User-visible third-party components**: Material UI components count. Must have at least one in each major view.
 - Component hierarchy: `AppContainer.jsx` (Redux-connected via `connect()`, triggers side effects) wraps `AppPresenter.jsx` (routing + prop passing) which renders per-view Presenters (`HomePresenter.jsx`, `LoginPresenter.jsx`). Each Presenter composes props and manages view-specific UI state, and then renders a pure View (e.g., `HomeView.jsx`, `LoginView.jsx`).
-  - **Save/Resume**: `gameProgressModel.js` stores sessions per user at `users/{uid}/sessions/game` with `savedAt`; `gameSlice.loadSavedGame` thunk reads; persistence middleware writes after start/hint/guess and clears on game over.
+  - **Save/Resume**: `gameProgressModel.js` stores sessions per user (including guests) at `users/{uid}/sessions/game` with `savedAt`; `gameSlice.loadSavedGame` thunk reads; persistence middleware writes after start/hint/guess and clears on game over.
 
 ## 2. Dev & Build Workflow
 
@@ -35,12 +35,13 @@
 ## 4. Firestore Usage Pattern (Grade A Requirements)
 
 - All Firestore document logic lives in `src/app/models/` (e.g., `saveGameResult`, `getLeaderboard`, `saveUserData`, `saveCurrentGameState`).
-- **Authentication required**: All persisted data must be separated per authenticated user. Use Firebase Auth (`src/firebaseConfig.js`) to get user ID.
-- User-specific data: `users/{userId}` documents store aggregated stats (`gamesPlayed`, `totalScore`, `accuracy`, etc.). Pattern: `users/{userId}/...` for related collections if needed.
+- **Authentication required**: All persisted data must be separated per user/guest. Use Firebase Auth (`src/firebaseConfig.js`) to get user ID. Guests are allowed but do not appear on the leaderboard.
+- User-specific data: `users/{userId}` documents store aggregated stats (`gamesPlayed`, `totalScore`, `accuracy`, etc.). Pattern: `users/{userId}/...` for related collections if needed. Guest docs persist progress but are filtered out of leaderboard display.
 - **Live updates**: `subscribe*` functions implemented using `onSnapshot` for real-time sync. Ready to connect to Redux via container components.
 - **Current Firestore functions**:
   - `saveGameResult(userId, summary, profile)` - Transactionally updates leaderboard aggregates per user
   - `getLeaderboard(maxCount)` - Reads global leaderboard ordered by `highScore`
+    - Anonymous users (missing email) are filtered out from the displayed leaderboard, though their runs are still persisted.
   - `saveUserData(userId, data)` - Generic user data save
   - `getUserData(userId)` - Generic user data read
   - `subscribeToUserData(userId, callback)` - Generic user data subscription
@@ -91,11 +92,11 @@
 
 ### Authentication Flow
 
-App mounts → `initAuthListener` called in `AppContainer` → `onAuthStateChanged` listener fires → `setUser` action dispatched → auth state updated → routes re-render based on `user` state → once authenticated, containers dispatch any required thunks (e.g., `fetchLeaderboard`) using the signed-in user's ID.
+App mounts → `initAuthListener` called in `AppContainer` → `onAuthStateChanged` listener fires → `setUser` action dispatched → auth state updated → routes re-render based on `user` state. Users explicitly choose email/password login or **Continue as Guest** (no automatic guest sign-in). Containers then dispatch any required thunks (e.g., `fetchLeaderboard`) using the current user's ID.
 
 ### Login/Registration Flow
 
-User submits form → `LoginView` calls `onLogin`/`onRegister` → `AppContainer` dispatches `loginUser`/`registerUser` thunk → Firebase Auth API called → on success, user object stored in Redux → `onAuthStateChanged` listener fires → routes redirect to home → containers load user-specific data (leaderboard, saved progress) as needed.
+User submits form → `LoginView` calls `onLogin`/`onRegister` or **Continue as Guest** → `AppContainer` dispatches the chosen auth thunk → Firebase Auth API called → on success, user object stored in Redux → `onAuthStateChanged` listener fires → routes redirect to home → containers load user-specific data (leaderboard, saved progress) as needed. Guest sessions can view the leaderboard but are filtered out of rankings.
 
 ### Game & Leaderboard Flow
 

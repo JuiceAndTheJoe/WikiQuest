@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { loadSavedGameState } from "../../models/gameProgressModel";
 import { getLeaderboard } from "../../models/leaderboardModel";
+import { getUserData } from "../../models/userModel";
 import {
   BASE_SCORE,
   HINT_PENALTY,
@@ -26,9 +27,34 @@ export const fetchLeaderboard = createAsyncThunk(
   },
 );
 
+export const fetchUserStats = createAsyncThunk(
+  "game/fetchUserStats",
+  async (userId) => {
+    const userDoc = await getUserData(userId);
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      return {
+        gamesPlayed: data.gamesPlayed || 0,
+        highScore: data.highScore || 0,
+        totalScore: data.totalScore || 0,
+        averageScore: data.averageScore || 0,
+        accuracy: data.accuracy || 0,
+      };
+    }
+    return {
+      gamesPlayed: 0,
+      highScore: 0,
+      totalScore: 0,
+      averageScore: 0,
+      accuracy: 0,
+    };
+  },
+);
+
 export const loadSavedGame = createAsyncThunk(
   "game/loadSavedGame",
-  async (userId) => {
+  async ({ userId }) => {
+    // All users (anonymous and authenticated) load from Firestore
     const savedState = await loadSavedGameState(userId);
     return savedState;
   },
@@ -61,6 +87,13 @@ const initialState = {
   leaderboardError: null,
   hasSavedGame: false,
   loadingGameState: false,
+  userStats: {
+    gamesPlayed: 0,
+    highScore: 0,
+    totalScore: 0,
+    averageScore: 0,
+    accuracy: 0,
+  },
 };
 
 const gameSlice = createSlice({
@@ -210,6 +243,9 @@ const gameSlice = createSlice({
     setSavedGameFlag(state, action) {
       state.hasSavedGame = action.payload;
     },
+    updateLeaderboard(state, action) {
+      state.leaderboardData = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -242,6 +278,9 @@ const gameSlice = createSlice({
       .addCase(loadSavedGame.rejected, (state) => {
         state.loadingGameState = false;
         state.hasSavedGame = false;
+      })
+      .addCase(fetchUserStats.fulfilled, (state, action) => {
+        state.userStats = action.payload;
       });
   },
 });
@@ -253,6 +292,7 @@ export const {
   useHint,
   setSavedGameFlag,
   resumeGame,
+  updateLeaderboard,
 } = gameSlice.actions;
 
 export default gameSlice.reducer;

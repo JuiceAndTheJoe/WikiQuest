@@ -18,17 +18,24 @@ function LoginView({
   onToggleMode,
   onSubmit,
   onClearError,
+  onContinueAsGuest,
+  isAnonymous = false,
 }) {
+  const heading = isRegisterMode ? "Create Account" : "Login";
+  const description = isAnonymous
+    ? "You're currently playing as a guest. Sign in or create an account to keep your progress synced."
+    : isRegisterMode
+      ? "Create an account to save your progress across devices."
+      : "Sign in to continue or start a new session.";
+
   return (
     <Paper elevation={3} sx={{ p: 3, maxWidth: 480, m: "2rem auto" }}>
       <Stack spacing={2} component="form" onSubmit={onSubmit}>
         <Typography variant="h4" component="h1">
-          {isRegisterMode ? "Register" : "Login"}
+          {heading}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          {isRegisterMode
-            ? "Create an account to save your data"
-            : "Sign in to access your saved data"}
+          {description}
         </Typography>
 
         {error && (
@@ -71,6 +78,15 @@ function LoginView({
           {isRegisterMode
             ? "Already have an account? Login"
             : "Don't have an account? Register"}
+        </Button>
+
+        <Button
+          variant="outlined"
+          onClick={onContinueAsGuest}
+          disabled={loading}
+          sx={{ textTransform: "none" }}
+        >
+          Continue as Guest
         </Button>
       </Stack>
     </Paper>
