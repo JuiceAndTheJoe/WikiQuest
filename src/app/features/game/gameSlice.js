@@ -47,7 +47,6 @@ const initialState = {
   bestStreak: 0,
   highScore: 0,
   completedRuns: 0,
-  totalScoreAcrossRuns: 0,
   currentCeleb: null, // string name
   lastGuessResult: null, // 'correct' | 'wrong' | null
   lastResultDetail: null,
@@ -181,9 +180,6 @@ const gameSlice = createSlice({
           state.status = "game_over";
           state.lastGameResult = buildRunSummary(state);
           state.completedRuns = (state.completedRuns || 0) + 1;
-          state.totalScoreAcrossRuns =
-            (state.totalScoreAcrossRuns || 0) +
-            (state.lastGameResult?.finalScore || 0);
           // keep currentCeleb for review
         } else {
           state.lastAnsweredCeleb = rawTarget;

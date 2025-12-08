@@ -30,7 +30,7 @@ function MenuView({
   onLogout,
   onStartGame,
   onViewLeaderboard,
-  userStats = { gamesPlayed: 0, highScore: 0, totalScore: 0 },
+  userStats = { gamesPlayed: 0, highScore: 0 },
 }) {
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
@@ -128,16 +128,8 @@ function MenuView({
               <Stack
                 direction={{ xs: "column", sm: "row" }}
                 spacing={2}
-                justifyContent="space-around"
+                justifyContent="center"
               >
-                <Box display="flex" flexDirection="column" alignItems="center">
-                  <Typography variant="caption" color="text.secondary">
-                    Total Score
-                  </Typography>
-                  <Typography variant="h6" fontWeight="bold">
-                    {userStats.totalScore || 0}
-                  </Typography>
-                </Box>
                 <Box display="flex" flexDirection="column" alignItems="center">
                   <Stack direction="row" spacing={0.5} alignItems="center">
                     <EmojiEvents

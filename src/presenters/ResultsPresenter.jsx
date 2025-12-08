@@ -22,7 +22,6 @@ function ResultsPresenter({
   const safeUserStats = userStats || {
     gamesPlayed: 0,
     highScore: 0,
-    totalScore: 0,
     averageScore: 0,
   };
 

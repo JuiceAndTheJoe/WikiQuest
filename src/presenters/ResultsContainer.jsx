@@ -47,15 +47,13 @@ const mapState = (state) => {
   }));
 
   const gamesPlayed = g.completedRuns || (g.lastGameResult ? 1 : 0);
-  const totalScore = g.totalScoreAcrossRuns || run.finalScore || 0;
   const averageScore = gamesPlayed
-    ? Math.round(totalScore / gamesPlayed)
-    : totalScore;
+    ? Math.round((run.finalScore || 0) / gamesPlayed)
+    : run.finalScore || 0;
 
   const userStats = {
     gamesPlayed,
     highScore: g.highScore || 0,
-    totalScore,
     averageScore,
   };
 

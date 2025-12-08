@@ -26,7 +26,6 @@ const mapState = (state) => {
     userStats: {
       gamesPlayed: g.completedRuns || 0,
       highScore: g.highScore || 0,
-      totalScore: g.totalScoreAcrossRuns || 0,
     },
   };
 };

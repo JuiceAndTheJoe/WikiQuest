@@ -68,7 +68,6 @@ export async function saveGameResult(userId, summary = {}, userProfile = {}) {
     const safeCorrect = summary.correctAnswers || 0;
     const safeQuestions = summary.totalQuestions || 0;
 
-    const totalScore = (existing.totalScore || 0) + safeScore;
     const gamesPlayed = (existing.gamesPlayed || 0) + 1;
     const totalCorrectAnswers =
       (existing.totalCorrectAnswers || 0) + safeCorrect;
@@ -78,7 +77,7 @@ export async function saveGameResult(userId, summary = {}, userProfile = {}) {
         ? Math.round((totalCorrectAnswers / totalQuestions) * 100)
         : 0;
     const averageScore =
-      gamesPlayed > 0 ? Math.round(totalScore / gamesPlayed) : safeScore;
+      gamesPlayed > 0 ? Math.round(safeScore / gamesPlayed) : safeScore;
 
     transaction.set(
       userRef,
@@ -88,7 +87,6 @@ export async function saveGameResult(userId, summary = {}, userProfile = {}) {
         photoURL: userProfile.photoURL || existing.photoURL || null,
         highScore: Math.max(existing.highScore || 0, safeScore),
         gamesPlayed,
-        totalScore,
         averageScore,
         totalCorrectAnswers,
         totalQuestions,

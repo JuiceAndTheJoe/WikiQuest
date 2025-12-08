@@ -273,12 +273,6 @@ function ResultsView({
                       </Typography>
                     </Box>
                     <Box display="flex" justifyContent="space-between">
-                      <Typography variant="body2">Total Score:</Typography>
-                      <Typography variant="body2" fontWeight="bold">
-                        {userStats?.totalScore || 0}
-                      </Typography>
-                    </Box>
-                    <Box display="flex" justifyContent="space-between">
                       <Typography variant="body2">Average Score:</Typography>
                       <Typography variant="body2" fontWeight="bold">
                         {Math.round(userStats?.averageScore || 0)}
@@ -297,7 +291,7 @@ function ResultsView({
                     </Typography>
                     <LinearProgress
                       variant="determinate"
-                      value={((userStats?.totalScore || 0) % 1000) / 10}
+                      value={((userStats?.highScore || 0) % 1000) / 10}
                       sx={{ height: 8, borderRadius: 4 }}
                     />
                   </Box>
