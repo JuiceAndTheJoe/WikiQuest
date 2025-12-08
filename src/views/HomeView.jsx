@@ -125,6 +125,7 @@ function MenuView({
                 >
                   See Who's Best
                 </Button>
+              </Stack>
               <Stack direction="row" spacing={2} alignItems="center">
                 <Avatar sx={{ bgcolor: "primary.main" }}>
                   <Person />
