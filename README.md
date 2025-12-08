@@ -4,7 +4,7 @@
 
 WikiQuest is a quiz game that tests your knowledge of famous people using real content from Wikipedia. Each round, you are shown a short, progressively revealing summary of a celebrity's article. Your goal is to guess the name of the person.
 
-Your score depends on how many celebrities you identify correctly in a single run, how many hints you use, and how long you survive before losing all your lives. The game tracks advanced statistics across runs (such as total score and best streak) and features a global leaderboard so you can compare your performance with other players. Since the game requires login, users also benefit from automatic save/resume: you can leave mid-game and continue later from where you left off.
+Your score depends on how many celebrities you identify correctly in a single run, how many hints you use, and how long you survive before losing all your lives. The game tracks advanced statistics across runs (such as total score and best streak) and features a global leaderboard so you can compare your performance with other players. You can play as a guest (anonymous session) or with an email/password account; both modes auto save/resume in-progress runs. Guests can view the leaderboard but are filtered out from the rankings.
 
 ## What we have done
 
@@ -12,11 +12,11 @@ Your score depends on how many celebrities you identify correctly in a single ru
   - Progressive guessing game based on Wikipedia biography text.
   - Hint system that reveals more information at a score penalty.
   - Life system and game-over state with a detailed results screen.
-- Set up user authentication using Firebase Authentication (email/password).
-- Implemented per-user persistence in Firestore:
-  - Global leaderboard with aggregated scores per user.
+- Set up user authentication using Firebase Authentication (email/password) with optional guest sessions.
+- Implemented per-user (and guest) persistence in Firestore:
+  - Global leaderboard with aggregated scores per authenticated user (guests are excluded from rankings but can view them).
   - Per-run summaries stored when a game ends.
-  - Automatic save/resume of an in-progress game per user.
+  - Automatic save/resume of an in-progress game per user or guest session.
 - Built a structured front-end architecture with React + Vite:
   - Redux Toolkit for application state, including separate slices for auth, game logic, and Wikipedia data.
   - Custom persistence middleware for all Firestore writes (game progress and leaderboard updates).
@@ -29,7 +29,6 @@ Your score depends on how many celebrities you identify correctly in a single ru
 
 ## What we still plan to do
 
-- Allow playing as a guest, with the option to save progress later by creating an account.
 - Add live leaderboard updates using Firestore `onSnapshot` so changes appear in real time.
 - Refine game balance, for example by adjusting when images and specific types of hints are shown. Currently the images make the game too easy.
 - Add a larger pool of celebrities and prevent getting the same celebrity more than once in a single run.

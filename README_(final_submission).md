@@ -42,7 +42,7 @@ npm run dev
 
 Clean separation of concerns following Model-View-Presenter pattern:
 
-- **Persistence Layer**: Firestore access lives in `src/app/models/` (`firestoreModel.js`, `leaderboardModel.js`, `gameProgressModel.js`, `userModel.js`). Game progress is stored per user under `users/{uid}/sessions/game` with a `savedAt` timestamp.
+- **Persistence Layer**: Firestore access lives in `src/app/models/` (`firestoreModel.js`, `leaderboardModel.js`, `gameProgressModel.js`, `userModel.js`). Game progress is stored per user (or guest) under `users/{uid}/sessions/game` with a `savedAt` timestamp.
 - **External APIs**: `src/app/models/wikipediaModel.js` for Wikipedia REST API integration.
 - **Application State**: Redux slices in `src/app/features/`.
 - **Middleware**: `src/app/middleware/persistenceMiddleware.js` (syncs game state and results to Firestore; clears saved sessions on game over).
@@ -69,8 +69,8 @@ Firebase is pre-configured in `src/firebaseConfig.js`. The app connects to:
 
 - **Project ID**: `iprog-project-c443f`
 - **Services**: Authentication (Email/Password), Firestore Database
-- **Authentication Flow**: Managed via `authSlice.js` with `onAuthStateChanged` listener
-- **User Data**: Stored per-user in Firestore at `users/{userId}` (aggregate stats, leaderboard info)
+- **Authentication Flow**: Managed via `authSlice.js` with `onAuthStateChanged` listener. Users can log in with email/password or start a guest session; guest sessions do not auto-start and must be chosen explicitly.
+- **User Data**: Stored per-user in Firestore at `users/{userId}` (aggregate stats, leaderboard info). Guest sessions persist progress but are filtered out of leaderboard rankings.
 
 ## Project Structure
 
@@ -119,10 +119,10 @@ src/
 
 ## Save & Resume Gameplay
 
-- **Auto-save triggers**: The Redux persistence middleware writes the current game state to Firestore after starting a game, using a hint, and after each guess. Data is stored per user at `users/{uid}/sessions/game` with a `savedAt` timestamp.
-- **Resume flow**: On login, `HomeContainer` dispatches `loadSavedGame(userId)` to detect prior sessions. `GameContainer` also attempts to load on mount; if none exists it starts a fresh run.
+- **Auto-save triggers**: The Redux persistence middleware writes the current game state to Firestore after starting a game, using a hint, and after each guess. Data is stored per user (including guests) at `users/{uid}/sessions/game` with a `savedAt` timestamp.
+- **Resume flow**: On login or guest start, `HomeContainer` dispatches `loadSavedGame(userId)` to detect prior sessions. `GameContainer` also attempts to load on mount; if none exists it starts a fresh run.
 - **UI**: `HomeView` shows a **Resume Game** button when a saved session exists (`hasSavedGame` flag). Starting a new game resets `hasSavedGame` and overwrites the saved snapshot.
-- **Game over**: When a run ends, middleware clears the saved session and persists the final summary to the leaderboard via `saveGameResult`.
+- **Game over**: When a run ends, middleware clears the saved session and persists the final summary to the leaderboard via `saveGameResult` (guests are persisted but excluded from ranking display).
 
 This ensures players can leave mid-run and continue later without losing progress, while completed runs are recorded in the leaderboard.
 
