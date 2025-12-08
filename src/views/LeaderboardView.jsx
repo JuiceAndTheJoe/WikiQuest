@@ -106,7 +106,7 @@ function LeaderboardView({
               Back to Menu
             </Button>
             <Typography variant="h3" component="h1">
-              📶 Leaderboard
+              Leaderboard 📶
             </Typography>
           </Box>
 
@@ -116,7 +116,59 @@ function LeaderboardView({
             spacing={3}
             alignItems="stretch"
           >
-            {/* Community Statistics - Left Half */}
+            {/* User's Current Rank - Left Half */}
+            {userRank && (
+              <Card
+                elevation={2}
+                sx={{
+                  bgcolor: "rgba(255, 255, 255, 0.1)",
+                  borderRadius: 2,
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  flex: { xs: 1, md: 0.5 },
+                  width: "100%",
+                }}
+              >
+                <CardContent
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    height: "100%",
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    alignItems="center"
+                    sx={{ width: "100%" }}
+                  >
+                    <Avatar sx={{ bgcolor: "primary.main" }}>
+                      <Person />
+                    </Avatar>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography variant="h6">
+                        {currentUser?.isAnonymous
+                          ? "Guest Player"
+                          : currentUser?.email || "You"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Your Current Rank: {` #${userRank.rank}`}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: "right" }}>
+                      <Typography variant="h4" fontWeight="bold">
+                        {getRankIcon(userRank.rank)}
+                      </Typography>
+                      <Typography variant="body2">
+                        Your Highscore: {userRank.highScore}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Community Statistics - Right Half */}
             {leaderboardData && leaderboardData.length > 0 && (
               <Paper
                 elevation={1}
@@ -187,56 +239,6 @@ function LeaderboardView({
                 </Box>
               </Paper>
             )}
-
-            {/* User's Current Rank - Right Half */}
-            {userRank && (
-              <Card
-                elevation={2}
-                sx={{
-                  bgcolor: "rgba(255, 255, 255, 0.1)",
-                  borderRadius: 2,
-                  border: "1px solid rgba(255, 255, 255, 0.2)",
-                  flex: { xs: 1, md: 0.5 },
-                  width: "100%",
-                }}
-              >
-                <CardContent
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: "100%",
-                  }}
-                >
-                  <Stack
-                    direction="row"
-                    spacing={2}
-                    alignItems="center"
-                    sx={{ width: "100%" }}
-                  >
-                    <Avatar sx={{ bgcolor: "primary.main" }}>
-                      <Person />
-                    </Avatar>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="h6">Your Current Rank</Typography>
-                      <Typography variant="body2">
-                        {currentUser?.isAnonymous
-                          ? "Guest Player"
-                          : currentUser?.email || "You"}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ textAlign: "right" }}>
-                      <Typography variant="h4" fontWeight="bold">
-                        {getRankIcon(userRank.rank)}
-                      </Typography>
-                      <Typography variant="body2">
-                        Score: {userRank.highScore}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                </CardContent>
-              </Card>
-            )}
           </Stack>
 
           {/* Loading State */}
@@ -285,7 +287,7 @@ function LeaderboardView({
                           <strong>Player</strong>
                         </TableCell>
                         <TableCell align="right">
-                          <strong>High Score</strong>
+                          <strong>Highscore</strong>
                         </TableCell>
                         <TableCell align="right">
                           <strong>Games Played</strong>

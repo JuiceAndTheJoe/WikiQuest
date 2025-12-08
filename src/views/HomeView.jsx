@@ -122,7 +122,7 @@ function MenuView({
                 <Button
                   variant="outlined"
                   size="small"
-                  startIcon={<Leaderboard />}
+                  endIcon={<Leaderboard />}
                   onClick={onViewLeaderboard}
                 >
                   All top players
@@ -184,7 +184,7 @@ function MenuView({
               <Button
                 variant="contained"
                 size="large"
-                startIcon={<PlayArrow />}
+                endIcon={<PlayArrow />}
                 onClick={onStartGame}
                 sx={{
                   py: 1.5,
@@ -196,7 +196,7 @@ function MenuView({
               </Button>
               <Button
                 variant="outlined"
-                startIcon={<Help />}
+                endIcon={<Help />}
                 onClick={() => setOpenHowToPlay(true)}
                 sx={{ py: 1.5, flex: 1 }}
               >
@@ -277,7 +277,7 @@ function MenuView({
                       <Button
                         variant="outlined"
                         size="small"
-                        startIcon={<ExitToApp />}
+                        endIcon={<ExitToApp />}
                         onClick={onLogout}
                       >
                         Logout
