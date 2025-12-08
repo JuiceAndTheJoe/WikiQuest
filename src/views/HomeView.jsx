@@ -3,25 +3,31 @@
  * Pure component for game start, leaderboard access, and user info display
  */
 
+import { useState } from "react";
 import {
-  EmojiEvents,
-  ExitToApp,
-  Leaderboard,
-  Person,
-  PlayArrow,
-  PlayCircle,
-  Quiz,
-} from "@mui/icons-material";
-import {
-  Avatar,
   Box,
   Button,
   Card,
   CardContent,
   Container,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Paper,
   Stack,
   Typography,
+  Avatar,
 } from "@mui/material";
+import {
+  PlayArrow,
+  Leaderboard,
+  Person,
+  Quiz,
+  ExitToApp,
+  EmojiEvents,
+  Help,
+  Close,
+} from "@mui/icons-material";
 import ColorBends from "../components/background/ColorBends";
 
 // Pure view: receives interaction handlers & data via props from Presenter.
@@ -29,12 +35,13 @@ function MenuView({
   user,
   onLogout,
   onStartGame,
-  onResumeGame,
   onViewLeaderboard,
   onCreateAccount,
   hasSavedGame = false,
-  userStats = { gamesPlayed: 0, highScore: 0, totalScore: 0 },
+  userStats = { gamesPlayed: 0, highScore: 0 },
+  leaderboardData = [],
 }) {
+  const [openHowToPlay, setOpenHowToPlay] = useState(false);
   const isAnonymous = user?.isAnonymous || false;
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
@@ -48,8 +55,8 @@ function MenuView({
         warpStrength={1.2}
         mouseInfluence={0.8}
         parallax={0.6}
-        noise={0.08}
-        transparent
+        noise={0}
+        transparent={false}
         sx={{
           position: "fixed",
           top: 0,
@@ -82,227 +89,304 @@ function MenuView({
               WikiQuest
             </Typography>
             <Typography variant="h5" color="text.secondary" gutterBottom>
-              Test your knowledge of famous people!
+              Guess famous people based on their Wikipedia biographies. Use
+              hints wisely to maximize your score!
             </Typography>
           </Box>
 
-          {/* User Info */}
-          <Box
-            sx={{
-              p: 3,
-              bgcolor: "rgba(255, 255, 255, 0.1)",
-              backdropFilter: "blur(10px)",
-              borderRadius: 2,
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-            }}
+          {/* Top Players Mini Leaderboard & Action Buttons */}
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={3}
+            alignItems="flex-start"
           >
-            <Stack
-              direction="row"
-              spacing={2}
-              alignItems="center"
-              justifyContent="space-between"
+            {/* Mini Leaderboard */}
+            <Box
+              sx={{
+                p: 3,
+                bgcolor: "rgba(255, 255, 255, 0.1)",
+                borderRadius: 2,
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                flex: { xs: 1, md: 0.5 },
+              }}
             >
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Avatar sx={{ bgcolor: "primary.main" }}>
-                  <Person />
-                </Avatar>
-                <Box>
-                  <Typography variant="h6">
-                    {isAnonymous ? "Guest Player" : user?.email || "Player"}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {isAnonymous
-                      ? "Playing as guest - create account to save progress"
-                      : `Games Played: ${userStats.gamesPlayed}`}
-                  </Typography>
-                </Box>
-              </Stack>
-              <Stack alignItems="flex-end" spacing={1}>
-                {!isAnonymous && (
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <EmojiEvents color="warning" />
-                    <Typography variant="h6">
-                      High Score: {userStats.highScore}
-                    </Typography>
-                  </Stack>
-                )}
-                <Stack direction="row" spacing={1}>
-                  {isAnonymous ? (
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={onCreateAccount}
-                    >
-                      Sign In or Create Account
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      startIcon={<ExitToApp />}
-                      onClick={onLogout}
-                    >
-                      Logout
-                    </Button>
-                  )}
-                </Stack>
-              </Stack>
-            </Stack>
-          </Box>
-
-          <Box
-            sx={{
-              display: "grid",
-              gap: 3,
-              gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" },
-            }}
-          >
-            {/* Game Options */}
-            <Box>
-              <Card
-                sx={{
-                  bgcolor: "rgba(255, 255, 255, 0.1)",
-                  backdropFilter: "blur(10px)",
-                  border: "1px solid rgba(255, 255, 255, 0.2)",
-                }}
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ mb: 2 }}
               >
-                <CardContent sx={{ p: 4 }}>
-                  <Typography variant="h5" gutterBottom>
-                    {hasSavedGame ? "Continue Your Game" : "Start New Game"}
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary" paragraph>
-                    {hasSavedGame
-                      ? "You have a game in progress. Resume where you left off or start fresh!"
-                      : "Guess famous people based on their Wikipedia biographies. Use hints wisely to maximize your score!"}
-                  </Typography>
-
-                  <Stack direction="row" spacing={2}>
-                    {hasSavedGame && (
-                      <Button
-                        variant="contained"
-                        size="large"
-                        startIcon={<PlayCircle />}
-                        onClick={onResumeGame}
-                        sx={{
-                          py: 1.5,
-                          fontSize: "1.1rem",
-                          minWidth: 200,
-                        }}
-                      >
-                        Resume Game
-                      </Button>
-                    )}
-                    <Button
-                      variant={hasSavedGame ? "outlined" : "contained"}
-                      size="large"
-                      startIcon={<PlayArrow />}
-                      onClick={onStartGame}
-                      sx={{
-                        py: 1.5,
-                        fontSize: "1.1rem",
-                        minWidth: 200,
-                      }}
-                    >
-                      {hasSavedGame ? "New Game" : "Start Quiz"}
-                    </Button>
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Box>
-
-            {/* Stats & Actions */}
-            <Box>
-              <Stack spacing={2}>
-                {/* Stats Card */}
-                <Card
-                  sx={{
-                    bgcolor: "rgba(255, 255, 255, 0.1)",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                  }}
+                <Typography variant="h6">🏆 Top Players</Typography>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<Leaderboard />}
+                  onClick={onViewLeaderboard}
                 >
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Your Stats
-                    </Typography>
-                    <Stack spacing={1}>
-                      <Box display="flex" justifyContent="space-between">
-                        <Typography variant="body2">Total Score:</Typography>
+                  All top players →
+                </Button>
+              </Stack>
+              <Stack spacing={1.5}>
+                {leaderboardData.slice(0, 3).map((player, index) => (
+                  <Box
+                    key={player.uid || index}
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    sx={{
+                      p: 1.5,
+                      bgcolor: "rgba(255, 255, 255, 0.05)",
+                      borderRadius: 1,
+                    }}
+                  >
+                    <Stack direction="row" spacing={1.5} alignItems="center">
+                      <Typography
+                        variant="h6"
+                        fontWeight="bold"
+                        sx={{ minWidth: 30 }}
+                      >
+                        #{index + 1}
+                      </Typography>
+                      <Box>
                         <Typography variant="body2" fontWeight="bold">
-                          {userStats.totalScore || 0}
+                          {player.displayName || player.email || "Anonymous"}
                         </Typography>
-                      </Box>
-                      <Box display="flex" justifyContent="space-between">
-                        <Typography variant="body2">Games:</Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {userStats.gamesPlayed}
-                        </Typography>
-                      </Box>
-                      <Box display="flex" justifyContent="space-between">
-                        <Typography variant="body2">High Score:</Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {userStats.highScore}
+                        <Typography variant="caption" color="text.secondary">
+                          {player.gamesPlayed || 0} games
                         </Typography>
                       </Box>
                     </Stack>
-                  </CardContent>
-                </Card>
-
-                {/* Leaderboard Button */}
-                <Button
-                  variant="outlined"
-                  startIcon={<Leaderboard />}
-                  onClick={onViewLeaderboard}
-                  sx={{ py: 1.5 }}
-                >
-                  View Leaderboard
-                </Button>
+                    <Typography variant="body2" fontWeight="bold">
+                      {player.highScore || 0}
+                    </Typography>
+                  </Box>
+                ))}
+                {leaderboardData.length === 0 && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    align="center"
+                  >
+                    No scores yet. Be the first!
+                  </Typography>
+                )}
               </Stack>
             </Box>
-          </Box>
 
-          {/* Game Rules */}
-          <Box
-            sx={{
-              p: 3,
-              bgcolor: "rgba(255, 255, 255, 0.1)",
-              backdropFilter: "blur(10px)",
-              borderRadius: 2,
-              border: "1px solid rgba(255, 255, 255, 0.2)",
+            {/* Action Buttons & User Info */}
+            <Stack spacing={2} sx={{ flex: { xs: 1, md: 0.5 }, width: "100%" }}>
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<PlayArrow />}
+                onClick={onStartGame}
+                sx={{
+                  py: 1.5,
+                  fontSize: "1.1rem",
+                }}
+              >
+                Start Quiz
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<Help />}
+                onClick={() => setOpenHowToPlay(true)}
+                sx={{ py: 1.5 }}
+              >
+                How to Play
+              </Button>
+
+              {/* User Info & Stats Card */}
+              <Box
+                sx={{
+                  p: 3,
+                  bgcolor: "rgba(255, 255, 255, 0.1)",
+                  borderRadius: 2,
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  mt: 2,
+                }}
+              >
+                <Stack spacing={3}>
+                  {/* User Profile Row */}
+                  <Stack
+                    direction={{ xs: "column", md: "row" }}
+                    spacing={2}
+                    alignItems={{ xs: "flex-start", md: "center" }}
+                    justifyContent="space-between"
+                  >
+                    <Stack direction="row" spacing={3} alignItems="center">
+                      <Avatar
+                        sx={{ bgcolor: "primary.main", width: 48, height: 48 }}
+                      >
+                        <Person />
+                      </Avatar>
+                      <Stack direction="column" spacing={0.5}>
+                        <Typography variant="h6">
+                          {isAnonymous
+                            ? "Guest Player"
+                            : user?.email || "Player"}
+                        </Typography>
+                        {isAnonymous ? (
+                          <Typography variant="body2" color="text.secondary">
+                            Playing as guest - create account to save progress
+                          </Typography>
+                        ) : (
+                          <>
+                            <Stack
+                              direction="row"
+                              spacing={0.5}
+                              alignItems="center"
+                            >
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                High Score:
+                              </Typography>
+                              <Typography variant="body2" fontWeight="bold">
+                                {userStats.highScore}
+                              </Typography>
+                              <EmojiEvents
+                                fontSize="small"
+                                sx={{ color: "warning.main" }}
+                              />
+                            </Stack>
+                            <Typography variant="body2" color="text.secondary">
+                              Games Played: {userStats.gamesPlayed}
+                            </Typography>
+                          </>
+                        )}
+                      </Stack>
+                    </Stack>
+                    {isAnonymous ? (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={onCreateAccount}
+                      >
+                        Sign In or Create Account
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<ExitToApp />}
+                        onClick={onLogout}
+                      >
+                        Logout
+                      </Button>
+                    )}
+                  </Stack>
+                </Stack>
+              </Box>
+            </Stack>
+          </Stack>
+
+          {/* How to Play Modal */}
+          <Dialog
+            open={openHowToPlay}
+            onClose={() => setOpenHowToPlay(false)}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{
+              sx: {
+                bgcolor: "rgba(20, 20, 20, 0.9)",
+
+                borderRadius: 2,
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                animation: openHowToPlay
+                  ? "slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
+                  : "slideOutDown 0.3s ease-in",
+                "@keyframes slideInUp": {
+                  from: {
+                    opacity: 0,
+                    transform: "translateY(40px) scale(0.95) rotateX(-10deg)",
+                  },
+                  to: {
+                    opacity: 1,
+                    transform: "translateY(0) scale(1) rotateX(0deg)",
+                  },
+                },
+                "@keyframes slideOutDown": {
+                  from: {
+                    opacity: 1,
+                    transform: "translateY(0) scale(1) rotateX(0deg)",
+                  },
+                  to: {
+                    opacity: 0,
+                    transform: "translateY(40px) scale(0.95) rotateX(-10deg)",
+                  },
+                },
+                perspective: "1000px",
+                transformStyle: "preserve-3d",
+                boxShadow: openHowToPlay
+                  ? "0 20px 60px rgba(0, 0, 0, 0.4)"
+                  : "0 5px 15px rgba(0, 0, 0, 0.2)",
+                transition: "box-shadow 0.4s ease-out",
+              },
+            }}
+            TransitionProps={{
+              timeout: 400,
             }}
           >
-            <Typography variant="h6" gutterBottom>
-              How to Play
-            </Typography>
-            <Box
+            <DialogTitle
               sx={{
-                display: "grid",
-                gap: 2,
-                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                color: "white",
+                borderBottom: "1px solid rgba(255, 255, 255, 0.1)",
+                animation: openHowToPlay
+                  ? "fadeInDown 0.4s ease-out 0.05s both"
+                  : "none",
+                "@keyframes fadeInDown": {
+                  from: {
+                    opacity: 0,
+                    transform: "translateY(-10px)",
+                  },
+                  to: {
+                    opacity: 1,
+                    transform: "translateY(0)",
+                  },
+                },
               }}
             >
-              <Box>
-                <Typography variant="body2" component="div">
-                  <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
-                    <li>Read the biographical clues about a famous person</li>
-                    <li>Type your guess for who it is</li>
-                    <li>Use hints if you&apos;re stuck (reduces score)</li>
-                    <li>Faster answers get bonus points</li>
-                  </ul>
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" component="div">
-                  <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
-                    <li>Correct answers increase your streak</li>
-                    <li>Wrong answers end the game</li>
-                    <li>Challenge yourself with famous people from history</li>
-                    <li>Compete for the highest score!</li>
-                  </ul>
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
+              How to Play:
+              <Button
+                onClick={() => setOpenHowToPlay(false)}
+                sx={{
+                  minWidth: "auto",
+                  color: "white",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    transform: "rotate(90deg) scale(1.1)",
+                  },
+                }}
+              >
+                <Close />
+              </Button>
+            </DialogTitle>
+            <DialogContent>
+              <Typography
+                variant="body2"
+                sx={{ lineHeight: 1.8, color: "white", mt: 2 }}
+              >
+                We'll give you some biographical clues about a random celebrity,
+                and you'll guess who it is.
+                <strong>Type your best guess and see if you're right!</strong>
+                <br />
+                <br />
+                Stuck? No worries, use a hint! Just know that hints come at a
+                cost to your score. 💡
+                <br />
+                <br />
+                <strong>The goal:</strong> Get as many correct as you can! But
+                be careful... 3 wrong answers means your game is over. Build
+                your streak, climb the leaderboard, and prove you're a true
+                WikiQuest champion! 🏆
+              </Typography>
+            </DialogContent>
+          </Dialog>
         </Stack>
       </Container>
     </Box>

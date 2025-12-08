@@ -61,10 +61,9 @@ const mapState = (state) => {
   }));
 
   const gamesPlayed = g.completedRuns || (g.lastGameResult ? 1 : 0);
-  const totalScore = g.totalScoreAcrossRuns || run.finalScore || 0;
   const averageScore = gamesPlayed
-    ? Math.round(totalScore / gamesPlayed)
-    : totalScore;
+    ? Math.round((run.finalScore || 0) / gamesPlayed)
+    : run.finalScore || 0;
 
   // Use the actual user stats from Firestore (fetched in HomeContainer)
   const actualUserStats = g.userStats || {
@@ -77,7 +76,6 @@ const mapState = (state) => {
   const userStats = {
     gamesPlayed: actualUserStats.gamesPlayed || gamesPlayed,
     highScore: actualUserStats.highScore || 0,
-    totalScore: actualUserStats.totalScore || totalScore,
     averageScore: actualUserStats.averageScore || averageScore,
   };
 

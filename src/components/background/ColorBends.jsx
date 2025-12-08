@@ -1,3 +1,6 @@
+// This component creates a dynamic background with colorful bending patterns using Three.js and GLSL shaders.
+// Retrieved from ReactBits: https://reactbits.dev/backgrounds/color-bends
+
 import { useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import * as THREE from "three";
@@ -105,7 +108,7 @@ export default function ColorBends({
   warpStrength = 1,
   mouseInfluence = 1,
   parallax = 0.5,
-  noise = 0.1,
+  noise = 0,
   transparent = true,
   autoRotate = 0,
   sx,
@@ -227,16 +230,7 @@ export default function ColorBends({
         container.removeChild(renderer.domElement);
       }
     };
-  }, [
-    frequency,
-    mouseInfluence,
-    noise,
-    parallax,
-    scale,
-    speed,
-    transparent,
-    warpStrength,
-  ]);
+  }, []);
 
   useEffect(() => {
     const material = materialRef.current;
@@ -255,17 +249,21 @@ export default function ColorBends({
 
     const toVec3 = (hex) => {
       const h = hex.replace("#", "").trim();
+      // Normalize: support 3, 6, or 8 hex digits (ignore alpha if present).
+      let normalized = h;
+      if (h.length === 8) normalized = h.slice(0, 6);
+      else if (h.length === 4) normalized = h.slice(0, 3);
       const v =
-        h.length === 3
+        normalized.length === 3
           ? [
-              parseInt(h[0] + h[0], 16),
-              parseInt(h[1] + h[1], 16),
-              parseInt(h[2] + h[2], 16),
+              parseInt(normalized[0] + normalized[0], 16),
+              parseInt(normalized[1] + normalized[1], 16),
+              parseInt(normalized[2] + normalized[2], 16),
             ]
           : [
-              parseInt(h.slice(0, 2), 16),
-              parseInt(h.slice(2, 4), 16),
-              parseInt(h.slice(4, 6), 16),
+              parseInt(normalized.slice(0, 2), 16),
+              parseInt(normalized.slice(2, 4), 16),
+              parseInt(normalized.slice(4, 6), 16),
             ];
       return new THREE.Vector3(v[0] / 255, v[1] / 255, v[2] / 255);
     };

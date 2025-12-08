@@ -7,6 +7,7 @@ function HomePresenter({
   user,
   userStats,
   hasSavedGame,
+  leaderboardData,
   onStartGame,
   onLogout,
 }) {
@@ -39,6 +40,7 @@ function HomePresenter({
       onCreateAccount={handleCreateAccount}
       userStats={userStats}
       hasSavedGame={hasSavedGame}
+      leaderboardData={leaderboardData}
     />
   );
 }
