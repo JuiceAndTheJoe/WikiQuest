@@ -82,7 +82,7 @@ function MenuView({
             </Typography>
           </Box>
 
-          {/* User Info */}
+          {/* User Info & Stats */}
           <Box
             sx={{
               p: 3,
@@ -91,31 +91,28 @@ function MenuView({
               border: "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
-            <Stack
-              direction="row"
-              spacing={2}
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Avatar sx={{ bgcolor: "primary.main" }}>
-                  <Person />
-                </Avatar>
-                <Box>
-                  <Typography variant="h6">
-                    {user?.email || "Player"}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Games Played: {userStats.gamesPlayed}
-                  </Typography>
-                </Box>
-              </Stack>
-              <Stack alignItems="flex-end" spacing={1}>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <EmojiEvents color="warning" />
-                  <Typography variant="h6">
-                    High Score: {userStats.highScore}
-                  </Typography>
+            <Stack spacing={3}>
+              {/* User Profile Row */}
+              <Stack
+                direction={{ xs: "column", md: "row" }}
+                spacing={2}
+                alignItems={{ xs: "flex-start", md: "center" }}
+                justifyContent="space-between"
+              >
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Avatar
+                    sx={{ bgcolor: "primary.main", width: 48, height: 48 }}
+                  >
+                    <Person />
+                  </Avatar>
+                  <Box>
+                    <Typography variant="h6">
+                      {user?.email || "Player"}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Games Played: {userStats.gamesPlayed}
+                    </Typography>
+                  </Box>
                 </Stack>
                 <Button
                   variant="outlined"
@@ -125,6 +122,36 @@ function MenuView({
                 >
                   Logout
                 </Button>
+              </Stack>
+
+              {/* Stats Row */}
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                justifyContent="space-around"
+              >
+                <Box display="flex" flexDirection="column" alignItems="center">
+                  <Typography variant="caption" color="text.secondary">
+                    Total Score
+                  </Typography>
+                  <Typography variant="h6" fontWeight="bold">
+                    {userStats.totalScore || 0}
+                  </Typography>
+                </Box>
+                <Box display="flex" flexDirection="column" alignItems="center">
+                  <Stack direction="row" spacing={0.5} alignItems="center">
+                    <EmojiEvents
+                      fontSize="small"
+                      sx={{ color: "warning.main" }}
+                    />
+                    <Typography variant="caption" color="text.secondary">
+                      High Score
+                    </Typography>
+                  </Stack>
+                  <Typography variant="h6" fontWeight="bold">
+                    {userStats.highScore}
+                  </Typography>
+                </Box>
               </Stack>
             </Stack>
           </Box>
@@ -172,51 +199,15 @@ function MenuView({
 
             {/* Stats & Actions */}
             <Box>
-              <Stack spacing={2}>
-                {/* Stats Card */}
-                <Card
-                  sx={{
-                    bgcolor: "rgba(255, 255, 255, 0.1)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Your Stats
-                    </Typography>
-                    <Stack spacing={1}>
-                      <Box display="flex" justifyContent="space-between">
-                        <Typography variant="body2">Total Score:</Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {userStats.totalScore || 0}
-                        </Typography>
-                      </Box>
-                      <Box display="flex" justifyContent="space-between">
-                        <Typography variant="body2">Games:</Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {userStats.gamesPlayed}
-                        </Typography>
-                      </Box>
-                      <Box display="flex" justifyContent="space-between">
-                        <Typography variant="body2">High Score:</Typography>
-                        <Typography variant="body2" fontWeight="bold">
-                          {userStats.highScore}
-                        </Typography>
-                      </Box>
-                    </Stack>
-                  </CardContent>
-                </Card>
-
-                {/* Leaderboard Button */}
-                <Button
-                  variant="outlined"
-                  startIcon={<Leaderboard />}
-                  onClick={onViewLeaderboard}
-                  sx={{ py: 1.5 }}
-                >
-                  View Leaderboard
-                </Button>
-              </Stack>
+              {/* Leaderboard Button */}
+              <Button
+                variant="outlined"
+                startIcon={<Leaderboard />}
+                onClick={onViewLeaderboard}
+                sx={{ py: 1.5, width: "100%" }}
+              >
+                View Leaderboard
+              </Button>
             </Box>
           </Box>
 
