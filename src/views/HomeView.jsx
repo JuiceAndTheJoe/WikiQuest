@@ -31,6 +31,7 @@ function MenuView({
   onStartGame,
   onViewLeaderboard,
   userStats = { gamesPlayed: 0, highScore: 0 },
+  leaderboardData = [],
 }) {
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
@@ -148,6 +149,65 @@ function MenuView({
             </Stack>
           </Box>
 
+          {/* Top Players Mini Leaderboard */}
+          <Box
+            sx={{
+              p: 3,
+              bgcolor: "rgba(255, 255, 255, 0.1)",
+              borderRadius: 2,
+              border: "1px solid rgba(255, 255, 255, 0.2)",
+            }}
+          >
+            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+              🏆 Top Players
+            </Typography>
+            <Stack spacing={1.5}>
+              {leaderboardData.slice(0, 3).map((player, index) => (
+                <Box
+                  key={player.uid || index}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{
+                    p: 1.5,
+                    bgcolor: "rgba(255, 255, 255, 0.05)",
+                    borderRadius: 1,
+                  }}
+                >
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Typography
+                      variant="h6"
+                      fontWeight="bold"
+                      sx={{ minWidth: 30 }}
+                    >
+                      #{index + 1}
+                    </Typography>
+                    <Box>
+                      <Typography variant="body2" fontWeight="bold">
+                        {player.displayName || player.email || "Anonymous"}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {player.gamesPlayed || 0} games
+                      </Typography>
+                    </Box>
+                  </Stack>
+                  <Typography variant="body2" fontWeight="bold">
+                    {player.highScore || 0}
+                  </Typography>
+                </Box>
+              ))}
+              {leaderboardData.length === 0 && (
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  align="center"
+                >
+                  No scores yet. Be the first!
+                </Typography>
+              )}
+            </Stack>
+          </Box>
+
           {/* Action Buttons */}
           <Stack spacing={2} sx={{ maxWidth: 300, mx: "auto" }}>
             <Button
@@ -156,7 +216,7 @@ function MenuView({
               onClick={onViewLeaderboard}
               sx={{ py: 1.5 }}
             >
-              View Leaderboard
+              See Who's Best
             </Button>
             <Button
               variant="contained"

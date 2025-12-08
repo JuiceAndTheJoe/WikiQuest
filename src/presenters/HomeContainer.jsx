@@ -27,6 +27,7 @@ const mapState = (state) => {
       gamesPlayed: g.completedRuns || 0,
       highScore: g.highScore || 0,
     },
+    leaderboardData: g.leaderboardData || [],
   };
 };
 

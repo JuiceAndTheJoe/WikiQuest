@@ -7,6 +7,7 @@ function HomePresenter({
   user,
   userStats,
   hasSavedGame,
+  leaderboardData,
   onStartGame,
   onLogout,
 }) {
@@ -34,6 +35,7 @@ function HomePresenter({
       onViewLeaderboard={handleViewLeaderboard}
       userStats={userStats}
       hasSavedGame={hasSavedGame}
+      leaderboardData={leaderboardData}
     />
   );
 }
