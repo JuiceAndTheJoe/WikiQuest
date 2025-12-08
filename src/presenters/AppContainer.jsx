@@ -21,6 +21,7 @@ function AppContainer({
   onRegister,
   onLogout,
   onClearError,
+  onConvertGuest,
   dispatch,
 }) {
   // Initialize auth listener on mount
@@ -52,6 +53,7 @@ function AppContainer({
       onRegister={onRegister}
       onLogout={onLogout}
       onClearError={onClearError}
+      onConvertGuest={onConvertGuest}
     />
   );
 }
@@ -67,6 +69,7 @@ const mapDispatchToProps = (dispatch) => ({
   onLogin: (credentials) => dispatch(loginUser(credentials)),
   onRegister: (credentials) => dispatch(registerUser(credentials)),
   onLogout: () => dispatch(logoutUser()),
+  onConvertGuest: (credentials) => dispatch(convertGuestToAccount(credentials)),
   onClearError: () => dispatch(clearError()),
   dispatch,
 });

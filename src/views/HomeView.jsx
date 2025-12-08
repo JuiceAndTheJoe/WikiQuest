@@ -31,6 +31,7 @@ function MenuView({
   onStartGame,
   onResumeGame,
   onViewLeaderboard,
+  onCreateAccount,
   hasSavedGame = false,
   userStats = { gamesPlayed: 0, highScore: 0, totalScore: 0 },
 }) {
