@@ -205,6 +205,8 @@ export async function migrateAnonymousData(
     const authData = authSnap.exists() ? authSnap.data() : {};
 
     // Merge the data - taking the best of both
+    const totalScore =
+      (authData.totalScore || 0) + (anonData.totalScore || 0);
     const gamesPlayed =
       (authData.gamesPlayed || 0) + (anonData.gamesPlayed || 0);
     const totalCorrectAnswers =
