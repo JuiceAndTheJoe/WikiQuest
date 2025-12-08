@@ -108,7 +108,7 @@ export default function ColorBends({
   warpStrength = 1,
   mouseInfluence = 1,
   parallax = 0.5,
-  noise = 0.1,
+  noise = 0,
   transparent = true,
   autoRotate = 0,
   sx,

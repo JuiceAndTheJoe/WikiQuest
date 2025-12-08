@@ -4,24 +4,24 @@
  */
 
 import {
-  EmojiEvents,
-  ExitToApp,
-  Leaderboard,
-  Person,
-  PlayArrow,
-  PlayCircle,
-  Quiz,
-} from "@mui/icons-material";
-import {
-  Avatar,
   Box,
   Button,
   Card,
   CardContent,
   Container,
+  Paper,
   Stack,
   Typography,
+  Avatar,
 } from "@mui/material";
+import {
+  PlayArrow,
+  Leaderboard,
+  Person,
+  Quiz,
+  ExitToApp,
+  EmojiEvents,
+} from "@mui/icons-material";
 import ColorBends from "../components/background/ColorBends";
 
 // Pure view: receives interaction handlers & data via props from Presenter.
@@ -29,9 +29,7 @@ function MenuView({
   user,
   onLogout,
   onStartGame,
-  onResumeGame,
   onViewLeaderboard,
-  hasSavedGame = false,
   userStats = { gamesPlayed: 0, highScore: 0, totalScore: 0 },
 }) {
   return (
@@ -46,8 +44,8 @@ function MenuView({
         warpStrength={1.2}
         mouseInfluence={0.8}
         parallax={0.6}
-        noise={0.08}
-        transparent
+        noise={0}
+        transparent={false}
         sx={{
           position: "fixed",
           top: 0,
@@ -89,7 +87,6 @@ function MenuView({
             sx={{
               p: 3,
               bgcolor: "rgba(255, 255, 255, 0.1)",
-              backdropFilter: "blur(10px)",
               borderRadius: 2,
               border: "1px solid rgba(255, 255, 255, 0.2)",
             }}
@@ -144,50 +141,31 @@ function MenuView({
               <Card
                 sx={{
                   bgcolor: "rgba(255, 255, 255, 0.1)",
-                  backdropFilter: "blur(10px)",
                   border: "1px solid rgba(255, 255, 255, 0.2)",
                 }}
               >
                 <CardContent sx={{ p: 4 }}>
                   <Typography variant="h5" gutterBottom>
-                    {hasSavedGame ? "Continue Your Game" : "Start New Game"}
+                    Start New Game
                   </Typography>
                   <Typography variant="body1" color="text.secondary" paragraph>
-                    {hasSavedGame
-                      ? "You have a game in progress. Resume where you left off or start fresh!"
-                      : "Guess famous people based on their Wikipedia biographies. Use hints wisely to maximize your score!"}
+                    Guess famous people based on their Wikipedia biographies.
+                    Use hints wisely to maximize your score!
                   </Typography>
 
-                  <Stack direction="row" spacing={2}>
-                    {hasSavedGame && (
-                      <Button
-                        variant="contained"
-                        size="large"
-                        startIcon={<PlayCircle />}
-                        onClick={onResumeGame}
-                        sx={{
-                          py: 1.5,
-                          fontSize: "1.1rem",
-                          minWidth: 200,
-                        }}
-                      >
-                        Resume Game
-                      </Button>
-                    )}
-                    <Button
-                      variant={hasSavedGame ? "outlined" : "contained"}
-                      size="large"
-                      startIcon={<PlayArrow />}
-                      onClick={onStartGame}
-                      sx={{
-                        py: 1.5,
-                        fontSize: "1.1rem",
-                        minWidth: 200,
-                      }}
-                    >
-                      {hasSavedGame ? "New Game" : "Start Quiz"}
-                    </Button>
-                  </Stack>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    startIcon={<PlayArrow />}
+                    onClick={onStartGame}
+                    sx={{
+                      py: 1.5,
+                      fontSize: "1.1rem",
+                      minWidth: 200,
+                    }}
+                  >
+                    Start Quiz
+                  </Button>
                 </CardContent>
               </Card>
             </Box>
@@ -199,7 +177,6 @@ function MenuView({
                 <Card
                   sx={{
                     bgcolor: "rgba(255, 255, 255, 0.1)",
-                    backdropFilter: "blur(10px)",
                     border: "1px solid rgba(255, 255, 255, 0.2)",
                   }}
                 >
@@ -248,7 +225,6 @@ function MenuView({
             sx={{
               p: 3,
               bgcolor: "rgba(255, 255, 255, 0.1)",
-              backdropFilter: "blur(10px)",
               borderRadius: 2,
               border: "1px solid rgba(255, 255, 255, 0.2)",
             }}
@@ -268,7 +244,7 @@ function MenuView({
                   <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
                     <li>Read the biographical clues about a famous person</li>
                     <li>Type your guess for who it is</li>
-                    <li>Use hints if you&apos;re stuck (reduces score)</li>
+                    <li>Use hints if you're stuck (reduces score)</li>
                     <li>Faster answers get bonus points</li>
                   </ul>
                 </Typography>
