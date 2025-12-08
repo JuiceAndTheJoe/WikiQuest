@@ -1,7 +1,21 @@
+import { useEffect } from "react";
 import { connect } from "react-redux";
-import { startNewGame } from "../app/features/game/gameSlice";
+import { startNewGame, fetchUserStats } from "../app/features/game/gameSlice";
 import { getDifficulty } from "../app/features/game/gameUtils";
 import ResultsPresenter from "./ResultsPresenter";
+
+const ResultsContainer = (props) => {
+  const { user, fetchUserStats } = props;
+
+  // Fetch updated user stats when results page loads
+  useEffect(() => {
+    if (user?.uid) {
+      fetchUserStats(user.uid);
+    }
+  }, [user?.uid, fetchUserStats]);
+
+  return <ResultsPresenter {...props} />;
+};
 
 const mapState = (state) => {
   const g = state.game || {};
@@ -52,14 +66,23 @@ const mapState = (state) => {
     ? Math.round(totalScore / gamesPlayed)
     : totalScore;
 
-  const userStats = {
-    gamesPlayed,
-    highScore: g.highScore || 0,
-    totalScore,
-    averageScore,
+  // Use the actual user stats from Firestore (fetched in HomeContainer)
+  const actualUserStats = g.userStats || {
+    gamesPlayed: 0,
+    highScore: 0,
+    totalScore: 0,
+    averageScore: 0,
   };
 
-  const newHighScore = (run.finalScore || 0) > (g.highScore || 0);
+  const userStats = {
+    gamesPlayed: actualUserStats.gamesPlayed || gamesPlayed,
+    highScore: actualUserStats.highScore || 0,
+    totalScore: actualUserStats.totalScore || totalScore,
+    averageScore: actualUserStats.averageScore || averageScore,
+  };
+
+  // Compare current game score with the user's actual high score from Firestore
+  const newHighScore = (run.finalScore || 0) > (actualUserStats.highScore || 0);
 
   return {
     gameStats,
@@ -72,6 +95,7 @@ const mapState = (state) => {
 
 const mapDispatch = (dispatch) => ({
   onStartNewGame: () => dispatch(startNewGame()),
+  fetchUserStats: (uid) => dispatch(fetchUserStats(uid)),
 });
 
-export default connect(mapState, mapDispatch)(ResultsPresenter);
+export default connect(mapState, mapDispatch)(ResultsContainer);

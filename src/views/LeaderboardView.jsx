@@ -27,7 +27,6 @@ import {
   EmojiEvents,
   TrendingUp,
   Person,
-  Refresh,
 } from "@mui/icons-material";
 
 function LeaderboardView({
@@ -37,7 +36,6 @@ function LeaderboardView({
   userRank,
   currentUser,
   onBackToMenu,
-  onRefresh,
 }) {
   const getRankIcon = (rank) => {
     switch (rank) {
@@ -85,14 +83,6 @@ function LeaderboardView({
           <Stack direction="row" spacing={2}>
             <Button
               variant="outlined"
-              startIcon={<Refresh />}
-              onClick={onRefresh}
-              disabled={loading}
-            >
-              Refresh
-            </Button>
-            <Button
-              variant="outlined"
               startIcon={<ArrowBack />}
               onClick={onBackToMenu}
             >
@@ -115,7 +105,9 @@ function LeaderboardView({
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="h6">Your Current Rank</Typography>
                   <Typography variant="body2">
-                    {currentUser?.email || "You"}
+                    {currentUser?.isAnonymous
+                      ? "Guest Player"
+                      : currentUser?.email || "You"}
                   </Typography>
                 </Box>
                 <Box sx={{ textAlign: "right" }}>

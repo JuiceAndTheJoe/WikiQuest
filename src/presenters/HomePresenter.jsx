@@ -25,6 +25,10 @@ function HomePresenter({
     navigate("/leaderboard");
   }, [navigate]);
 
+  const handleCreateAccount = useCallback(() => {
+    navigate("/login");
+  }, [navigate]);
+
   return (
     <HomeView
       user={user}
@@ -32,6 +36,7 @@ function HomePresenter({
       onStartGame={handleStartGame}
       onResumeGame={handleResumeGame}
       onViewLeaderboard={handleViewLeaderboard}
+      onCreateAccount={handleCreateAccount}
       userStats={userStats}
       hasSavedGame={hasSavedGame}
     />

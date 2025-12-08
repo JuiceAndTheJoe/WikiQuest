@@ -4,6 +4,7 @@
  */
 
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -23,6 +24,7 @@ import {
   EmojiEvents,
   CheckCircle,
   Cancel,
+  AccountCircle,
 } from "@mui/icons-material";
 
 function ResultsView({
@@ -33,7 +35,10 @@ function ResultsView({
   onViewLeaderboard,
   onBackToMenu,
   newHighScore = false,
+  user,
+  onCreateAccount,
 }) {
+  const isAnonymous = user?.isAnonymous || false;
   const accuracy =
     gameStats?.totalQuestions > 0
       ? Math.round((gameStats.correctAnswers / gameStats.totalQuestions) * 100)
@@ -59,18 +64,22 @@ function ResultsView({
             gutterBottom
             color={newHighScore ? "success.main" : "inherit"}
           >
-            {newHighScore ? "🎉 New High Score! 🎉" : "Game Over"}
+            {newHighScore ? "🎉 New Personal Best! 🎉" : "Good Job! 👏"}
           </Typography>
           <Typography variant="h4" color="primary" gutterBottom>
             Final Score: {gameStats?.score || 0}
           </Typography>
-          {newHighScore && (
+          {newHighScore ? (
             <Chip
               icon={<EmojiEvents />}
-              label="Personal Best!"
+              label="New High Score!"
               color="warning"
               sx={{ fontSize: "1rem", py: 2 }}
             />
+          ) : (
+            <Typography variant="body1" color="text.secondary">
+              Play again to beat your high score!
+            </Typography>
           )}
         </Box>
 
@@ -303,6 +312,31 @@ function ResultsView({
                   </Box>
                 </CardContent>
               </Card>
+
+              {/* Anonymous User Conversion Prompt */}
+              {isAnonymous && (
+                <Alert
+                  severity="info"
+                  action={
+                    <Button
+                      color="inherit"
+                      size="small"
+                      onClick={onCreateAccount}
+                      startIcon={<AccountCircle />}
+                    >
+                      Sign In
+                    </Button>
+                  }
+                  sx={{ mb: 2 }}
+                >
+                  <Typography variant="body2" fontWeight="bold">
+                    Save Your Progress!
+                  </Typography>
+                  <Typography variant="caption">
+                    Create an account or sign in to save this score permanently
+                  </Typography>
+                </Alert>
+              )}
 
               {/* Action Buttons */}
               <Stack spacing={2}>

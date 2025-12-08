@@ -16,6 +16,8 @@ function AppPresenter({
   onLogin,
   onRegister,
   onClearError,
+  onGuestLogin,
+  onConvertGuest,
 }) {
   // Show loading spinner while checking auth state
   if (!isAuthChecked) {
@@ -37,12 +39,15 @@ function AppPresenter({
         <Route
           path="/login"
           element={
-            user ? (
+            user && !user.isAnonymous ? (
               <Navigate to="/" replace />
             ) : (
               <LoginPresenter
+                user={user}
                 onLogin={onLogin}
                 onRegister={onRegister}
+                onGuestLogin={onGuestLogin}
+                onConvertGuest={onConvertGuest}
                 loading={authLoading}
                 error={authError}
                 onClearError={onClearError}

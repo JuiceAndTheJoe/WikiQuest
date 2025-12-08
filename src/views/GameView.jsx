@@ -3,7 +3,7 @@
  * Pure component for displaying biography, hints, guess input, and score
  */
 
-import { Lightbulb, Send, Timer } from "@mui/icons-material";
+import { Lightbulb, Send, Timer, Home } from "@mui/icons-material";
 import {
   Alert,
   Box,
@@ -29,6 +29,7 @@ function GameView({
   onSubmitGuess,
   onUseHint,
   onNextQuestion,
+  onBackToHome,
   lastResult,
   wikipediaSummary,
   revealedSummarySentences,
@@ -41,6 +42,13 @@ function GameView({
   const canUseHint =
     hasSummary && hints && hints.availableHints > hints.usedHints;
   const isGameOver = gameState?.lives <= 0;
+
+  const getBlurAmount = () => {
+    if (hintsUsed === 0) return 8;
+    if (hintsUsed === 1) return 5;
+    if (hintsUsed === 2) return 2;
+    return 0;
+  };
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
@@ -135,11 +143,20 @@ function GameView({
                             component="img"
                             src={wikipediaSummary.thumbnail.source}
                             alt="Person"
+                            onContextMenu={(e) => e.preventDefault()}
+                            onDragStart={(e) => e.preventDefault()}
                             sx={{
                               maxWidth: "220px",
                               borderRadius: 1,
                               mx: "auto",
                               display: "block",
+                              pointerEvents: "auto",
+                              userSelect: "none",
+                              WebkitUserSelect: "none",
+                              MozUserSelect: "none",
+                              msUserSelect: "none",
+                              filter: `blur(${getBlurAmount()}px)`,
+                              transition: "filter 0.3s ease",
                             }}
                           />
                         )}
@@ -276,11 +293,13 @@ function GameView({
                   </Stack>
 
                   <Button
-                    variant="outlined"
+                    variant="contained"
+                    color="error"
                     startIcon={<Lightbulb />}
                     onClick={onUseHint}
                     disabled={!canUseHint || isGameOver}
                     fullWidth
+                    sx={{ fontWeight: "bold" }}
                   >
                     Use Hint ({hints?.availableHints - hints?.usedHints || 0}{" "}
                     left)
@@ -330,6 +349,16 @@ function GameView({
                     %
                   </Typography>
                 </Stack>
+                <Button
+                  variant="outlined"
+                  size="medium"
+                  startIcon={<Home />}
+                  onClick={onBackToHome}
+                  sx={{ mt: 2, fontWeight: "bold" }}
+                  fullWidth
+                >
+                  Back to Home
+                </Button>
               </CardContent>
             </Card>
           </Box>

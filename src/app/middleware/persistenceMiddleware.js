@@ -18,8 +18,9 @@ const persistenceMiddleware = (store) => (next) => (action) => {
   const state = store.getState();
   const userId = state.auth.user?.uid;
 
-  // Watch for game start to generate a gameId
+  // Watch for game start to save initial state
   if (action.type === startNewGame.type && userId && !state.game.hasSavedGame) {
+    // Save to Firestore for all users (anonymous and authenticated)
     saveCurrentGameState(userId, { ...state.game })
       .then(() => {
         store.dispatch(setSavedGameFlag(true));
@@ -56,22 +57,27 @@ const persistenceMiddleware = (store) => (next) => (action) => {
   ) {
     lastPersistedRunId = runSummary.endedAt;
 
+    // Clear Firestore saved state for all users
     clearSavedGameState(userId).catch((err) => {
       console.warn("Failed to clear saved game state", err);
     });
 
     store.dispatch(setSavedGameFlag(false));
 
+    // Save game result to Firestore (for both anonymous and authenticated users)
+    // Anonymous users won't appear on leaderboard but data is still saved
     saveGameResult(userId, runSummary, {
       email: state.auth.user?.email || null,
       displayName: state.auth.user?.displayName || null,
-      photoURL: state.auth.user?.photoURL || null,
     })
       .then(() => {
         store.dispatch(fetchLeaderboard());
       })
       .catch((err) => {
-        console.warn("Failed to persist game result", err);
+        console.warn(
+          "Failed to persist game result. If quota exceeded, wait and try later.",
+          err,
+        );
       });
   }
 
