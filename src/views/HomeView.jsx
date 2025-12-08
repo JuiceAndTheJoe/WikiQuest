@@ -7,13 +7,10 @@ import { useState } from "react";
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   Container,
   Dialog,
   DialogContent,
   DialogTitle,
-  Paper,
   Stack,
   Typography,
   Avatar,
@@ -37,7 +34,6 @@ function MenuView({
   onStartGame,
   onViewLeaderboard,
   onCreateAccount,
-  hasSavedGame = false,
   userStats = { gamesPlayed: 0, highScore: 0 },
   leaderboardData = [],
 }) {
@@ -98,7 +94,7 @@ function MenuView({
           <Stack
             direction={{ xs: "column", md: "row" }}
             spacing={3}
-            alignItems="flex-start"
+            alignItems="stretch"
           >
             {/* Mini Leaderboard */}
             <Box
@@ -108,6 +104,8 @@ function MenuView({
                 borderRadius: 2,
                 border: "1px solid rgba(255, 255, 255, 0.2)",
                 flex: { xs: 1, md: 0.5 },
+                display: "flex",
+                flexDirection: "column",
               }}
             >
               <Stack
@@ -120,10 +118,10 @@ function MenuView({
                 <Button
                   variant="outlined"
                   size="small"
-                  startIcon={<Leaderboard />}
+                  endIcon={<Leaderboard />}
                   onClick={onViewLeaderboard}
                 >
-                  All top players →
+                  All top players
                 </Button>
               </Stack>
               <Stack spacing={1.5}>
@@ -174,24 +172,29 @@ function MenuView({
             </Box>
 
             {/* Action Buttons & User Info */}
-            <Stack spacing={2} sx={{ flex: { xs: 1, md: 0.5 }, width: "100%" }}>
+            <Stack
+              spacing={2}
+              sx={{ flex: { xs: 1, md: 0.5 }, width: "100%" }}
+              justifyContent="space-between"
+            >
               <Button
                 variant="contained"
                 size="large"
-                startIcon={<PlayArrow />}
+                endIcon={<PlayArrow />}
                 onClick={onStartGame}
                 sx={{
                   py: 1.5,
                   fontSize: "1.1rem",
+                  flex: 1,
                 }}
               >
                 Start Quiz
               </Button>
               <Button
                 variant="outlined"
-                startIcon={<Help />}
+                endIcon={<Help />}
                 onClick={() => setOpenHowToPlay(true)}
-                sx={{ py: 1.5 }}
+                sx={{ py: 1.5, flex: 1 }}
               >
                 How to Play
               </Button>
@@ -270,7 +273,7 @@ function MenuView({
                       <Button
                         variant="outlined"
                         size="small"
-                        startIcon={<ExitToApp />}
+                        endIcon={<ExitToApp />}
                         onClick={onLogout}
                       >
                         Logout
@@ -371,9 +374,11 @@ function MenuView({
                 variant="body2"
                 sx={{ lineHeight: 1.8, color: "white", mt: 2 }}
               >
-                We'll give you some biographical clues about a random celebrity,
-                and you'll guess who it is.
-                <strong>Type your best guess and see if you're right!</strong>
+                We&apos;ll give you some biographical clues about a random
+                celebrity, and you&apos;ll guess who it is.&nbsp;
+                <strong>
+                  Type your best guess and see if you&apos;re right!
+                </strong>
                 <br />
                 <br />
                 Stuck? No worries, use a hint! Just know that hints come at a
@@ -382,7 +387,7 @@ function MenuView({
                 <br />
                 <strong>The goal:</strong> Get as many correct as you can! But
                 be careful... 3 wrong answers means your game is over. Build
-                your streak, climb the leaderboard, and prove you're a true
+                your streak, climb the leaderboard, and prove you&apos;re a true
                 WikiQuest champion! 🏆
               </Typography>
             </DialogContent>
