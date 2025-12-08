@@ -7,6 +7,7 @@ function LoginPresenter({
   user,
   onLogin,
   onRegister,
+  onGuestLogin,
   onConvertGuest,
   loading,
   error,
@@ -44,7 +45,12 @@ function LoginPresenter({
   };
 
   const handleContinueAsGuest = () => {
-    navigate("/");
+    // Manually create an anonymous session instead of auto-login
+    onGuestLogin()
+      .then(() => navigate("/"))
+      .catch(() => {
+        /* error handled via redux error state */
+      });
   };
 
   return (

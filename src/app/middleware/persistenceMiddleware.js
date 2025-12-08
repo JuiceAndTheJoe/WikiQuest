@@ -69,7 +69,6 @@ const persistenceMiddleware = (store) => (next) => (action) => {
     saveGameResult(userId, runSummary, {
       email: state.auth.user?.email || null,
       displayName: state.auth.user?.displayName || null,
-      photoURL: state.auth.user?.photoURL || null,
     })
       .then(() => {
         store.dispatch(fetchLeaderboard());
@@ -77,6 +76,7 @@ const persistenceMiddleware = (store) => (next) => (action) => {
       .catch((err) => {
         console.warn(
           "Failed to persist game result. If quota exceeded, wait and try later.",
+          err,
         );
       });
   }

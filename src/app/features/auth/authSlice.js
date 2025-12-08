@@ -52,10 +52,25 @@ export const registerUser = createAsyncThunk(
 );
 
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
-  // Sign out from Firebase
   await signOut(auth);
-  // onAuthStateChanged will trigger and create a new anonymous user automatically
 });
+
+// Explicit guest login to avoid automatic anonymous sessions
+export const loginAsGuest = createAsyncThunk(
+  "auth/loginAsGuest",
+  async (_, { rejectWithValue }) => {
+    try {
+      const userCredential = await signInAnonymously(auth);
+      return {
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+        isAnonymous: true,
+      };
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
 
 // Convert anonymous account to permanent account using Firebase account linking
 export const convertGuestToAccount = createAsyncThunk(
@@ -84,7 +99,6 @@ export const convertGuestToAccount = createAsyncThunk(
           await migrateAnonymousData(anonymousUserId, userCredential.user.uid, {
             email: userCredential.user.email,
             displayName: userCredential.user.displayName,
-            photoURL: userCredential.user.photoURL,
           });
           console.log("Data migration completed successfully");
         } catch (migrationError) {
@@ -114,7 +128,6 @@ export const convertGuestToAccount = createAsyncThunk(
         await updateUserProfile(userCredential.user.uid, {
           email: userCredential.user.email,
           displayName: userCredential.user.displayName,
-          photoURL: userCredential.user.photoURL,
         });
 
         return {
@@ -180,8 +193,21 @@ const authSlice = createSlice({
       })
       // Logout
       .addCase(logoutUser.fulfilled, (state) => {
-        // User will be set via onAuthStateChanged listener
         state.loading = false;
+      })
+      // Guest login
+      .addCase(loginAsGuest.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginAsGuest.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.isAuthChecked = true;
+      })
+      .addCase(loginAsGuest.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       // Convert anonymous to account
       .addCase(convertGuestToAccount.pending, (state) => {

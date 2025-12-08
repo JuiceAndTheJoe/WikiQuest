@@ -27,7 +27,6 @@ import {
   EmojiEvents,
   TrendingUp,
   Person,
-  Refresh,
 } from "@mui/icons-material";
 
 function LeaderboardView({
@@ -37,7 +36,6 @@ function LeaderboardView({
   userRank,
   currentUser,
   onBackToMenu,
-  onRefresh,
 }) {
   const getRankIcon = (rank) => {
     switch (rank) {
@@ -83,14 +81,6 @@ function LeaderboardView({
             Leaderboard
           </Typography>
           <Stack direction="row" spacing={2}>
-            <Button
-              variant="outlined"
-              startIcon={<Refresh />}
-              onClick={onRefresh}
-              disabled={loading}
-            >
-              Refresh
-            </Button>
             <Button
               variant="outlined"
               startIcon={<ArrowBack />}

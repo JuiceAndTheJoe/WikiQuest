@@ -15,8 +15,8 @@ function AppPresenter({
   authError,
   onLogin,
   onRegister,
-  onLogout,
   onClearError,
+  onGuestLogin,
   onConvertGuest,
 }) {
   // Show loading spinner while checking auth state
@@ -46,6 +46,7 @@ function AppPresenter({
                 user={user}
                 onLogin={onLogin}
                 onRegister={onRegister}
+                onGuestLogin={onGuestLogin}
                 onConvertGuest={onConvertGuest}
                 loading={authLoading}
                 error={authError}

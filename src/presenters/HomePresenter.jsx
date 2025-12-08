@@ -9,7 +9,6 @@ function HomePresenter({
   hasSavedGame,
   onStartGame,
   onLogout,
-  onCreateAccount,
 }) {
   const navigate = useNavigate();
 
