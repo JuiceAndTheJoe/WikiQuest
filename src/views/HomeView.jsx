@@ -7,13 +7,10 @@ import { useState } from "react";
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   Container,
   Dialog,
   DialogContent,
   DialogTitle,
-  Paper,
   Stack,
   Typography,
   Avatar,
@@ -37,7 +34,6 @@ function MenuView({
   onStartGame,
   onViewLeaderboard,
   onCreateAccount,
-  hasSavedGame = false,
   userStats = { gamesPlayed: 0, highScore: 0 },
   leaderboardData = [],
 }) {
@@ -378,9 +374,11 @@ function MenuView({
                 variant="body2"
                 sx={{ lineHeight: 1.8, color: "white", mt: 2 }}
               >
-                We'll give you some biographical clues about a random celebrity,
-                and you'll guess who it is.
-                <strong>Type your best guess and see if you're right!</strong>
+                We&apos;ll give you some biographical clues about a random
+                celebrity, and you&apos;ll guess who it is.&nbsp;
+                <strong>
+                  Type your best guess and see if you&apos;re right!
+                </strong>
                 <br />
                 <br />
                 Stuck? No worries, use a hint! Just know that hints come at a
@@ -389,7 +387,7 @@ function MenuView({
                 <br />
                 <strong>The goal:</strong> Get as many correct as you can! But
                 be careful... 3 wrong answers means your game is over. Build
-                your streak, climb the leaderboard, and prove you're a true
+                your streak, climb the leaderboard, and prove you&apos;re a true
                 WikiQuest champion! 🏆
               </Typography>
             </DialogContent>

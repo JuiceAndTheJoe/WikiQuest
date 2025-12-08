@@ -22,12 +22,7 @@ import {
   Chip,
   CircularProgress,
 } from "@mui/material";
-import {
-  ArrowBack,
-  EmojiEvents,
-  TrendingUp,
-  Person,
-} from "@mui/icons-material";
+import { ArrowBack, TrendingUp, Person } from "@mui/icons-material";
 import ColorBends from "../components/background/ColorBends";
 
 function LeaderboardView({
