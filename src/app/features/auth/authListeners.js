@@ -14,10 +14,10 @@ export function initAuthListener(dispatch) {
     // Pass through Firebase user (authenticated or anonymous) or null
     const userPayload = user
       ? {
-        uid: user.uid,
-        email: user.email,
-        isAnonymous: user.isAnonymous,
-      }
+          uid: user.uid,
+          email: user.email,
+          isAnonymous: user.isAnonymous,
+        }
       : null;
 
     dispatch(setUser(userPayload));
