@@ -78,7 +78,8 @@ function MenuView({
               WikiQuest
             </Typography>
             <Typography variant="h5" color="text.secondary" gutterBottom>
-              Test your knowledge of famous people!
+              Guess famous people based on their Wikipedia biographies. Use
+              hints wisely to maximize your score!
             </Typography>
           </Box>
 
@@ -99,20 +100,34 @@ function MenuView({
                 alignItems={{ xs: "flex-start", md: "center" }}
                 justifyContent="space-between"
               >
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack direction="row" spacing={3} alignItems="center">
                   <Avatar
                     sx={{ bgcolor: "primary.main", width: 48, height: 48 }}
                   >
                     <Person />
                   </Avatar>
-                  <Box>
-                    <Typography variant="h6">
-                      {user?.email || "Player"}
-                    </Typography>
+                  <Stack direction="column" spacing={0.5}>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Typography variant="h6">
+                        {user?.email || "Player"}
+                      </Typography>
+                      <Stack direction="row" spacing={0.5} alignItems="center">
+                        <Typography variant="body2" color="text.secondary">
+                          High Score:
+                        </Typography>
+                        <Typography variant="body2" fontWeight="bold">
+                          {userStats.highScore}
+                        </Typography>
+                        <EmojiEvents
+                          fontSize="small"
+                          sx={{ color: "warning.main" }}
+                        />
+                      </Stack>
+                    </Stack>
                     <Typography variant="body2" color="text.secondary">
                       Games Played: {userStats.gamesPlayed}
                     </Typography>
-                  </Box>
+                  </Stack>
                 </Stack>
                 <Button
                   variant="outlined"
@@ -129,79 +144,33 @@ function MenuView({
                 direction={{ xs: "column", sm: "row" }}
                 spacing={2}
                 justifyContent="center"
-              >
-                <Box display="flex" flexDirection="column" alignItems="center">
-                  <Stack direction="row" spacing={0.5} alignItems="center">
-                    <EmojiEvents
-                      fontSize="small"
-                      sx={{ color: "warning.main" }}
-                    />
-                    <Typography variant="caption" color="text.secondary">
-                      High Score
-                    </Typography>
-                  </Stack>
-                  <Typography variant="h6" fontWeight="bold">
-                    {userStats.highScore}
-                  </Typography>
-                </Box>
-              </Stack>
+              ></Stack>
             </Stack>
           </Box>
 
-          <Box
-            sx={{
-              display: "grid",
-              gap: 3,
-              gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" },
-            }}
-          >
-            {/* Game Options */}
-            <Box>
-              <Card
-                sx={{
-                  bgcolor: "rgba(255, 255, 255, 0.1)",
-                  border: "1px solid rgba(255, 255, 255, 0.2)",
-                }}
-              >
-                <CardContent sx={{ p: 4 }}>
-                  <Typography variant="h5" gutterBottom>
-                    Start New Game
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary" paragraph>
-                    Guess famous people based on their Wikipedia biographies.
-                    Use hints wisely to maximize your score!
-                  </Typography>
-
-                  <Button
-                    variant="contained"
-                    size="large"
-                    startIcon={<PlayArrow />}
-                    onClick={onStartGame}
-                    sx={{
-                      py: 1.5,
-                      fontSize: "1.1rem",
-                      minWidth: 200,
-                    }}
-                  >
-                    Start Quiz
-                  </Button>
-                </CardContent>
-              </Card>
-            </Box>
-
-            {/* Stats & Actions */}
-            <Box>
-              {/* Leaderboard Button */}
-              <Button
-                variant="outlined"
-                startIcon={<Leaderboard />}
-                onClick={onViewLeaderboard}
-                sx={{ py: 1.5, width: "100%" }}
-              >
-                View Leaderboard
-              </Button>
-            </Box>
-          </Box>
+          {/* Action Buttons */}
+          <Stack spacing={2} sx={{ maxWidth: 300, mx: "auto" }}>
+            <Button
+              variant="outlined"
+              startIcon={<Leaderboard />}
+              onClick={onViewLeaderboard}
+              sx={{ py: 1.5 }}
+            >
+              View Leaderboard
+            </Button>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<PlayArrow />}
+              onClick={onStartGame}
+              sx={{
+                py: 1.5,
+                fontSize: "1.1rem",
+              }}
+            >
+              Start Quiz
+            </Button>
+          </Stack>
 
           {/* Game Rules */}
           <Box
@@ -213,7 +182,7 @@ function MenuView({
             }}
           >
             <Typography variant="h6" gutterBottom>
-              How to Play
+              How to Play:
             </Typography>
             <Box
               sx={{
@@ -227,8 +196,10 @@ function MenuView({
                   <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
                     <li>Read the biographical clues about a famous person</li>
                     <li>Type your guess for who it is</li>
-                    <li>Use hints if you're stuck (reduces score)</li>
-                    <li>Faster answers get bonus points</li>
+                    <li>
+                      You can use hints if you're stuck! at the cost of your
+                      score...)
+                    </li>
                   </ul>
                 </Typography>
               </Box>
@@ -236,8 +207,8 @@ function MenuView({
                 <Typography variant="body2" component="div">
                   <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
                     <li>Correct answers increase your streak</li>
-                    <li>Wrong answers end the game</li>
-                    <li>Challenge yourself with famous people from history</li>
+                    <li>3 wrong answers end the game</li>
+                    <li>Challenge yourself and your peers!</li>
                     <li>Compete for the highest score!</li>
                   </ul>
                 </Typography>
