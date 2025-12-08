@@ -341,6 +341,7 @@ function LeaderboardView({
                                 </Avatar>
                                 <Box>
                                   <Typography
+                                    component="span"
                                     variant="body2"
                                     fontWeight={
                                       isCurrentUser ? "bold" : "normal"
@@ -363,7 +364,7 @@ function LeaderboardView({
                                       variant="caption"
                                       color="text.secondary"
                                     >
-                                      Last played:{" "}
+                                      &nbsp;Last played:{" "}
                                       {new Date(
                                         player.lastPlayed,
                                       ).toLocaleDateString()}
