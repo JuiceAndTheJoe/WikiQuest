@@ -234,23 +234,22 @@ function LeaderboardView({
                                 )}
                               </Avatar>
                               <Box>
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                  <Typography
-                                    variant="body2"
-                                    fontWeight={isCurrentUser ? "bold" : "normal"}
-                                  >
-                                    {player.name ||
-                                      player.email ||
-                                      `Player ${rank}`}
-                                  </Typography>
+                                <Typography
+                                  variant="body2"
+                                  fontWeight={isCurrentUser ? "bold" : "normal"}
+                                >
+                                  {player.name ||
+                                    player.email ||
+                                    `Player ${rank}`}
                                   {isCurrentUser && (
                                     <Chip
                                       label="You"
                                       size="small"
                                       color="primary"
+                                      sx={{ ml: 1 }}
                                     />
                                   )}
-                                </Stack>
+                                </Typography>
                                 {player.lastPlayed && (
                                   <Typography
                                     variant="caption"
@@ -258,7 +257,7 @@ function LeaderboardView({
                                   >
                                     Last played:{" "}
                                     {new Date(
-                                      player.lastPlayed
+                                      player.lastPlayed,
                                     ).toLocaleDateString()}
                                   </Typography>
                                 )}
@@ -292,8 +291,8 @@ function LeaderboardView({
                                 (player.accuracy || 0) >= 80
                                   ? "success"
                                   : (player.accuracy || 0) >= 60
-                                  ? "warning"
-                                  : "error"
+                                    ? "warning"
+                                    : "error"
                               }
                             />
                           </TableCell>
@@ -348,7 +347,7 @@ function LeaderboardView({
                 </Typography>
                 <Typography variant="h5" fontWeight="bold" color="warning.main">
                   {Math.max(
-                    ...leaderboardData.map((p) => p.highScore || 0)
+                    ...leaderboardData.map((p) => p.highScore || 0),
                   ).toLocaleString()}
                 </Typography>
               </Box>
@@ -370,8 +369,8 @@ function LeaderboardView({
                   {Math.round(
                     leaderboardData.reduce(
                       (sum, p) => sum + (p.accuracy || 0),
-                      0
-                    ) / leaderboardData.length
+                      0,
+                    ) / leaderboardData.length,
                   )}
                   %
                 </Typography>

@@ -4,6 +4,7 @@
  */
 
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -15,7 +16,6 @@ import {
   LinearProgress,
   Chip,
   Divider,
-  Alert,
 } from "@mui/material";
 import {
   PlayArrow,
@@ -34,9 +34,9 @@ function ResultsView({
   onPlayAgain,
   onViewLeaderboard,
   onBackToMenu,
-  onCreateAccount,
-  user,
   newHighScore = false,
+  user,
+  onCreateAccount,
 }) {
   const isAnonymous = user?.isAnonymous || false;
   const accuracy =
@@ -175,7 +175,7 @@ function ResultsView({
                           <Typography variant="h6" fontWeight="bold">
                             {gameHistory?.reduce(
                               (total, q) => total + (q.hintsUsed || 0),
-                              0
+                              0,
                             ) || 0}
                           </Typography>
                         </Box>

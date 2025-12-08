@@ -9,9 +9,9 @@ import {
   deleteDoc,
   getDoc,
   onSnapshot,
-} from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
-import { USER_COLLECTION } from './constants';
+} from "firebase/firestore";
+import { db } from "../../firebaseConfig";
+import { USER_COLLECTION } from "./constants";
 
 /**
  * Fetches the leaderboard data from Firestore.
@@ -24,24 +24,24 @@ export async function getLeaderboard(maxCount = 10) {
     const leaderboardRef = collection(db, USER_COLLECTION);
     const q = query(
       leaderboardRef,
-      orderBy('highScore', 'desc'),
-      limit(maxCount * 2) // Fetch more to account for filtering anonymous users
+      orderBy("highScore", "desc"),
+      limit(maxCount * 2), // Fetch more to account for filtering anonymous users
     );
     const snapshot = await getDocs(q);
 
     const leaderboard = [];
     snapshot.forEach((doc) => {
       const data = doc.data();
-      
+
       // Skip anonymous users (those without email) and migrated users
       if (!data.email || data.migrated) {
         return;
       }
-      
+
       leaderboard.push({
         userId: doc.id,
         email: data.email,
-        name: data.displayName || data.email || 'Player',
+        name: data.displayName || data.email || "Player",
         highScore: data.highScore || 0,
         gamesPlayed: data.gamesPlayed || 0,
         averageScore: data.averageScore || 0,
@@ -53,7 +53,7 @@ export async function getLeaderboard(maxCount = 10) {
     // Limit to requested count after filtering
     return leaderboard.slice(0, maxCount);
   } catch (error) {
-    console.error('Error fetching leaderboard:', error);
+    console.error("Error fetching leaderboard:", error);
     throw error;
   }
 }
@@ -69,37 +69,41 @@ export function subscribeToLeaderboard(callback, maxCount = 10) {
   const leaderboardRef = collection(db, USER_COLLECTION);
   const q = query(
     leaderboardRef,
-    orderBy('highScore', 'desc'),
-    limit(maxCount * 2) // Fetch more to account for filtering
+    orderBy("highScore", "desc"),
+    limit(maxCount * 2), // Fetch more to account for filtering
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const leaderboard = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      
-      // Skip anonymous users (those without email) and migrated users
-      if (!data.email || data.migrated) {
-        return;
-      }
-      
-      leaderboard.push({
-        userId: doc.id,
-        email: data.email,
-        name: data.displayName || data.email || 'Player',
-        highScore: data.highScore || 0,
-        gamesPlayed: data.gamesPlayed || 0,
-        averageScore: data.averageScore || 0,
-        accuracy: data.accuracy || 0,
-        lastPlayed: data.lastPlayed || null,
-      });
-    });
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const leaderboard = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
 
-    // Limit to requested count after filtering
-    callback(leaderboard.slice(0, maxCount));
-  }, (error) => {
-    console.error('Error in leaderboard subscription:', error);
-  });
+        // Skip anonymous users (those without email) and migrated users
+        if (!data.email || data.migrated) {
+          return;
+        }
+
+        leaderboard.push({
+          userId: doc.id,
+          email: data.email,
+          name: data.displayName || data.email || "Player",
+          highScore: data.highScore || 0,
+          gamesPlayed: data.gamesPlayed || 0,
+          averageScore: data.averageScore || 0,
+          accuracy: data.accuracy || 0,
+          lastPlayed: data.lastPlayed || null,
+        });
+      });
+
+      // Limit to requested count after filtering
+      callback(leaderboard.slice(0, maxCount));
+    },
+    (error) => {
+      console.error("Error in leaderboard subscription:", error);
+    },
+  );
 }
 
 /**
@@ -111,13 +115,17 @@ export function subscribeToLeaderboard(callback, maxCount = 10) {
  * @returns {Promise<void>}
  */
 export async function saveGameResult(userId, summary = {}, userProfile = {}) {
-  console.log('💾 Saving game result:', { userId, score: summary.finalScore, userProfile });
-  
+  console.log("💾 Saving game result:", {
+    userId,
+    score: summary.finalScore,
+    userProfile,
+  });
+
   if (!userId || !summary) {
-    console.log('⚠️ Skipping save - missing userId or summary');
+    console.log("⚠️ Skipping save - missing userId or summary");
     return;
   }
-  
+
   const userRef = doc(db, USER_COLLECTION, userId);
 
   try {
@@ -154,16 +162,18 @@ export async function saveGameResult(userId, summary = {}, userProfile = {}) {
         accuracy,
         lastPlayed: summary.endedAt || Date.now(),
       };
-      
-      console.log('✅ Updating user document with:', updatedData);
-      
+
+      console.log("✅ Updating user document with:", updatedData);
+
       transaction.set(userRef, updatedData, { merge: true });
     });
-    
-    console.log('✅ Game result saved successfully');
+
+    console.log("✅ Game result saved successfully");
   } catch (error) {
-    if (error.code === 'resource-exhausted') {
-      console.warn('Firestore quota exceeded. Score will not be saved. Try again later.');
+    if (error.code === "resource-exhausted") {
+      console.warn(
+        "Firestore quota exceeded. Score will not be saved. Try again later.",
+      );
     } else {
       throw error;
     }

@@ -3,7 +3,7 @@
  * Pure component for displaying biography, hints, guess input, and score
  */
 
-import { Lightbulb, Send, Timer, Home } from '@mui/icons-material';
+import { Lightbulb, Send, Timer, Home } from "@mui/icons-material";
 import {
   Alert,
   Box,
@@ -19,7 +19,7 @@ import {
   Stack,
   TextField,
   Typography,
-} from '@mui/material';
+} from "@mui/material";
 
 function GameView({
   gameState,
@@ -51,31 +51,31 @@ function GameView({
   };
 
   return (
-    <Container maxWidth='lg' sx={{ py: 3 }}>
+    <Container maxWidth="lg" sx={{ py: 3 }}>
       <Stack spacing={3}>
         {/* Game Header */}
         <Paper elevation={2} sx={{ p: 2 }}>
           <Stack
-            direction='row'
+            direction="row"
             spacing={3}
-            alignItems='center'
-            justifyContent='space-between'
+            alignItems="center"
+            justifyContent="space-between"
           >
-            <Stack direction='row' spacing={3} alignItems='center'>
+            <Stack direction="row" spacing={3} alignItems="center">
               <Box>
-                <Typography variant='h6'>
+                <Typography variant="h6">
                   Score: {gameState?.score || 0}
                 </Typography>
               </Box>
               <Box>
-                <Typography variant='h6'>
+                <Typography variant="h6">
                   Streak: {gameState?.streak || 0}
                 </Typography>
               </Box>
               <Box>
                 <Typography
-                  variant='h6'
-                  color={gameState?.lives <= 1 ? 'error' : 'inherit'}
+                  variant="h6"
+                  color={gameState?.lives <= 1 ? "error" : "inherit"}
                 >
                   Lives: {gameState?.lives || 3}
                 </Typography>
@@ -84,45 +84,45 @@ function GameView({
             <Chip
               icon={<Timer />}
               label={`Question ${(gameState?.totalQuestions || 0) + 1}`}
-              color='primary'
+              color="primary"
             />
           </Stack>
         </Paper>
 
         <Box
           sx={{
-            display: 'flex',
+            display: "flex",
             gap: 3,
-            flexDirection: { xs: 'column', md: 'row' },
+            flexDirection: { xs: "column", md: "row" },
           }}
         >
           {/* Left Column - Question */}
           <Box sx={{ flex: 2 }}>
             <Card elevation={3}>
               <CardContent sx={{ p: 3 }}>
-                <Typography variant='h5' gutterBottom>
+                <Typography variant="h5" gutterBottom>
                   Who Am I?
                 </Typography>
 
                 {/* Wikipedia API Integration */}
-                <Typography variant='h6' component='h2' gutterBottom>
+                <Typography variant="h6" component="h2" gutterBottom>
                   Biography Clues
                 </Typography>
                 {wikipediaLoading && (
                   <Stack
-                    direction='row'
+                    direction="row"
                     spacing={1}
-                    alignItems='center'
+                    alignItems="center"
                     sx={{ my: 2 }}
                   >
                     <CircularProgress size={20} />
-                    <Typography variant='caption' color='text.secondary'>
+                    <Typography variant="caption" color="text.secondary">
                       Loading Wikipedia data…
                     </Typography>
                   </Stack>
                 )}
                 {wikipediaError && (
-                  <Typography variant='body2' color='error' sx={{ my: 2 }}>
+                  <Typography variant="body2" color="error" sx={{ my: 2 }}>
                     Error: {wikipediaError}
                   </Typography>
                 )}
@@ -132,31 +132,31 @@ function GameView({
                       elevation={1}
                       sx={{
                         p: 2,
-                        width: '100%',
-                        bgcolor: 'grey.700',
+                        width: "100%",
+                        bgcolor: "grey.700",
                         my: 2,
                       }}
                     >
                       <Stack spacing={1.5}>
                         {wikipediaSummary.thumbnail && (
                           <Box
-                            component='img'
+                            component="img"
                             src={wikipediaSummary.thumbnail.source}
-                            alt='Person'
+                            alt="Person"
                             onContextMenu={(e) => e.preventDefault()}
                             onDragStart={(e) => e.preventDefault()}
                             sx={{
-                              maxWidth: '220px',
+                              maxWidth: "220px",
                               borderRadius: 1,
-                              mx: 'auto',
-                              display: 'block',
-                              pointerEvents: 'auto',
-                              userSelect: 'none',
-                              WebkitUserSelect: 'none',
-                              MozUserSelect: 'none',
-                              msUserSelect: 'none',
+                              mx: "auto",
+                              display: "block",
+                              pointerEvents: "auto",
+                              userSelect: "none",
+                              WebkitUserSelect: "none",
+                              MozUserSelect: "none",
+                              msUserSelect: "none",
                               filter: `blur(${getBlurAmount()}px)`,
-                              transition: 'filter 0.3s ease',
+                              transition: "filter 0.3s ease",
                             }}
                           />
                         )}
@@ -164,8 +164,8 @@ function GameView({
                           <>
                             {wikipediaSummary.description && (
                               <Typography
-                                variant='body2'
-                                color='text.secondary'
+                                variant="body2"
+                                color="text.secondary"
                               >
                                 {wikipediaSummary.description}
                               </Typography>
@@ -175,12 +175,12 @@ function GameView({
                                 (sentence, idx) => (
                                   <Typography
                                     key={`${sentence}-${idx}`}
-                                    variant='body1'
-                                    color='text.primary'
+                                    variant="body1"
+                                    color="text.primary"
                                   >
                                     {sentence}
                                   </Typography>
-                                )
+                                ),
                               )}
                             </Stack>
                           </>
@@ -189,15 +189,15 @@ function GameView({
                     </Paper>
                     {hasSummary && hintsUsed === 0 && (
                       <Typography
-                        variant='caption'
-                        color='text.secondary'
-                        sx={{ fontStyle: 'italic' }}
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontStyle: "italic" }}
                       >
                         Use hints to gradually reveal the biography text.
                       </Typography>
                     )}
                     {!hasSummary && !wikipediaLoading && (
-                      <Typography variant='body2' color='text.secondary'>
+                      <Typography variant="body2" color="text.secondary">
                         No summary is available for this person yet.
                       </Typography>
                     )}
@@ -210,18 +210,18 @@ function GameView({
                 <Stack spacing={2}>
                   <TextField
                     fullWidth
-                    label='Your guess'
+                    label="Your guess"
                     placeholder="Enter the person's name..."
-                    value={userGuess || ''}
+                    value={userGuess || ""}
                     onChange={(e) => onGuessChange(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && onSubmitGuess()}
+                    onKeyDown={(e) => e.key === "Enter" && onSubmitGuess()}
                     disabled={isGameOver}
-                    variant='outlined'
+                    variant="outlined"
                   />
 
-                  <Stack direction='row' spacing={2}>
+                  <Stack direction="row" spacing={2}>
                     <Button
-                      variant='contained'
+                      variant="contained"
                       startIcon={<Send />}
                       onClick={onSubmitGuess}
                       disabled={!userGuess?.trim() || isGameOver}
@@ -231,7 +231,7 @@ function GameView({
                     </Button>
 
                     {isGameOver && (
-                      <Button variant='outlined' onClick={onNextQuestion}>
+                      <Button variant="outlined" onClick={onNextQuestion}>
                         Try Again
                       </Button>
                     )}
@@ -239,7 +239,7 @@ function GameView({
 
                   {/* Last Result Feedback */}
                   {lastResult && (
-                    <Alert severity={lastResult.correct ? 'success' : 'error'}>
+                    <Alert severity={lastResult.correct ? "success" : "error"}>
                       {lastResult.correct
                         ? `Correct! +${lastResult.scoreDelta} points`
                         : `Wrong! The answer was: ${lastResult.correctAnswer}`}
@@ -254,7 +254,7 @@ function GameView({
           <Box sx={{ flex: 1 }}>
             <Card elevation={3}>
               <CardContent>
-                <Typography variant='h6' gutterBottom>
+                <Typography variant="h6" gutterBottom>
                   Hints
                 </Typography>
 
@@ -264,9 +264,9 @@ function GameView({
                       const isUnlocked = hintsUsed >= stage;
                       const isCurrent = hintsUsed + 1 === stage;
                       const descriptions = [
-                        'Reveals the first sentence',
-                        'Adds the next sentence',
-                        'Shows the entire summary',
+                        "Reveals the first sentence",
+                        "Adds the next sentence",
+                        "Shows the entire summary",
                       ];
                       return (
                         <Paper
@@ -275,16 +275,16 @@ function GameView({
                           sx={{
                             p: 1.5,
                             bgcolor: isUnlocked
-                              ? 'success.light'
+                              ? "success.light"
                               : isCurrent
-                                ? 'warning.light'
-                                : 'action.hover',
+                                ? "warning.light"
+                                : "action.hover",
                           }}
                         >
-                          <Typography variant='subtitle2'>
+                          <Typography variant="subtitle2">
                             Hint {stage}
                           </Typography>
-                          <Typography variant='body2' color='text.secondary'>
+                          <Typography variant="body2" color="text.secondary">
                             {descriptions[stage - 1]}
                           </Typography>
                         </Paper>
@@ -293,22 +293,22 @@ function GameView({
                   </Stack>
 
                   <Button
-                    variant='contained'
-                    color='error'
+                    variant="contained"
+                    color="error"
                     startIcon={<Lightbulb />}
                     onClick={onUseHint}
                     disabled={!canUseHint || isGameOver}
                     fullWidth
-                    sx={{ fontWeight: 'bold' }}
+                    sx={{ fontWeight: "bold" }}
                   >
-                    Use Hint ({hints?.availableHints - hints?.usedHints || 0}{' '}
+                    Use Hint ({hints?.availableHints - hints?.usedHints || 0}{" "}
                     left)
                   </Button>
 
                   <Typography
-                    variant='caption'
-                    color='text.secondary'
-                    sx={{ textAlign: 'center' }}
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ textAlign: "center" }}
                   >
                     Using hints reduces your score multiplier
                   </Typography>
@@ -319,16 +319,16 @@ function GameView({
             {/* Progress Card */}
             <Card elevation={1} sx={{ mt: 2 }}>
               <CardContent>
-                <Typography variant='h6' gutterBottom>
+                <Typography variant="h6" gutterBottom>
                   Progress
                 </Typography>
                 <Stack spacing={1}>
                   <Box>
-                    <Typography variant='body2' gutterBottom>
+                    <Typography variant="body2" gutterBottom>
                       Questions: {gameState?.totalQuestions || 0}
                     </Typography>
                     <LinearProgress
-                      variant='determinate'
+                      variant="determinate"
                       value={
                         ((gameState?.correctAnswers || 0) /
                           Math.max(gameState?.totalQuestions || 1, 1)) *
@@ -337,13 +337,13 @@ function GameView({
                       sx={{ height: 8, borderRadius: 4 }}
                     />
                   </Box>
-                  <Typography variant='caption' color='text.secondary'>
-                    Accuracy:{' '}
+                  <Typography variant="caption" color="text.secondary">
+                    Accuracy:{" "}
                     {gameState?.totalQuestions > 0
                       ? Math.round(
                           ((gameState?.correctAnswers || 0) /
                             gameState.totalQuestions) *
-                            100
+                            100,
                         )
                       : 0}
                     %

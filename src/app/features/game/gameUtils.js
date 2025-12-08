@@ -1,4 +1,4 @@
-import { EasyCelebs, HardCelebs, MediumCelebs } from '../../data/celebs';
+import { EasyCelebs, HardCelebs, MediumCelebs } from "../../data/celebs";
 
 /**
  * Gets difficulty label based on game level
@@ -7,9 +7,9 @@ import { EasyCelebs, HardCelebs, MediumCelebs } from '../../data/celebs';
  * @returns {string} - difficulty label ('EASY', 'MEDIUM', 'HARD')
  */
 export function getDifficulty(level) {
-  if (level >= 11) return 'HARD';
-  if (level >= 6) return 'MEDIUM';
-  return 'EASY';
+  if (level >= 11) return "HARD";
+  if (level >= 6) return "MEDIUM";
+  return "EASY";
 }
 
 /**
@@ -32,8 +32,8 @@ export function pickRandom(arr) {
  */
 export function poolForLevel(level) {
   const difficulty = getDifficulty(level);
-  if (difficulty === 'HARD') return HardCelebs;
-  if (difficulty === 'MEDIUM') return MediumCelebs;
+  if (difficulty === "HARD") return HardCelebs;
+  if (difficulty === "MEDIUM") return MediumCelebs;
   return EasyCelebs;
 }
 
@@ -44,11 +44,11 @@ export function poolForLevel(level) {
  * @returns {string} - formatted celeb name
  */
 export function formatCelebDisplayName(value) {
-  if (!value) return '';
+  if (!value) return "";
 
   return value
-    .replace(/_/g, ' ')
-    .replace(/\s{2,}/g, ' ')
+    .replace(/_/g, " ")
+    .replace(/\s{2,}/g, " ")
     .trim();
 }
 
@@ -83,10 +83,10 @@ export function buildRunSummary(state) {
  * @returns {string} - Normalized string
  */
 export function normalizeLetters(s) {
-  return String(s || '')
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .replace(/[_\s\-\d\W]+/g, '')
+  return String(s || "")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/[_\s\-\d\W]+/g, "")
     .toLowerCase();
 }
 
@@ -116,7 +116,7 @@ export function validateGuess(guess, target) {
   if (!target) return false;
 
   const targetFrequency = frequencyMap(target);
-  const guessFrequency = frequencyMap(guess || '');
+  const guessFrequency = frequencyMap(guess || "");
 
   let deficit = 0;
 

@@ -3,7 +3,15 @@ import { useNavigate } from "react-router-dom";
 import LoginView from "../views/LoginView";
 
 // Presenter for LoginView: manages form state and handlers
-function LoginPresenter({ onLogin, onRegister, onConvertGuest, loading, error, onClearError, user }) {
+function LoginPresenter({
+  user,
+  onLogin,
+  onRegister,
+  onConvertGuest,
+  loading,
+  error,
+  onClearError,
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRegisterMode, setIsRegisterMode] = useState(false);
@@ -12,14 +20,14 @@ function LoginPresenter({ onLogin, onRegister, onConvertGuest, loading, error, o
   // Redirect authenticated (non-anonymous) users to home
   useEffect(() => {
     if (user && !user.isAnonymous) {
-      navigate('/');
+      navigate("/");
     }
   }, [user, navigate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const payload = { email, password };
-    
+
     // If user is anonymous, convert their account
     if (user?.isAnonymous) {
       onConvertGuest({ ...payload, isLogin: !isRegisterMode });
@@ -36,7 +44,7 @@ function LoginPresenter({ onLogin, onRegister, onConvertGuest, loading, error, o
   };
 
   const handleContinueAsGuest = () => {
-    navigate('/');
+    navigate("/");
   };
 
   return (

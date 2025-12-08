@@ -15,7 +15,7 @@ function LeaderboardPresenter({
   // Redirect anonymous users to login
   const isAnonymous = user?.isAnonymous || false;
   if (isAnonymous) {
-    navigate('/login');
+    navigate("/login");
     return null;
   }
 
@@ -38,7 +38,7 @@ function LeaderboardPresenter({
   const userRank = useMemo(() => {
     if (!user) return null;
     const idx = normalizedData.findIndex(
-      (entry) => entry.email === user.email || entry.id === user.uid
+      (entry) => entry.email === user.email || entry.id === user.uid,
     );
     if (idx === -1) return null;
     return {

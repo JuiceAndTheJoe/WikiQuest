@@ -1,8 +1,8 @@
-import { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { startNewGame, fetchUserStats } from '../app/features/game/gameSlice';
-import { getDifficulty } from '../app/features/game/gameUtils';
-import ResultsPresenter from './ResultsPresenter';
+import { useEffect } from "react";
+import { connect } from "react-redux";
+import { startNewGame, fetchUserStats } from "../app/features/game/gameSlice";
+import { getDifficulty } from "../app/features/game/gameUtils";
+import ResultsPresenter from "./ResultsPresenter";
 
 const ResultsContainer = (props) => {
   const { user, fetchUserStats } = props;
@@ -32,7 +32,7 @@ const mapState = (state) => {
   const questionLog = Array.isArray(run.questionLog) ? run.questionLog : [];
   const totalTime = questionLog.reduce(
     (sum, entry) => sum + (entry.timeTakenMs || 0),
-    0
+    0,
   );
 
   const gameStats = {
@@ -47,11 +47,11 @@ const mapState = (state) => {
   };
 
   const gameHistory = questionLog.map((entry) => ({
-    question: entry.displayName || entry.celeb || 'Unknown',
-    userAnswer: entry.guess || '—',
+    question: entry.displayName || entry.celeb || "Unknown",
+    userAnswer: entry.guess || "—",
     correct: Boolean(entry.correct),
     score:
-      typeof entry.scoreDelta === 'number'
+      typeof entry.scoreDelta === "number"
         ? entry.scoreDelta
         : entry.correct
           ? 100

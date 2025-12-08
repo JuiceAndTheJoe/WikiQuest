@@ -20,6 +20,8 @@
 - Production build: `npm run build` → outputs to `dist/` (referenced by `firebase.json`).
 - Preview build locally: `npm run serve`.
 - Deploy: `firebase deploy` (already configured to host `dist`).
+- Lint: `npm run lint` (ESLint flat config in `eslint.config.js`).
+- Format: `npm run format` (Prettier using `.prettierrc` / `.prettierignore`).
 
 ## 3. State & Side Effects Rules
 
@@ -110,6 +112,8 @@ App mounts → `AppContainer` dispatches `fetchWikipediaPage` thunk → `getPage
 ## 10. Debugging & Tooling
 
 - Sourcemaps enabled; build `minify: false` to ease Firebase-hosted debugging.
+- ESLint configured via flat config (`eslint.config.js`) with React, JSON, Markdown and CSS plugins plus `eslint-config-prettier` to avoid style conflicts.
+- Prettier configured via `.prettierrc` (with `.prettierignore`) and run through `npm run format`.
 - Fire-and-forget writes: middleware catches errors via `console.warn`; for production, evolve into dispatching an error slice/action.
 
 ## 11. Usage of external code
@@ -125,7 +129,7 @@ App mounts → `AppContainer` dispatches `fetchWikipediaPage` thunk → `getPage
 - **Authentication gates**: All persistence operations must check user authentication status first. Currently implemented: middleware checks `state.auth.user?.uid` before persisting; `AppPresenter` uses route guards (`<Navigate>`) to redirect unauthenticated users to `/login`; `AppContainer` only fetches user data when `user?.uid` exists.
 - **One role per view**: Each view component should have a single, clear responsibility. Don't mix sidebar + summary in one component.
 - API Integration: Always use context7 (if avalible) when asked for code generation, setup or configuration steps, or library/API documentation. This means you should automatically use the Context7 MCP tools (if avalible) to resolve library id and get library docs without having to be explicitly asked.
- - **Save/Resume guardrails**: Do not bypass middleware for persistence. Use `loadSavedGame` thunk for reads, `saveCurrentGameState` only inside middleware. Keep `hasSavedGame` flag in Redux and show resume CTAs via presenters/views; do not trigger Firestore writes from views/components or slices.
+- **Save/Resume guardrails**: Do not bypass middleware for persistence. Use `loadSavedGame` thunk for reads, `saveCurrentGameState` only inside middleware. Keep `hasSavedGame` flag in Redux and show resume CTAs via presenters/views; do not trigger Firestore writes from views/components or slices.
 
 ## 13. Safe Extension Checklist (Grade A Compliance)
 

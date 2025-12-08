@@ -1,7 +1,7 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { loadSavedGameState } from '../../models/gameProgressModel';
-import { getLeaderboard } from '../../models/leaderboardModel';
-import { getUserData } from '../../models/userModel';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { loadSavedGameState } from "../../models/gameProgressModel";
+import { getLeaderboard } from "../../models/leaderboardModel";
+import { getUserData } from "../../models/userModel";
 import {
   BASE_SCORE,
   HINT_PENALTY,
@@ -9,7 +9,7 @@ import {
   MAX_LIVES,
   MIN_SCORE,
   WRONG_ANSWER_PENALTY,
-} from './gameConstants';
+} from "./gameConstants";
 import {
   buildRunSummary,
   formatCelebDisplayName,
@@ -17,18 +17,18 @@ import {
   pickRandom,
   poolForLevel,
   validateGuess,
-} from './gameUtils';
+} from "./gameUtils";
 
 export const fetchLeaderboard = createAsyncThunk(
-  'game/fetchLeaderboard',
+  "game/fetchLeaderboard",
   async () => {
     const leaderboard = await getLeaderboard();
     return leaderboard;
-  }
+  },
 );
 
 export const fetchUserStats = createAsyncThunk(
-  'game/fetchUserStats',
+  "game/fetchUserStats",
   async (userId) => {
     const userDoc = await getUserData(userId);
     if (userDoc.exists()) {
@@ -48,21 +48,21 @@ export const fetchUserStats = createAsyncThunk(
       averageScore: 0,
       accuracy: 0,
     };
-  }
+  },
 );
 
 export const loadSavedGame = createAsyncThunk(
-  'game/loadSavedGame',
+  "game/loadSavedGame",
   async ({ userId }) => {
     // All users (anonymous and authenticated) load from Firestore
     const savedState = await loadSavedGameState(userId);
     return savedState;
-  }
+  },
 );
 
 const initialState = {
   inGame: false,
-  status: 'idle',
+  status: "idle",
   level: 1,
   lives: 3,
   correctCount: 0,
@@ -98,12 +98,12 @@ const initialState = {
 };
 
 const gameSlice = createSlice({
-  name: 'game',
+  name: "game",
   initialState,
   reducers: {
     startNewGame(state) {
       state.inGame = true;
-      state.status = 'playing';
+      state.status = "playing";
       state.level = 1;
       state.lives = MAX_LIVES;
       state.correctCount = 0;
@@ -124,26 +124,10 @@ const gameSlice = createSlice({
       const pool = poolForLevel(state.level);
       state.currentCeleb = pickRandom(pool);
     },
-    resumeGame(state, action) {
-      const savedState = action.payload;
-      Object.assign(state, savedState);
-      state.inGame = true;
-      state.status = 'playing';
-      if (!state.currentQuestionStartTime) {
-        state.currentQuestionStartTime = Date.now();
-      }
-    },
-    continueGame(state) {
-      const savedState = action.payload;
-      if (savedState) return;
-
-      Object.assign(state, savedState);
-      state.hasSavedGame = false;
-    },
     submitGuess(state, action) {
-      const rawGuess = String(action.payload || '').trim();
+      const rawGuess = String(action.payload || "").trim();
       const guess = rawGuess.toLowerCase();
-      const rawTarget = String(state.currentCeleb || '').trim();
+      const rawTarget = String(state.currentCeleb || "").trim();
 
       const target = normalizeLetters(rawTarget);
       const guessLetters = normalizeLetters(guess);
@@ -155,7 +139,7 @@ const gameSlice = createSlice({
       }
 
       if (!guess) {
-        state.lastGuessResult = 'wrong';
+        state.lastGuessResult = "wrong";
         state.lastResultDetail = {
           correct: false,
           correctAnswer: formatCelebDisplayName(rawTarget),
@@ -178,7 +162,7 @@ const gameSlice = createSlice({
 
       const baseScoreDelta = Math.max(
         MIN_SCORE,
-        BASE_SCORE - (state.hintsUsedThisQuestion || 0) * HINT_PENALTY
+        BASE_SCORE - (state.hintsUsedThisQuestion || 0) * HINT_PENALTY,
       );
       const scoreDelta = correctGuess ? baseScoreDelta : WRONG_ANSWER_PENALTY;
 
@@ -201,7 +185,7 @@ const gameSlice = createSlice({
 
       if (correctGuess) {
         // correct
-        state.lastGuessResult = 'correct';
+        state.lastGuessResult = "correct";
         state.correctCount = (state.correctCount || 0) + 1;
         state.correctAnswers = (state.correctAnswers || 0) + 1;
         state.score = (state.score || 0) + baseScoreDelta;
@@ -220,14 +204,14 @@ const gameSlice = createSlice({
         state.hintsUsedThisQuestion = 0;
       } else {
         // wrong guess
-        state.lastGuessResult = 'wrong';
+        state.lastGuessResult = "wrong";
         state.score = Math.max(0, (state.score || 0) + scoreDelta);
         state.streak = 0;
         state.lives = Math.max(0, (state.lives || 0) - 1);
         if (state.lives <= 0) {
           // game over
           state.inGame = false;
-          state.status = 'game_over';
+          state.status = "game_over";
           state.lastGameResult = buildRunSummary(state);
           state.completedRuns = (state.completedRuns || 0) + 1;
           state.totalScoreAcrossRuns =
@@ -245,7 +229,7 @@ const gameSlice = createSlice({
       state.lastResultDetail = {
         correct: correctGuess,
         correctAnswer: formatCelebDisplayName(
-          correctGuess ? state.lastAnsweredCeleb || rawTarget : rawTarget
+          correctGuess ? state.lastAnsweredCeleb || rawTarget : rawTarget,
         ),
         guess: rawGuess,
         scoreDelta,
@@ -280,7 +264,7 @@ const gameSlice = createSlice({
       .addCase(fetchLeaderboard.rejected, (state, action) => {
         state.leaderboardLoading = false;
         state.leaderboardError =
-          action.error.message || 'Failed to load leaderboard';
+          action.error.message || "Failed to load leaderboard";
       })
       .addCase(loadSavedGame.pending, (state) => {
         state.loadingGameState = true;

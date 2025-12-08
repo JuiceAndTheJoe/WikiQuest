@@ -1,22 +1,22 @@
-import { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
+import { useEffect, useState } from "react";
+import { connect } from "react-redux";
 import {
   MAX_HINTS_PER_QUESTION,
   MAX_LIVES,
-} from '../app/features/game/gameConstants';
+} from "../app/features/game/gameConstants";
 import {
   loadSavedGame,
   startNewGame,
   submitGuess,
   useHint,
-} from '../app/features/game/gameSlice';
-import { fetchWikipediaPage } from '../app/features/wikipedia/wikipediaSlice';
-import GamePresenter from './GamePresenter';
+} from "../app/features/game/gameSlice";
+import { fetchWikipediaPage } from "../app/features/wikipedia/wikipediaSlice";
+import GamePresenter from "./GamePresenter";
 
 const formatDisplayName = (value) =>
-  String(value || '')
-    .replace(/_/g, ' ')
-    .replace(/\s{2,}/g, ' ')
+  String(value || "")
+    .replace(/_/g, " ")
+    .replace(/\s{2,}/g, " ")
     .trim();
 
 const GameContainer = (props) => {
@@ -39,7 +39,7 @@ const GameContainer = (props) => {
     if (
       props.user?.uid &&
       !inGame &&
-      gameStatus !== 'game_over' &&
+      gameStatus !== "game_over" &&
       !hasAttemptedLoad
     ) {
       loadSavedGame(props.user.uid);
@@ -53,7 +53,7 @@ const GameContainer = (props) => {
       !loadingGameState &&
       !hasSavedGame &&
       !inGame &&
-      gameStatus !== 'game_over'
+      gameStatus !== "game_over"
     ) {
       startNewGame();
     }
@@ -66,11 +66,11 @@ const GameContainer = (props) => {
     try {
       running = fetchPage(currentCelebRaw);
     } catch (err) {
-      console.warn('Failed to fetch Wikipedia page', err);
+      console.warn("Failed to fetch Wikipedia page", err);
     }
 
     return () => {
-      if (running && typeof running.abort === 'function') {
+      if (running && typeof running.abort === "function") {
         running.abort();
       }
     };
@@ -88,12 +88,12 @@ const GameContainer = (props) => {
 
 const mapState = (state) => {
   const g = state.game || {};
-  const displayName = g.currentCeleb ? formatDisplayName(g.currentCeleb) : '';
+  const displayName = g.currentCeleb ? formatDisplayName(g.currentCeleb) : "";
 
   const gameState = {
     score: g.score ?? Math.max(0, (g.level || 1) - 1),
     streak: g.streak || 0,
-    lives: typeof g.lives === 'number' ? g.lives : MAX_LIVES,
+    lives: typeof g.lives === "number" ? g.lives : MAX_LIVES,
     totalQuestions: g.totalQuestions || 0,
     correctAnswers: g.correctAnswers ?? g.correctCount ?? 0,
   };

@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -6,19 +6,19 @@ import {
   EmailAuthProvider,
   linkWithCredential,
   signInAnonymously,
-} from 'firebase/auth';
-import { auth } from '../../../firebaseConfig';
-import { migrateAnonymousData } from '../../models/leaderboardModel';
+} from "firebase/auth";
+import { auth } from "../../../firebaseConfig";
+import { migrateAnonymousData } from "../../models/leaderboardModel";
 
 // Async thunks for Firebase auth operations
 export const loginUser = createAsyncThunk(
-  'auth/loginUser',
+  "auth/loginUser",
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
       return {
         uid: userCredential.user.uid,
@@ -28,17 +28,17 @@ export const loginUser = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 export const registerUser = createAsyncThunk(
-  'auth/registerUser',
+  "auth/registerUser",
   async ({ email, password }, { rejectWithValue }) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
       return {
         uid: userCredential.user.uid,
@@ -48,10 +48,10 @@ export const registerUser = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
-export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
+export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
   // Sign out from Firebase
   await signOut(auth);
   // onAuthStateChanged will trigger and create a new anonymous user automatically
@@ -59,38 +59,41 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async () => {
 
 // Convert anonymous account to permanent account using Firebase account linking
 export const convertGuestToAccount = createAsyncThunk(
-  'auth/convertGuestToAccount',
+  "auth/convertGuestToAccount",
   async ({ email, password, isLogin }, { rejectWithValue }) => {
     try {
       const currentUser = auth.currentUser;
-      
+
       // Verify current user is anonymous
       if (!currentUser || !currentUser.isAnonymous) {
-        throw new Error('Can only convert anonymous accounts');
+        throw new Error("Can only convert anonymous accounts");
       }
-      
+
       const anonymousUserId = currentUser.uid;
-      
+
       if (isLogin) {
         // Sign in to existing account - migrate anonymous data
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password,
+        );
+
         // Migrate anonymous user data to authenticated account
         try {
-          await migrateAnonymousData(
-            anonymousUserId,
-            userCredential.user.uid,
-            {
-              email: userCredential.user.email,
-              displayName: userCredential.user.displayName,
-              photoURL: userCredential.user.photoURL,
-            }
-          );
-          console.log('Data migration completed successfully');
+          await migrateAnonymousData(anonymousUserId, userCredential.user.uid, {
+            email: userCredential.user.email,
+            displayName: userCredential.user.displayName,
+            photoURL: userCredential.user.photoURL,
+          });
+          console.log("Data migration completed successfully");
         } catch (migrationError) {
-          console.error('Failed to migrate data, but login succeeded:', migrationError);
+          console.error(
+            "Failed to migrate data, but login succeeded:",
+            migrationError,
+          );
         }
-        
+
         return {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
@@ -100,16 +103,18 @@ export const convertGuestToAccount = createAsyncThunk(
         // Link anonymous account with email/password credential
         const credential = EmailAuthProvider.credential(email, password);
         const userCredential = await linkWithCredential(currentUser, credential);
-        
+
         // When linking, the UID stays the same, but we need to update Firestore with the email
         // Import dynamically to avoid circular dependency
-        const { updateUserProfile } = await import('../../models/leaderboardModel');
+        const { updateUserProfile } = await import(
+          "../../models/leaderboardModel"
+        );
         await updateUserProfile(userCredential.user.uid, {
           email: userCredential.user.email,
           displayName: userCredential.user.displayName,
           photoURL: userCredential.user.photoURL,
         });
-        
+
         return {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
@@ -120,12 +125,12 @@ export const convertGuestToAccount = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
 // Auth slice
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState: {
     user: null, // { uid, email, isAnonymous }
     loading: false,

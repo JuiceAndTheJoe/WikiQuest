@@ -11,7 +11,7 @@ import {
   PlayArrow,
   PlayCircle,
   Quiz,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -21,8 +21,8 @@ import {
   Container,
   Stack,
   Typography,
-} from '@mui/material';
-import ColorBends from '../components/background/ColorBends';
+} from "@mui/material";
+import ColorBends from "../components/background/ColorBends";
 
 // Pure view: receives interaction handlers & data via props from Presenter.
 function MenuView({
@@ -31,16 +31,15 @@ function MenuView({
   onStartGame,
   onResumeGame,
   onViewLeaderboard,
-  onCreateAccount,
   hasSavedGame = false,
   userStats = { gamesPlayed: 0, highScore: 0, totalScore: 0 },
 }) {
   const isAnonymous = user?.isAnonymous || false;
   return (
-    <Box sx={{ position: 'relative', minHeight: '100vh' }}>
+    <Box sx={{ position: "relative", minHeight: "100vh" }}>
       {/* Animated Background */}
       <ColorBends
-        colors={['#d80000ff', '#00a90eff', '#0010bdff']}
+        colors={["#d80000ff", "#00a90eff", "#0010bdff"]}
         rotation={30}
         speed={0.3}
         scale={1.2}
@@ -51,37 +50,37 @@ function MenuView({
         noise={0.08}
         transparent
         sx={{
-          position: 'fixed',
+          position: "fixed",
           top: 0,
           left: 0,
-          width: '100vw',
-          height: '100vh',
+          width: "100vw",
+          height: "100vh",
           zIndex: -1,
         }}
       />
 
-      <Container maxWidth='lg' sx={{ py: 4, position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="lg" sx={{ py: 4, position: "relative", zIndex: 1 }}>
         <Stack spacing={4}>
           {/* Header */}
-          <Box sx={{ textAlign: 'center' }}>
+          <Box sx={{ textAlign: "center" }}>
             <Typography
-              variant='h2'
-              component='h1'
+              variant="h2"
+              component="h1"
               gutterBottom
               sx={{
-                fontWeight: 'bold',
-                background: 'linear-gradient(45deg, #4d77a1ff, #42a5f5)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
+                fontWeight: "bold",
+                background: "linear-gradient(45deg, #4d77a1ff, #42a5f5)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
               }}
             >
               <Quiz
-                sx={{ fontSize: 'inherit', mr: 1, verticalAlign: 'bottom' }}
+                sx={{ fontSize: "inherit", mr: 1, verticalAlign: "bottom" }}
               />
               WikiQuest
             </Typography>
-            <Typography variant='h5' color='text.secondary' gutterBottom>
+            <Typography variant="h5" color="text.secondary" gutterBottom>
               Test your knowledge of famous people!
             </Typography>
           </Box>
@@ -90,56 +89,55 @@ function MenuView({
           <Box
             sx={{
               p: 3,
-              bgcolor: 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(10px)',
+              bgcolor: "rgba(255, 255, 255, 0.1)",
+              backdropFilter: "blur(10px)",
               borderRadius: 2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
             <Stack
-              direction='row'
+              direction="row"
               spacing={2}
-              alignItems='center'
-              justifyContent='space-between'
+              alignItems="center"
+              justifyContent="space-between"
             >
-              <Stack direction='row' spacing={2} alignItems='center'>
-                <Avatar sx={{ bgcolor: 'primary.main' }}>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Avatar sx={{ bgcolor: "primary.main" }}>
                   <Person />
                 </Avatar>
                 <Box>
-                  <Typography variant='h6'>
-                    {isAnonymous ? 'Guest Player' : user?.email || 'Player'}
+                  <Typography variant="h6">
+                    {isAnonymous ? "Guest Player" : user?.email || "Player"}
                   </Typography>
-                  <Typography variant='body2' color='text.secondary'>
-                    {isAnonymous 
-                      ? 'Playing as guest - create account to save progress'
-                      : `Games Played: ${userStats.gamesPlayed}`
-                    }
+                  <Typography variant="body2" color="text.secondary">
+                    {isAnonymous
+                      ? "Playing as guest - create account to save progress"
+                      : `Games Played: ${userStats.gamesPlayed}`}
                   </Typography>
                 </Box>
               </Stack>
-              <Stack alignItems='flex-end' spacing={1}>
+              <Stack alignItems="flex-end" spacing={1}>
                 {!isAnonymous && (
-                  <Stack direction='row' spacing={1} alignItems='center'>
-                    <EmojiEvents color='warning' />
-                    <Typography variant='h6'>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <EmojiEvents color="warning" />
+                    <Typography variant="h6">
                       High Score: {userStats.highScore}
                     </Typography>
                   </Stack>
                 )}
-                <Stack direction='row' spacing={1}>
+                <Stack direction="row" spacing={1}>
                   {isAnonymous ? (
                     <Button
-                      variant='contained'
-                      size='small'
+                      variant="contained"
+                      size="small"
                       onClick={onCreateAccount}
                     >
                       Sign In or Create Account
                     </Button>
                   ) : (
                     <Button
-                      variant='outlined'
-                      size='small'
+                      variant="outlined"
+                      size="small"
                       startIcon={<ExitToApp />}
                       onClick={onLogout}
                     >
@@ -153,40 +151,40 @@ function MenuView({
 
           <Box
             sx={{
-              display: 'grid',
+              display: "grid",
               gap: 3,
-              gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' },
+              gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" },
             }}
           >
             {/* Game Options */}
             <Box>
               <Card
                 sx={{
-                  bgcolor: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  bgcolor: "rgba(255, 255, 255, 0.1)",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
                 }}
               >
                 <CardContent sx={{ p: 4 }}>
-                  <Typography variant='h5' gutterBottom>
-                    {hasSavedGame ? 'Continue Your Game' : 'Start New Game'}
+                  <Typography variant="h5" gutterBottom>
+                    {hasSavedGame ? "Continue Your Game" : "Start New Game"}
                   </Typography>
-                  <Typography variant='body1' color='text.secondary' paragraph>
+                  <Typography variant="body1" color="text.secondary" paragraph>
                     {hasSavedGame
-                      ? 'You have a game in progress. Resume where you left off or start fresh!'
-                      : 'Guess famous people based on their Wikipedia biographies. Use hints wisely to maximize your score!'}
+                      ? "You have a game in progress. Resume where you left off or start fresh!"
+                      : "Guess famous people based on their Wikipedia biographies. Use hints wisely to maximize your score!"}
                   </Typography>
 
-                  <Stack direction='row' spacing={2}>
+                  <Stack direction="row" spacing={2}>
                     {hasSavedGame && (
                       <Button
-                        variant='contained'
-                        size='large'
+                        variant="contained"
+                        size="large"
                         startIcon={<PlayCircle />}
                         onClick={onResumeGame}
                         sx={{
                           py: 1.5,
-                          fontSize: '1.1rem',
+                          fontSize: "1.1rem",
                           minWidth: 200,
                         }}
                       >
@@ -194,17 +192,17 @@ function MenuView({
                       </Button>
                     )}
                     <Button
-                      variant={hasSavedGame ? 'outlined' : 'contained'}
-                      size='large'
+                      variant={hasSavedGame ? "outlined" : "contained"}
+                      size="large"
                       startIcon={<PlayArrow />}
                       onClick={onStartGame}
                       sx={{
                         py: 1.5,
-                        fontSize: '1.1rem',
+                        fontSize: "1.1rem",
                         minWidth: 200,
                       }}
                     >
-                      {hasSavedGame ? 'New Game' : 'Start Quiz'}
+                      {hasSavedGame ? "New Game" : "Start Quiz"}
                     </Button>
                   </Stack>
                 </CardContent>
@@ -217,31 +215,31 @@ function MenuView({
                 {/* Stats Card */}
                 <Card
                   sx={{
-                    bgcolor: 'rgba(255, 255, 255, 0.1)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    bgcolor: "rgba(255, 255, 255, 0.1)",
+                    backdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
                   }}
                 >
                   <CardContent>
-                    <Typography variant='h6' gutterBottom>
+                    <Typography variant="h6" gutterBottom>
                       Your Stats
                     </Typography>
                     <Stack spacing={1}>
-                      <Box display='flex' justifyContent='space-between'>
-                        <Typography variant='body2'>Total Score:</Typography>
-                        <Typography variant='body2' fontWeight='bold'>
+                      <Box display="flex" justifyContent="space-between">
+                        <Typography variant="body2">Total Score:</Typography>
+                        <Typography variant="body2" fontWeight="bold">
                           {userStats.totalScore || 0}
                         </Typography>
                       </Box>
-                      <Box display='flex' justifyContent='space-between'>
-                        <Typography variant='body2'>Games:</Typography>
-                        <Typography variant='body2' fontWeight='bold'>
+                      <Box display="flex" justifyContent="space-between">
+                        <Typography variant="body2">Games:</Typography>
+                        <Typography variant="body2" fontWeight="bold">
                           {userStats.gamesPlayed}
                         </Typography>
                       </Box>
-                      <Box display='flex' justifyContent='space-between'>
-                        <Typography variant='body2'>High Score:</Typography>
-                        <Typography variant='body2' fontWeight='bold'>
+                      <Box display="flex" justifyContent="space-between">
+                        <Typography variant="body2">High Score:</Typography>
+                        <Typography variant="body2" fontWeight="bold">
                           {userStats.highScore}
                         </Typography>
                       </Box>
@@ -251,7 +249,7 @@ function MenuView({
 
                 {/* Leaderboard Button */}
                 <Button
-                  variant='outlined'
+                  variant="outlined"
                   startIcon={<Leaderboard />}
                   onClick={onViewLeaderboard}
                   sx={{ py: 1.5 }}
@@ -266,35 +264,35 @@ function MenuView({
           <Box
             sx={{
               p: 3,
-              bgcolor: 'rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(10px)',
+              bgcolor: "rgba(255, 255, 255, 0.1)",
+              backdropFilter: "blur(10px)",
               borderRadius: 2,
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: "1px solid rgba(255, 255, 255, 0.2)",
             }}
           >
-            <Typography variant='h6' gutterBottom>
+            <Typography variant="h6" gutterBottom>
               How to Play
             </Typography>
             <Box
               sx={{
-                display: 'grid',
+                display: "grid",
                 gap: 2,
-                gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
               }}
             >
               <Box>
-                <Typography variant='body2' component='div'>
-                  <ul style={{ paddingLeft: '1.5rem', margin: 0 }}>
+                <Typography variant="body2" component="div">
+                  <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
                     <li>Read the biographical clues about a famous person</li>
                     <li>Type your guess for who it is</li>
-                    <li>Use hints if you're stuck (reduces score)</li>
+                    <li>Use hints if you&apos;re stuck (reduces score)</li>
                     <li>Faster answers get bonus points</li>
                   </ul>
                 </Typography>
               </Box>
               <Box>
-                <Typography variant='body2' component='div'>
-                  <ul style={{ paddingLeft: '1.5rem', margin: 0 }}>
+                <Typography variant="body2" component="div">
+                  <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
                     <li>Correct answers increase your streak</li>
                     <li>Wrong answers end the game</li>
                     <li>Challenge yourself with famous people from history</li>

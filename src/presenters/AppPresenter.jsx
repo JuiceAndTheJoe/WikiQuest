@@ -15,9 +15,7 @@ function AppPresenter({
   authError,
   onLogin,
   onRegister,
-  onLogout,
   onClearError,
-  onConvertGuest,
 }) {
   // Show loading spinner while checking auth state
   if (!isAuthChecked) {
@@ -39,21 +37,39 @@ function AppPresenter({
         <Route
           path="/login"
           element={
-            <LoginPresenter
-              onLogin={onLogin}
-              onRegister={onRegister}
-              onConvertGuest={onConvertGuest}
-              loading={authLoading}
-              error={authError}
-              onClearError={onClearError}
-              user={user}
-            />
+            user ? (
+              <Navigate to="/" replace />
+            ) : (
+              <LoginPresenter
+                onLogin={onLogin}
+                onRegister={onRegister}
+                loading={authLoading}
+                error={authError}
+                onClearError={onClearError}
+              />
+            )
           }
         />
-        <Route path="/" element={<HomeContainer />} />
-        <Route path="/leaderboard" element={<LeaderboardContainer />} />
-        <Route path="/game" element={<GameContainer />} />
-        <Route path="/results" element={<ResultsContainer />} />
+        <Route
+          path="/"
+          element={user ? <HomeContainer /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            user ? <LeaderboardContainer /> : <Navigate to="/login" replace />
+          }
+        />
+        <Route
+          path="/game"
+          element={user ? <GameContainer /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/results"
+          element={
+            user ? <ResultsContainer /> : <Navigate to="/login" replace />
+          }
+        />
       </Routes>
     </div>
   );

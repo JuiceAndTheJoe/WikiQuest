@@ -1,16 +1,16 @@
-import { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { initAuthListener } from '../app/features/auth/authListeners';
+import { useEffect } from "react";
+import { connect } from "react-redux";
+import { initAuthListener } from "../app/features/auth/authListeners";
 import {
   clearError,
   loginUser,
   logoutUser,
   registerUser,
   convertGuestToAccount,
-} from '../app/features/auth/authSlice';
-import { setSavedGameFlag } from '../app/features/game/gameSlice';
-import { hasSavedGame } from '../app/models/gameProgressModel';
-import AppPresenter from './AppPresenter';
+} from "../app/features/auth/authSlice";
+import { setSavedGameFlag } from "../app/features/game/gameSlice";
+import { hasSavedGame } from "../app/models/gameProgressModel";
+import AppPresenter from "./AppPresenter";
 
 function AppContainer({
   user,
@@ -21,7 +21,6 @@ function AppContainer({
   onRegister,
   onLogout,
   onClearError,
-  onConvertGuest,
   dispatch,
 }) {
   // Initialize auth listener on mount
@@ -38,7 +37,7 @@ function AppContainer({
           dispatch(setSavedGameFlag(exists));
         })
         .catch((err) => {
-          console.warn('Failed to check saved game', err);
+          console.warn("Failed to check saved game", err);
         });
     }
   }, [user?.uid, dispatch]);
@@ -53,7 +52,6 @@ function AppContainer({
       onRegister={onRegister}
       onLogout={onLogout}
       onClearError={onClearError}
-      onConvertGuest={onConvertGuest}
     />
   );
 }
@@ -70,7 +68,6 @@ const mapDispatchToProps = (dispatch) => ({
   onRegister: (credentials) => dispatch(registerUser(credentials)),
   onLogout: () => dispatch(logoutUser()),
   onClearError: () => dispatch(clearError()),
-  onConvertGuest: (credentials) => dispatch(convertGuestToAccount(credentials)),
   dispatch,
 });
 

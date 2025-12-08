@@ -1,6 +1,6 @@
-import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
-import { auth } from '../../../firebaseConfig';
-import { setUser } from './authSlice';
+import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import { auth } from "../../../firebaseConfig";
+import { setUser } from "./authSlice";
 
 /**
  * Initializes the Firebase authentication state listener.
@@ -13,10 +13,10 @@ export function initAuthListener(dispatch) {
   return onAuthStateChanged(auth, async (user) => {
     if (user) {
       // Firebase user (authenticated or anonymous)
-      const userPayload = { 
-        uid: user.uid, 
+      const userPayload = {
+        uid: user.uid,
         email: user.email,
-        isAnonymous: user.isAnonymous 
+        isAnonymous: user.isAnonymous,
       };
       dispatch(setUser(userPayload));
     } else {
@@ -25,15 +25,17 @@ export function initAuthListener(dispatch) {
         await signInAnonymously(auth);
         // onAuthStateChanged will trigger again with the anonymous user
       } catch (error) {
-        console.error('Failed to sign in anonymously:', error);
-        console.error('Please enable Anonymous Authentication in Firebase Console:');
-        console.error('Authentication → Sign-in method → Anonymous → Enable');
+        console.error("Failed to sign in anonymously:", error);
+        console.error("Please enable Anonymous Authentication in Firebase Console:");
+        console.error("Authentication → Sign-in method → Anonymous → Enable");
         // Create a local anonymous-like user as fallback
-        dispatch(setUser({ 
-          uid: 'local-' + Date.now(),
-          email: null,
-          isAnonymous: true 
-        }));
+        dispatch(
+          setUser({
+            uid: "local-" + Date.now(),
+            email: null,
+            isAnonymous: true,
+          }),
+        );
       }
     }
   });
