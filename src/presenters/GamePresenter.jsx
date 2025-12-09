@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import GameView from "../views/GameView";
 
 const removeDiacritics = (value) =>
   value ? value.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : value;
@@ -109,6 +108,27 @@ function GamePresenter({
     return summarySentences.slice(0, revealCount);
   }, [summarySentences, hints?.usedHints]);
 
+  // Business logic: Derived state calculations
+  const hasSummary = useMemo(
+    () => summarySentences.length > 0,
+    [summarySentences.length],
+  );
+
+  const canUseHint = useMemo(
+    () => hasSummary && hints && hints.availableHints > hints.usedHints,
+    [hasSummary, hints],
+  );
+
+  const isGameOver = useMemo(() => gameState?.lives <= 0, [gameState?.lives]);
+
+  const blurAmount = useMemo(() => {
+    const hintsUsed = hints?.usedHints || 0;
+    if (hintsUsed >= 3) return 0;
+    if (hintsUsed === 2) return 2;
+    if (hintsUsed === 1) return 5;
+    return 8;
+  }, [hints?.usedHints]);
+
   if (loadingGameState && !hasAttemptedLoad) {
     return <div>Loading previous game...</div>;
   }
@@ -127,10 +147,13 @@ function GamePresenter({
       lastResult={lastResult}
       wikipediaSummary={summary}
       revealedSummarySentences={revealedSummarySentences}
-      totalSummarySentences={summarySentences.length}
       hintsUsed={hints?.usedHints || 0}
       wikipediaLoading={wikipediaLoading}
       wikipediaError={wikipediaError}
+      hasSummary={hasSummary}
+      canUseHint={canUseHint}
+      isGameOver={isGameOver}
+      blurAmount={blurAmount}
     />
   );
 }
