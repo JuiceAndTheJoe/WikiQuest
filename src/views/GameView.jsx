@@ -77,13 +77,19 @@ function GameView({
 
       <Container maxWidth="lg" sx={{ py: 3, position: "relative", zIndex: 1 }}>
         <Button
-          variant="outlined"
-          size="small"
+          variant="contained"
+          size="large"
           startIcon={<Home />}
           onClick={onBackToHome}
-          sx={{ position: "absolute", top: 12, left: 0, fontWeight: "bold" }}
+          sx={{
+            position: "fixed",
+            left: 16,
+            top: 16,
+            zIndex: 10,
+            fontWeight: "bold",
+          }}
         >
-          Back to Home
+          Home
         </Button>
         <Stack spacing={3}>
           <Box
@@ -94,9 +100,17 @@ function GameView({
             }}
           >
             {/* Left Column - Question */}
-            <Box sx={{ flex: 2 }}>
-              <Card elevation={3}>
-                <CardContent sx={{ p: 3 }}>
+            <Box
+              sx={{
+                flex: 2,
+                bgcolor: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                borderRadius: 2,
+                p: 3,
+              }}
+            >
+              <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+                <CardContent sx={{ p: 0 }}>
                   <Typography variant="h5" gutterBottom>
                     Who is this? 🔍
                   </Typography>
@@ -200,59 +214,22 @@ function GameView({
                       )}
                     </>
                   )}
-
-                  <Divider sx={{ my: 2 }} />
-
-                  {/* Guess Input */}
-                  <Stack spacing={2}>
-                    <TextField
-                      fullWidth
-                      label="Your guess"
-                      placeholder="Enter the person's name..."
-                      value={userGuess || ""}
-                      onChange={(e) => onGuessChange(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && onSubmitGuess()}
-                      disabled={isGameOver}
-                      variant="outlined"
-                    />
-
-                    <Stack direction="row" spacing={2}>
-                      <Button
-                        variant="contained"
-                        startIcon={<Send />}
-                        onClick={onSubmitGuess}
-                        disabled={!userGuess?.trim() || isGameOver}
-                        sx={{ minWidth: 120 }}
-                      >
-                        Submit Guess
-                      </Button>
-
-                      {isGameOver && (
-                        <Button variant="outlined" onClick={onNextQuestion}>
-                          Try Again
-                        </Button>
-                      )}
-                    </Stack>
-
-                    {/* Last Result Feedback */}
-                    {lastResult && (
-                      <Alert
-                        severity={lastResult.correct ? "success" : "error"}
-                      >
-                        {lastResult.correct
-                          ? `Correct! +${lastResult.scoreDelta} points`
-                          : `Wrong! The answer was: ${lastResult.correctAnswer}`}
-                      </Alert>
-                    )}
-                  </Stack>
                 </CardContent>
               </Card>
             </Box>
 
             {/* Right Column - Hints */}
-            <Box sx={{ flex: 1 }}>
-              <Card elevation={3}>
-                <CardContent>
+            <Box
+              sx={{
+                flex: 1,
+                bgcolor: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                borderRadius: 2,
+                p: 3,
+              }}
+            >
+              <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+                <CardContent sx={{ p: 0 }}>
                   <Stack
                     direction="row"
                     spacing={3}
@@ -353,6 +330,51 @@ function GameView({
                     >
                       Using hints reduces your score multiplier
                     </Typography>
+                  </Stack>
+
+                  <Divider sx={{ my: 2 }} />
+
+                  {/* Guess Input */}
+                  <Stack spacing={2}>
+                    <TextField
+                      fullWidth
+                      label="Your guess"
+                      placeholder="Enter the person's name..."
+                      value={userGuess || ""}
+                      onChange={(e) => onGuessChange(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && onSubmitGuess()}
+                      disabled={isGameOver}
+                      variant="outlined"
+                    />
+
+                    <Stack direction="row" spacing={2}>
+                      <Button
+                        variant="contained"
+                        startIcon={<Send />}
+                        onClick={onSubmitGuess}
+                        disabled={!userGuess?.trim() || isGameOver}
+                        sx={{ minWidth: 120 }}
+                      >
+                        Submit Guess
+                      </Button>
+
+                      {isGameOver && (
+                        <Button variant="outlined" onClick={onNextQuestion}>
+                          Try Again
+                        </Button>
+                      )}
+                    </Stack>
+
+                    {/* Last Result Feedback */}
+                    {lastResult && (
+                      <Alert
+                        severity={lastResult.correct ? "success" : "error"}
+                      >
+                        {lastResult.correct
+                          ? `Correct! +${lastResult.scoreDelta} points`
+                          : `Wrong! The answer was: ${lastResult.correctAnswer}`}
+                      </Alert>
+                    )}
                   </Stack>
                 </CardContent>
               </Card>
