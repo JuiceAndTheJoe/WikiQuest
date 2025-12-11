@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import GameView from "../views/gameView";
+import GameView from "../views/GameView.jsx";
 
 const removeDiacritics = (value) =>
   value ? value.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : value;
