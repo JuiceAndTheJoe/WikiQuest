@@ -407,9 +407,12 @@ function GameView({
               borderRadius: 3,
               boxShadow: 6,
               border: "1px solid rgba(255, 255, 255, 0.2)",
-              backgroundColor: lastResult.correct
-                ? "rgba(0, 169, 14, 0.2)"
-                : "rgba(216, 0, 0, 0.2)",
+              backgroundColor:
+                lastResult.guess === "[SKIPPED]"
+                  ? "rgba(100, 100, 100, 0.3)"
+                  : lastResult.correct
+                    ? "rgba(0, 169, 14, 0.2)"
+                    : "rgba(216, 0, 0, 0.2)",
             },
           }}
           BackdropProps={{
@@ -465,32 +468,51 @@ function GameView({
                 color: "white",
               }}
             >
-              {lastResult.correct ? "Correct!" : "Wrong!"}
+              {lastResult.guess === "[SKIPPED]"
+                ? "Skipped!"
+                : lastResult.correct
+                  ? "Correct!"
+                  : "Wrong!"}
             </Typography>
             {lastResult.correct ? null : (
-              <Typography
-                variant="h5"
-                sx={{
-                  color: "rgba(255, 255, 255, 0.9)",
-                }}
-              >
-                The answer was: {lastResult.correctAnswer}
-              </Typography>
+              <>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    color: "rgba(255, 255, 255, 0.9)",
+                  }}
+                >
+                  {lastResult.guess === "[SKIPPED]"
+                    ? `The answer was: ${lastResult.correctAnswer}`
+                    : `The answer was: ${lastResult.correctAnswer}`}
+                </Typography>
+              </>
             )}
             <Typography
               variant="h5"
               sx={{
-                color: lastResult.correct ? "#00a90e" : "#d80000",
+                color:
+                  lastResult.guess === "[SKIPPED]"
+                    ? "#a9a9a9"
+                    : lastResult.correct
+                      ? "#00a90e"
+                      : "#d80000",
                 fontWeight: 600,
               }}
             >
               {lastResult.correct
                 ? `+${lastResult.scoreDelta} points`
-                : `${lastResult.scoreDelta} points`}
+                : `${lastResult.scoreDelta * 10} points`}
             </Typography>
             <Button
               variant="contained"
-              color={lastResult.correct ? "success" : "error"}
+              color={
+                lastResult.guess === "[SKIPPED]"
+                  ? "inherit"
+                  : lastResult.correct
+                    ? "success"
+                    : "error"
+              }
               size="large"
               onClick={onCloseResultFeedback}
               sx={{
