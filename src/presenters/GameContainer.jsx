@@ -7,6 +7,7 @@ import {
 import {
   advanceToNextQuestion,
   loadSavedGame,
+  skipQuestion,
   startNewGame,
   submitGuess,
   useHint,
@@ -128,6 +129,7 @@ const mapState = (state) => {
 const mapDispatch = (dispatch) => ({
   onSubmitGuess: (guess) => dispatch(submitGuess(guess)),
   onUseHint: () => dispatch(useHint()),
+  onSkipQuestion: () => dispatch(skipQuestion()),
   onNextQuestion: () => dispatch(advanceToNextQuestion()),
   startNewGame: () => dispatch(startNewGame()),
   loadSavedGame: (userId) => dispatch(loadSavedGame(userId)),

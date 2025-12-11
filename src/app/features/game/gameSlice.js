@@ -242,6 +242,59 @@ const gameSlice = createSlice({
       state.currentQuestionStartTime = Date.now();
       state.hintsUsedThisQuestion = 0;
     },
+    skipQuestion(state) {
+      if (!state.inGame || !state.currentCeleb) return;
+
+      const rawTarget = String(state.currentCeleb || "").trim();
+      const now = Date.now();
+      const questionNumber = (state.totalQuestions || 0) + 1;
+      const timeTakenMs = state.currentQuestionStartTime
+        ? Math.max(0, now - state.currentQuestionStartTime)
+        : 0;
+      const hintsUsedThisAttempt = state.hintsUsedThisQuestion || 0;
+
+      // Log the skip as a question
+      const questionEntry = {
+        id: `${questionNumber}-${now}`,
+        celeb: rawTarget,
+        displayName: formatCelebDisplayName(rawTarget),
+        guess: "[SKIPPED]",
+        correct: false,
+        hintsUsed: hintsUsedThisAttempt,
+        timeTakenMs,
+        questionNumber,
+        level: state.level,
+        scoreDelta: WRONG_ANSWER_PENALTY,
+      };
+
+      state.questionsLog = state.questionsLog || [];
+      state.questionsLog.push(questionEntry);
+      state.totalQuestions = questionNumber;
+
+      // Deduct score and life
+      state.lastGuessResult = "skipped";
+      state.score = Math.max(0, (state.score || 0) + WRONG_ANSWER_PENALTY);
+      state.streak = 0;
+      state.lives = Math.max(0, (state.lives || 0) - 1);
+
+      state.lastAnsweredCeleb = rawTarget;
+
+      if (state.lives <= 0) {
+        // Game over
+        state.inGame = false;
+        state.status = "game_over";
+        state.lastGameResult = buildRunSummary(state);
+        state.completedRuns = (state.completedRuns || 0) + 1;
+      }
+
+      state.lastResultDetail = {
+        correct: false,
+        correctAnswer: formatCelebDisplayName(rawTarget),
+        guess: "[SKIPPED]",
+        scoreDelta: WRONG_ANSWER_PENALTY,
+        finalScore: state.score || 0,
+      };
+    },
     setSavedGameFlag(state, action) {
       state.hasSavedGame = action.payload;
     },
@@ -293,6 +346,7 @@ export const {
   submitGuess,
   useHint,
   advanceToNextQuestion,
+  skipQuestion,
   setSavedGameFlag,
   resumeGame,
   updateLeaderboard,

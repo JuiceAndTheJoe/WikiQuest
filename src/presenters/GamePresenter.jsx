@@ -49,6 +49,7 @@ function GamePresenter({
   lastResult,
   onSubmitGuess,
   onUseHint,
+  onSkipQuestion,
   onNextQuestion,
   gameStatus,
   hasAttemptedLoad,
@@ -76,6 +77,10 @@ function GamePresenter({
     if (!userGuess?.trim()) return;
     onSubmitGuess(userGuess.trim());
     setUserGuess("");
+  };
+
+  const handleSkipQuestion = () => {
+    onSkipQuestion();
   };
 
   const handleUseHint = () => {
@@ -134,6 +139,7 @@ function GamePresenter({
       onGuessChange={handleGuessChange}
       onSubmitGuess={handleSubmitGuess}
       onUseHint={handleUseHint}
+      onSkipQuestion={handleSkipQuestion}
       onNextQuestion={handleNextQuestion}
       onBackToHome={handleBackToHome}
       lastResult={lastResult}

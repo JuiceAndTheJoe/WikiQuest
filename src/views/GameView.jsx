@@ -31,6 +31,7 @@ function GameView({
   onGuessChange,
   onSubmitGuess,
   onUseHint,
+  onSkipQuestion,
   onNextQuestion,
   onBackToHome,
   lastResult,
@@ -153,28 +154,40 @@ function GameView({
                         }}
                       >
                         <Stack spacing={1.5}>
-                          {wikipediaSummary.thumbnail && (
-                            <Box
-                              component="img"
-                              src={wikipediaSummary.thumbnail.source}
-                              alt="Person"
-                              onContextMenu={(e) => e.preventDefault()}
-                              onDragStart={(e) => e.preventDefault()}
-                              sx={{
-                                maxWidth: "220px",
-                                borderRadius: 1,
-                                mx: "auto",
-                                display: "block",
-                                pointerEvents: "auto",
-                                userSelect: "none",
-                                WebkitUserSelect: "none",
-                                MozUserSelect: "none",
-                                msUserSelect: "none",
-                                filter: `blur(${getBlurAmount()}px)`,
-                                transition: "filter 0.3s ease",
-                              }}
-                            />
-                          )}
+                          <Stack spacing={1} alignItems="center">
+                            {wikipediaSummary.thumbnail && (
+                              <Box
+                                component="img"
+                                src={wikipediaSummary.thumbnail.source}
+                                alt="Person"
+                                onContextMenu={(e) => e.preventDefault()}
+                                onDragStart={(e) => e.preventDefault()}
+                                sx={{
+                                  maxWidth: "220px",
+                                  borderRadius: 1,
+                                  display: "block",
+                                  pointerEvents: "auto",
+                                  userSelect: "none",
+                                  WebkitUserSelect: "none",
+                                  MozUserSelect: "none",
+                                  msUserSelect: "none",
+                                  filter: `blur(${getBlurAmount()}px)`,
+                                  transition: "filter 0.3s ease",
+                                }}
+                              />
+                            )}
+                            {hints &&
+                              hints.usedHints >= hints.availableHints && (
+                                <Button
+                                  variant="outlined"
+                                  color="warning"
+                                  onClick={onSkipQuestion}
+                                  sx={{ mt: 1 }}
+                                >
+                                  Skip
+                                </Button>
+                              )}
+                          </Stack>
                           {hintsUsed > 0 && (
                             <>
                               {wikipediaSummary.description && (
