@@ -387,6 +387,7 @@ function GameView({
             sx: {
               borderRadius: 3,
               boxShadow: 6,
+              border: "1px solid rgba(255, 255, 255, 0.2)",
               backgroundColor: lastResult.correct
                 ? "rgba(0, 169, 14, 0.2)"
                 : "rgba(216, 0, 0, 0.2)",
@@ -408,6 +409,7 @@ function GameView({
               py: 6,
               px: 4,
               textAlign: "center",
+              overflow: "hidden",
             }}
           >
             {wikipediaSummary?.thumbnail && (
@@ -419,11 +421,23 @@ function GameView({
                   maxWidth: "280px",
                   maxHeight: "280px",
                   borderRadius: 2,
-                  mb: 2,
+                  mb: 0.5,
                   border: "3px solid white",
                   boxShadow: 3,
                 }}
               />
+            )}
+            {lastResult.correctAnswer && (
+              <Typography
+                variant="h5"
+                sx={{
+                  color: "white",
+                  fontWeight: 600,
+                  mb: 2,
+                }}
+              >
+                {lastResult.correctAnswer}
+              </Typography>
             )}
             <Typography
               variant="h3"
