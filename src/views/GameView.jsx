@@ -22,6 +22,7 @@ import {
   Typography,
 } from "@mui/material";
 import ColorBends from "../components/background/ColorBends";
+import ElectricBorder from "../components/ElectricBorder";
 
 function GameView({
   gameState,
@@ -48,6 +49,33 @@ function GameView({
   const canUseHint =
     hasSummary && hints && hints.availableHints > hints.usedHints;
   const isGameOver = gameState?.lives <= 0;
+
+  // Calculate electric border intensity based on streak
+  const getElectricBorderConfig = (streak) => {
+    const currentStreak = streak || 0;
+
+    // Disabled for streak 0-2
+    if (currentStreak < 3) {
+      return { opacity: 0, speed: 0, chaos: 0, thickness: 0 };
+    }
+
+    // Mild at streak 3, then scales up
+    // streak 3: opacity 0.3, speed 0.5, chaos 0.2
+    // streak 5: opacity 0.5, speed 0.8, chaos 0.4
+    // streak 10: opacity 0.8, speed 1.5, chaos 0.8
+    // streak 15+: opacity 1, speed 2, chaos 1
+
+    const normalizedStreak = Math.min(currentStreak - 3, 12) / 12; // 0-1 scale from streak 3-15
+
+    return {
+      opacity: Math.min(0.3 + normalizedStreak * 0.7, 1),
+      speed: Math.min(0.5 + normalizedStreak * 1.5, 2),
+      chaos: Math.min(0.2 + normalizedStreak * 0.8, 1),
+      thickness: Math.min(1 + normalizedStreak * 1.5, 2.5),
+    };
+  };
+
+  const borderConfig = getElectricBorderConfig(gameState?.streak);
 
   const getBlurAmount = () => {
     if (hintsUsed === 0) return 8;
@@ -105,301 +133,640 @@ function GameView({
             }}
           >
             {/* Left Column - Question */}
-            <Box
-              sx={{
-                flex: 2,
-                bgcolor: "rgba(255, 255, 255, 0.1)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                borderRadius: 2,
-                p: 3,
-              }}
-            >
-              <Card elevation={0} sx={{ bgcolor: "transparent" }}>
-                <CardContent sx={{ p: 0 }}>
-                  <Stack
-                    direction="row"
-                    spacing={2}
-                    alignItems="center"
-                    justifyContent="space-between"
-                    sx={{ mb: 2 }}
-                  >
-                    <Typography variant="h5" gutterBottom sx={{ m: 0 }}>
-                      Who is this? 🔍
-                    </Typography>
-                    {difficulty && (
-                      <Chip
-                        label={difficulty.toUpperCase()}
-                        color="primary"
-                        size="small"
-                      />
-                    )}
-                  </Stack>
+            {borderConfig.opacity > 0 && (
+              <ElectricBorder
+                color="#7df9ff"
+                speed={borderConfig.speed}
+                chaos={borderConfig.chaos}
+                thickness={borderConfig.thickness}
+                effectOpacity={borderConfig.opacity}
+                style={{
+                  flex: 2,
+                  borderRadius: 8,
+                }}
+              >
+                <Box
+                  sx={{
+                    bgcolor: "rgba(255, 255, 255, 0.1)",
+                    p: 3,
+                  }}
+                >
+                  <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+                    <CardContent sx={{ p: 0 }}>
+                      <Stack
+                        direction="row"
+                        spacing={2}
+                        alignItems="center"
+                        justifyContent="space-between"
+                        sx={{ mb: 2 }}
+                      >
+                        <Typography variant="h5" gutterBottom sx={{ m: 0 }}>
+                          Who is this? 🔍
+                        </Typography>
+                        {difficulty && (
+                          <Chip
+                            label={difficulty.toUpperCase()}
+                            color="primary"
+                            size="small"
+                          />
+                        )}
+                      </Stack>
 
-                  {/* Wikipedia API Integration */}
-                  <Typography variant="h6" component="h2" gutterBottom>
-                    Biography Clues
-                  </Typography>
-                  {wikipediaLoading && (
+                      {/* Wikipedia API Integration */}
+                      <Typography variant="h6" component="h2" gutterBottom>
+                        Biography Clues
+                      </Typography>
+                      {wikipediaLoading && (
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          alignItems="center"
+                          sx={{ my: 2 }}
+                        >
+                          <CircularProgress size={20} />
+                          <Typography variant="caption" color="text.secondary">
+                            Loading Wikipedia data…
+                          </Typography>
+                        </Stack>
+                      )}
+                      {wikipediaError && (
+                        <Typography
+                          variant="body2"
+                          color="error"
+                          sx={{ my: 2 }}
+                        >
+                          Error: {wikipediaError}
+                        </Typography>
+                      )}
+                      {wikipediaSummary && (
+                        <>
+                          <Paper
+                            elevation={1}
+                            sx={{
+                              p: 2,
+                              width: "100%",
+                              bgcolor: "transparent",
+                              my: 2,
+                            }}
+                          >
+                            <Stack spacing={1.5}>
+                              <Stack spacing={1} alignItems="center">
+                                {wikipediaSummary.thumbnail && (
+                                  <Box
+                                    component="img"
+                                    src={wikipediaSummary.thumbnail.source}
+                                    alt="Person"
+                                    onContextMenu={(e) => e.preventDefault()}
+                                    onDragStart={(e) => e.preventDefault()}
+                                    sx={{
+                                      maxWidth: "220px",
+                                      borderRadius: 1,
+                                      display: "block",
+                                      pointerEvents: "auto",
+                                      userSelect: "none",
+                                      WebkitUserSelect: "none",
+                                      MozUserSelect: "none",
+                                      msUserSelect: "none",
+                                      filter: `blur(${getBlurAmount()}px)`,
+                                      transition: "filter 0.3s ease",
+                                    }}
+                                  />
+                                )}
+                                {hints &&
+                                  hints.usedHints >= hints.availableHints && (
+                                    <Button
+                                      variant="outlined"
+                                      color="warning"
+                                      onClick={onSkipQuestion}
+                                      sx={{ mt: 1 }}
+                                    >
+                                      Skip
+                                    </Button>
+                                  )}
+                              </Stack>
+                              {hintsUsed > 0 && (
+                                <>
+                                  {wikipediaSummary.description && (
+                                    <Typography
+                                      variant="body2"
+                                      color="text.secondary"
+                                    >
+                                      {wikipediaSummary.description}
+                                    </Typography>
+                                  )}
+                                  <Stack spacing={1}>
+                                    {revealedSummarySentences?.map(
+                                      (sentence, idx) => (
+                                        <Typography
+                                          key={`${sentence}-${idx}`}
+                                          variant="body1"
+                                          color="text.primary"
+                                        >
+                                          {sentence}
+                                        </Typography>
+                                      ),
+                                    )}
+                                  </Stack>
+                                </>
+                              )}
+                            </Stack>
+                          </Paper>
+                          {hasSummary && hintsUsed === 0 && (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ fontStyle: "italic" }}
+                            >
+                              Use hints to gradually reveal the biography text.
+                            </Typography>
+                          )}
+                          {!hasSummary && !wikipediaLoading && (
+                            <Typography variant="body2" color="text.secondary">
+                              No summary is available for this person yet.
+                            </Typography>
+                          )}
+                        </>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Box>
+              </ElectricBorder>
+            )}
+            {borderConfig.opacity === 0 && (
+              <Box
+                sx={{
+                  flex: 2,
+                  bgcolor: "rgba(255, 255, 255, 0.1)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: 2,
+                  p: 3,
+                }}
+              >
+                <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+                  <CardContent sx={{ p: 0 }}>
+                    <Stack
+                      direction="row"
+                      spacing={2}
+                      alignItems="center"
+                      justifyContent="space-between"
+                      sx={{ mb: 2 }}
+                    >
+                      <Typography variant="h5" gutterBottom sx={{ m: 0 }}>
+                        Who is this? 🔍
+                      </Typography>
+                      {difficulty && (
+                        <Chip
+                          label={difficulty.toUpperCase()}
+                          color="primary"
+                          size="small"
+                        />
+                      )}
+                    </Stack>
+
+                    {/* Wikipedia API Integration */}
+                    <Typography variant="h6" component="h2" gutterBottom>
+                      Biography Clues
+                    </Typography>
+                    {wikipediaLoading && (
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        sx={{ my: 2 }}
+                      >
+                        <CircularProgress size={20} />
+                        <Typography variant="caption" color="text.secondary">
+                          Loading Wikipedia data…
+                        </Typography>
+                      </Stack>
+                    )}
+                    {wikipediaError && (
+                      <Typography variant="body2" color="error" sx={{ my: 2 }}>
+                        Error: {wikipediaError}
+                      </Typography>
+                    )}
+                    {wikipediaSummary && (
+                      <>
+                        <Paper
+                          elevation={1}
+                          sx={{
+                            p: 2,
+                            width: "100%",
+                            bgcolor: "transparent",
+                            my: 2,
+                          }}
+                        >
+                          <Stack spacing={1.5}>
+                            <Stack spacing={1} alignItems="center">
+                              {wikipediaSummary.thumbnail && (
+                                <Box
+                                  component="img"
+                                  src={wikipediaSummary.thumbnail.source}
+                                  alt="Person"
+                                  onContextMenu={(e) => e.preventDefault()}
+                                  onDragStart={(e) => e.preventDefault()}
+                                  sx={{
+                                    maxWidth: "220px",
+                                    borderRadius: 1,
+                                    display: "block",
+                                    pointerEvents: "auto",
+                                    userSelect: "none",
+                                    WebkitUserSelect: "none",
+                                    MozUserSelect: "none",
+                                    msUserSelect: "none",
+                                    filter: `blur(${getBlurAmount()}px)`,
+                                    transition: "filter 0.3s ease",
+                                  }}
+                                />
+                              )}
+                              {hints &&
+                                hints.usedHints >= hints.availableHints && (
+                                  <Button
+                                    variant="outlined"
+                                    color="warning"
+                                    onClick={onSkipQuestion}
+                                    sx={{ mt: 1 }}
+                                  >
+                                    Skip
+                                  </Button>
+                                )}
+                            </Stack>
+                            {hintsUsed > 0 && (
+                              <>
+                                {wikipediaSummary.description && (
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    {wikipediaSummary.description}
+                                  </Typography>
+                                )}
+                                <Stack spacing={1}>
+                                  {revealedSummarySentences?.map(
+                                    (sentence, idx) => (
+                                      <Typography
+                                        key={`${sentence}-${idx}`}
+                                        variant="body1"
+                                        color="text.primary"
+                                      >
+                                        {sentence}
+                                      </Typography>
+                                    ),
+                                  )}
+                                </Stack>
+                              </>
+                            )}
+                          </Stack>
+                        </Paper>
+                        {hasSummary && hintsUsed === 0 && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ fontStyle: "italic" }}
+                          >
+                            Use hints to gradually reveal the biography text.
+                          </Typography>
+                        )}
+                        {!hasSummary && !wikipediaLoading && (
+                          <Typography variant="body2" color="text.secondary">
+                            No summary is available for this person yet.
+                          </Typography>
+                        )}
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </Box>
+            )}
+
+            {/* Right Column - Hints */}
+            {borderConfig.opacity > 0 && (
+              <ElectricBorder
+                color="#7df9ff"
+                speed={borderConfig.speed}
+                chaos={borderConfig.chaos}
+                thickness={borderConfig.thickness}
+                effectOpacity={borderConfig.opacity}
+                style={{
+                  flex: 1,
+                  borderRadius: 8,
+                }}
+              >
+                <Box
+                  sx={{
+                    bgcolor: "rgba(255, 255, 255, 0.1)",
+                    p: 3,
+                  }}
+                >
+                  <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+                    <CardContent sx={{ p: 0 }}>
+                      <Stack
+                        direction="row"
+                        spacing={3}
+                        alignItems="flex-start"
+                        justifyContent="space-between"
+                        sx={{ mb: 2 }}
+                      >
+                        <Stack
+                          direction="column"
+                          spacing={2}
+                          alignItems="center"
+                        >
+                          <Stack
+                            direction="row"
+                            spacing={0.5}
+                            alignItems="center"
+                          >
+                            {[...Array(gameState?.lives || 3)].map((_, i) => (
+                              <Favorite
+                                key={i}
+                                sx={{ color: "error.main", fontSize: "3rem" }}
+                              />
+                            ))}
+                          </Stack>
+                          <Stack direction="row" spacing={2}>
+                            <Box>
+                              <Typography variant="h6">
+                                Score: {gameState?.score || 0}
+                              </Typography>
+                            </Box>
+                            <Box>
+                              <Typography variant="h6">
+                                🔥 {gameState?.streak || 0}
+                              </Typography>
+                            </Box>
+                          </Stack>
+                        </Stack>
+                        <Chip
+                          icon={<Timer />}
+                          label={`Question ${(gameState?.totalQuestions || 0) + 1}`}
+                          color="primary"
+                        />
+                      </Stack>
+                      <Stack spacing={1} sx={{ mb: 2 }}>
+                        <Box>
+                          <Typography variant="body2" gutterBottom>
+                            Questions: {gameState?.totalQuestions || 0}
+                          </Typography>
+                          <LinearProgress
+                            variant="determinate"
+                            value={
+                              ((gameState?.correctAnswers || 0) /
+                                Math.max(gameState?.totalQuestions || 1, 1)) *
+                              100
+                            }
+                            sx={{ height: 8, borderRadius: 4 }}
+                          />
+                        </Box>
+                        <Typography variant="caption" color="text.secondary">
+                          Accuracy:{" "}
+                          {gameState?.totalQuestions > 0
+                            ? Math.round(
+                                ((gameState?.correctAnswers || 0) /
+                                  gameState.totalQuestions) *
+                                  100,
+                              )
+                            : 0}
+                          %
+                        </Typography>
+                      </Stack>
+                      <Divider sx={{ mb: 2 }} />
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        alignItems="center"
+                        sx={{ mb: 2 }}
+                      >
+                        <Typography variant="h6">Hints left:</Typography>
+                        {[
+                          ...Array(
+                            hints?.availableHints - hints?.usedHints || 0,
+                          ),
+                        ].map((_, i) => (
+                          <Typography key={i} variant="h6">
+                            🧩
+                          </Typography>
+                        ))}
+                      </Stack>
+
+                      <Stack spacing={2}>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          startIcon={<Lightbulb />}
+                          onClick={onUseHint}
+                          disabled={!canUseHint || isGameOver}
+                          fullWidth
+                          sx={{ fontWeight: "bold" }}
+                        >
+                          Use Hint (
+                          {hints?.availableHints - hints?.usedHints || 0} left)
+                        </Button>
+
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ textAlign: "center" }}
+                        >
+                          Using hints reduces your score multiplier
+                        </Typography>
+                      </Stack>
+
+                      <Divider sx={{ my: 2 }} />
+
+                      {/* Guess Input */}
+                      <Stack spacing={2}>
+                        <TextField
+                          fullWidth
+                          label="Your guess"
+                          placeholder="Enter the person's name..."
+                          value={userGuess || ""}
+                          onChange={(e) => onGuessChange(e.target.value)}
+                          onKeyDown={(e) =>
+                            e.key === "Enter" && onSubmitGuess()
+                          }
+                          disabled={isGameOver}
+                          variant="outlined"
+                        />
+
+                        <Stack direction="row" spacing={2}>
+                          <Button
+                            variant="contained"
+                            startIcon={<Send />}
+                            onClick={onSubmitGuess}
+                            disabled={!userGuess?.trim() || isGameOver}
+                            sx={{ minWidth: 120 }}
+                          >
+                            Submit Guess
+                          </Button>
+
+                          {isGameOver && (
+                            <Button variant="outlined" onClick={onNextQuestion}>
+                              Try Again
+                            </Button>
+                          )}
+                        </Stack>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Box>
+              </ElectricBorder>
+            )}
+            {borderConfig.opacity === 0 && (
+              <Box
+                sx={{
+                  flex: 1,
+                  bgcolor: "rgba(255, 255, 255, 0.1)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  borderRadius: 2,
+                  p: 3,
+                }}
+              >
+                <Card elevation={0} sx={{ bgcolor: "transparent" }}>
+                  <CardContent sx={{ p: 0 }}>
+                    <Stack
+                      direction="row"
+                      spacing={3}
+                      alignItems="flex-start"
+                      justifyContent="space-between"
+                      sx={{ mb: 2 }}
+                    >
+                      <Stack direction="column" spacing={2} alignItems="center">
+                        <Stack
+                          direction="row"
+                          spacing={0.5}
+                          alignItems="center"
+                        >
+                          {[...Array(gameState?.lives || 3)].map((_, i) => (
+                            <Favorite
+                              key={i}
+                              sx={{ color: "error.main", fontSize: "3rem" }}
+                            />
+                          ))}
+                        </Stack>
+                        <Stack direction="row" spacing={2}>
+                          <Box>
+                            <Typography variant="h6">
+                              Score: {gameState?.score || 0}
+                            </Typography>
+                          </Box>
+                          <Box>
+                            <Typography variant="h6">
+                              🔥 {gameState?.streak || 0}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </Stack>
+                      <Chip
+                        icon={<Timer />}
+                        label={`Question ${(gameState?.totalQuestions || 0) + 1}`}
+                        color="primary"
+                      />
+                    </Stack>
+                    <Stack spacing={1} sx={{ mb: 2 }}>
+                      <Box>
+                        <Typography variant="body2" gutterBottom>
+                          Questions: {gameState?.totalQuestions || 0}
+                        </Typography>
+                        <LinearProgress
+                          variant="determinate"
+                          value={
+                            ((gameState?.correctAnswers || 0) /
+                              Math.max(gameState?.totalQuestions || 1, 1)) *
+                            100
+                          }
+                          sx={{ height: 8, borderRadius: 4 }}
+                        />
+                      </Box>
+                      <Typography variant="caption" color="text.secondary">
+                        Accuracy:{" "}
+                        {gameState?.totalQuestions > 0
+                          ? Math.round(
+                              ((gameState?.correctAnswers || 0) /
+                                gameState.totalQuestions) *
+                                100,
+                            )
+                          : 0}
+                        %
+                      </Typography>
+                    </Stack>
+                    <Divider sx={{ mb: 2 }} />
                     <Stack
                       direction="row"
                       spacing={1}
                       alignItems="center"
-                      sx={{ my: 2 }}
+                      sx={{ mb: 2 }}
                     >
-                      <CircularProgress size={20} />
-                      <Typography variant="caption" color="text.secondary">
-                        Loading Wikipedia data…
-                      </Typography>
-                    </Stack>
-                  )}
-                  {wikipediaError && (
-                    <Typography variant="body2" color="error" sx={{ my: 2 }}>
-                      Error: {wikipediaError}
-                    </Typography>
-                  )}
-                  {wikipediaSummary && (
-                    <>
-                      <Paper
-                        elevation={1}
-                        sx={{
-                          p: 2,
-                          width: "100%",
-                          bgcolor: "transparent",
-                          my: 2,
-                        }}
-                      >
-                        <Stack spacing={1.5}>
-                          <Stack spacing={1} alignItems="center">
-                            {wikipediaSummary.thumbnail && (
-                              <Box
-                                component="img"
-                                src={wikipediaSummary.thumbnail.source}
-                                alt="Person"
-                                onContextMenu={(e) => e.preventDefault()}
-                                onDragStart={(e) => e.preventDefault()}
-                                sx={{
-                                  maxWidth: "220px",
-                                  borderRadius: 1,
-                                  display: "block",
-                                  pointerEvents: "auto",
-                                  userSelect: "none",
-                                  WebkitUserSelect: "none",
-                                  MozUserSelect: "none",
-                                  msUserSelect: "none",
-                                  filter: `blur(${getBlurAmount()}px)`,
-                                  transition: "filter 0.3s ease",
-                                }}
-                              />
-                            )}
-                            {hints &&
-                              hints.usedHints >= hints.availableHints && (
-                                <Button
-                                  variant="outlined"
-                                  color="warning"
-                                  onClick={onSkipQuestion}
-                                  sx={{ mt: 1 }}
-                                >
-                                  Skip
-                                </Button>
-                              )}
-                          </Stack>
-                          {hintsUsed > 0 && (
-                            <>
-                              {wikipediaSummary.description && (
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                >
-                                  {wikipediaSummary.description}
-                                </Typography>
-                              )}
-                              <Stack spacing={1}>
-                                {revealedSummarySentences?.map(
-                                  (sentence, idx) => (
-                                    <Typography
-                                      key={`${sentence}-${idx}`}
-                                      variant="body1"
-                                      color="text.primary"
-                                    >
-                                      {sentence}
-                                    </Typography>
-                                  ),
-                                )}
-                              </Stack>
-                            </>
-                          )}
-                        </Stack>
-                      </Paper>
-                      {hasSummary && hintsUsed === 0 && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ fontStyle: "italic" }}
-                        >
-                          Use hints to gradually reveal the biography text.
+                      <Typography variant="h6">Hints left:</Typography>
+                      {[
+                        ...Array(hints?.availableHints - hints?.usedHints || 0),
+                      ].map((_, i) => (
+                        <Typography key={i} variant="h6">
+                          🧩
                         </Typography>
-                      )}
-                      {!hasSummary && !wikipediaLoading && (
-                        <Typography variant="body2" color="text.secondary">
-                          No summary is available for this person yet.
-                        </Typography>
-                      )}
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            </Box>
-
-            {/* Right Column - Hints */}
-            <Box
-              sx={{
-                flex: 1,
-                bgcolor: "rgba(255, 255, 255, 0.1)",
-                border: "1px solid rgba(255, 255, 255, 0.2)",
-                borderRadius: 2,
-                p: 3,
-              }}
-            >
-              <Card elevation={0} sx={{ bgcolor: "transparent" }}>
-                <CardContent sx={{ p: 0 }}>
-                  <Stack
-                    direction="row"
-                    spacing={3}
-                    alignItems="flex-start"
-                    justifyContent="space-between"
-                    sx={{ mb: 2 }}
-                  >
-                    <Stack direction="column" spacing={2} alignItems="center">
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        {[...Array(gameState?.lives || 3)].map((_, i) => (
-                          <Favorite
-                            key={i}
-                            sx={{ color: "error.main", fontSize: "3rem" }}
-                          />
-                        ))}
-                      </Stack>
-                      <Stack direction="row" spacing={2}>
-                        <Box>
-                          <Typography variant="h6">
-                            Score: {gameState?.score || 0}
-                          </Typography>
-                        </Box>
-                        <Box>
-                          <Typography variant="h6">
-                            🔥 {gameState?.streak || 0}
-                          </Typography>
-                        </Box>
-                      </Stack>
+                      ))}
                     </Stack>
-                    <Chip
-                      icon={<Timer />}
-                      label={`Question ${(gameState?.totalQuestions || 0) + 1}`}
-                      color="primary"
-                    />
-                  </Stack>
-                  <Stack spacing={1} sx={{ mb: 2 }}>
-                    <Box>
-                      <Typography variant="body2" gutterBottom>
-                        Questions: {gameState?.totalQuestions || 0}
-                      </Typography>
-                      <LinearProgress
-                        variant="determinate"
-                        value={
-                          ((gameState?.correctAnswers || 0) /
-                            Math.max(gameState?.totalQuestions || 1, 1)) *
-                          100
-                        }
-                        sx={{ height: 8, borderRadius: 4 }}
-                      />
-                    </Box>
-                    <Typography variant="caption" color="text.secondary">
-                      Accuracy:{" "}
-                      {gameState?.totalQuestions > 0
-                        ? Math.round(
-                            ((gameState?.correctAnswers || 0) /
-                              gameState.totalQuestions) *
-                              100,
-                          )
-                        : 0}
-                      %
-                    </Typography>
-                  </Stack>
-                  <Divider sx={{ mb: 2 }} />
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    alignItems="center"
-                    sx={{ mb: 2 }}
-                  >
-                    <Typography variant="h6">Hints left:</Typography>
-                    {[
-                      ...Array(hints?.availableHints - hints?.usedHints || 0),
-                    ].map((_, i) => (
-                      <Typography key={i} variant="h6">
-                        🧩
-                      </Typography>
-                    ))}
-                  </Stack>
 
-                  <Stack spacing={2}>
-                    <Button
-                      variant="contained"
-                      color="error"
-                      startIcon={<Lightbulb />}
-                      onClick={onUseHint}
-                      disabled={!canUseHint || isGameOver}
-                      fullWidth
-                      sx={{ fontWeight: "bold" }}
-                    >
-                      Use Hint ({hints?.availableHints - hints?.usedHints || 0}{" "}
-                      left)
-                    </Button>
-
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ textAlign: "center" }}
-                    >
-                      Using hints reduces your score multiplier
-                    </Typography>
-                  </Stack>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  {/* Guess Input */}
-                  <Stack spacing={2}>
-                    <TextField
-                      fullWidth
-                      label="Your guess"
-                      placeholder="Enter the person's name..."
-                      value={userGuess || ""}
-                      onChange={(e) => onGuessChange(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && onSubmitGuess()}
-                      disabled={isGameOver}
-                      variant="outlined"
-                    />
-
-                    <Stack direction="row" spacing={2}>
+                    <Stack spacing={2}>
                       <Button
                         variant="contained"
-                        startIcon={<Send />}
-                        onClick={onSubmitGuess}
-                        disabled={!userGuess?.trim() || isGameOver}
-                        sx={{ minWidth: 120 }}
+                        color="error"
+                        startIcon={<Lightbulb />}
+                        onClick={onUseHint}
+                        disabled={!canUseHint || isGameOver}
+                        fullWidth
+                        sx={{ fontWeight: "bold" }}
                       >
-                        Submit Guess
+                        Use Hint (
+                        {hints?.availableHints - hints?.usedHints || 0} left)
                       </Button>
 
-                      {isGameOver && (
-                        <Button variant="outlined" onClick={onNextQuestion}>
-                          Try Again
-                        </Button>
-                      )}
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ textAlign: "center" }}
+                      >
+                        Using hints reduces your score multiplier
+                      </Typography>
                     </Stack>
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Box>
+
+                    <Divider sx={{ my: 2 }} />
+
+                    {/* Guess Input */}
+                    <Stack spacing={2}>
+                      <TextField
+                        fullWidth
+                        label="Your guess"
+                        placeholder="Enter the person's name..."
+                        value={userGuess || ""}
+                        onChange={(e) => onGuessChange(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && onSubmitGuess()}
+                        disabled={isGameOver}
+                        variant="outlined"
+                      />
+
+                      <Stack direction="row" spacing={2}>
+                        <Button
+                          variant="contained"
+                          startIcon={<Send />}
+                          onClick={onSubmitGuess}
+                          disabled={!userGuess?.trim() || isGameOver}
+                          sx={{ minWidth: 120 }}
+                        >
+                          Submit Guess
+                        </Button>
+
+                        {isGameOver && (
+                          <Button variant="outlined" onClick={onNextQuestion}>
+                            Try Again
+                          </Button>
+                        )}
+                      </Stack>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Box>
+            )}
           </Box>
         </Stack>
       </Container>
