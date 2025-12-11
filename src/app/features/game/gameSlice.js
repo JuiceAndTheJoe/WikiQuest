@@ -196,7 +196,6 @@ const gameSlice = createSlice({
         state.level = (state.level || 1) + 1;
         // update highScore
         state.highScore = Math.max(state.highScore || 0, state.level - 1);
-        // DON'T pick next celeb here - wait for advanceToNextQuestion
         state.lastAnsweredCeleb = rawTarget;
       } else {
         // wrong guess
