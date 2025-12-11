@@ -148,7 +148,7 @@ function GameView({
                         sx={{
                           p: 2,
                           width: "100%",
-                          bgcolor: "grey.700",
+                          bgcolor: "transparent",
                           my: 2,
                         }}
                       >
@@ -390,6 +390,11 @@ function GameView({
               backgroundColor: lastResult.correct
                 ? "rgba(0, 169, 14, 0.2)"
                 : "rgba(216, 0, 0, 0.2)",
+            },
+          }}
+          BackdropProps={{
+            sx: {
+              backdropFilter: "blur(4px)",
             },
           }}
         >
