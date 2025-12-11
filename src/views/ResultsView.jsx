@@ -107,6 +107,8 @@ function ResultsView({
                   threshold={0.1}
                   rootMargin="-100px"
                   textAlign="center"
+                  repeat={-1}
+                  repeatDelay={2.5}
                 />
               </Box>
             )}

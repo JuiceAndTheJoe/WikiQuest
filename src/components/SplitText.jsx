@@ -16,6 +16,8 @@ const SplitText = ({
   from = { opacity: 0, y: 40 },
   to = { opacity: 1, y: 0 },
   textAlign = "center",
+  repeat = 0,
+  repeatDelay = 0.5,
   onLetterAnimationComplete,
 }) => {
   const containerRef = useRef(null);
@@ -55,6 +57,9 @@ const SplitText = ({
         amount: (delay * (splitCharsRef.current.length - 1)) / 1000,
         from: "start",
       },
+      repeat: repeat,
+      repeatDelay: repeatDelay,
+      yoyo: repeat > 0,
       onComplete: onLetterAnimationComplete,
     });
 
@@ -69,6 +74,8 @@ const SplitText = ({
     ease,
     from,
     to,
+    repeat,
+    repeatDelay,
     onLetterAnimationComplete,
   ]);
 
