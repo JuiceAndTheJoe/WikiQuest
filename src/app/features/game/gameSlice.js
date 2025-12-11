@@ -211,7 +211,6 @@ const gameSlice = createSlice({
           state.completedRuns = (state.completedRuns || 0) + 1;
           // keep currentCeleb for review
         } else {
-          // DON'T pick next celeb here - wait for advanceToNextQuestion
           state.lastAnsweredCeleb = rawTarget;
         }
       }
