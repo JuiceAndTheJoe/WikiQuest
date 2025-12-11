@@ -107,7 +107,8 @@ export function cleanWikitext(wikiText) {
   const text = wikiText;
 
   const parts = text.split("\n\n");
-  let newText = parts.slice(1, 4).join("\n\n");
+  
+  let newText = parts.slice(1, 4).reverse().join("\n\n");
 
   newText = parseDateTemplates(newText);
   newText = removeTemplates(newText);
