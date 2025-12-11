@@ -68,17 +68,19 @@ function MenuView({
         <Stack spacing={4}>
           {/* Header */}
           <Box sx={{ textAlign: "center" }}>
-            <TrueFocus
-              sentence="WikiQuest"
-              words={["Wiki", "Quest"]}
-              manualMode={false}
-              blurAmount={8}
-              borderColor="#42a5f5"
-              glowColor="rgba(66, 165, 245, 0.6)"
-              animationDuration={0.8}
-              pauseBetweenAnimations={1.2}
-              gap="0"
-            />
+            <Box sx={{ mb: 3 }}>
+              <TrueFocus
+                sentence="WikiQuest"
+                words={["Wiki", "Quest"]}
+                manualMode={false}
+                blurAmount={8}
+                borderColor="#42a5f5"
+                glowColor="rgba(66, 165, 245, 0.6)"
+                animationDuration={0.8}
+                pauseBetweenAnimations={1.2}
+                gap="0"
+              />
+            </Box>
             <Typography variant="h5" color="text.secondary" gutterBottom>
               Guess famous people based on their Wikipedia biographies. Use
               hints wisely to maximize your score!
