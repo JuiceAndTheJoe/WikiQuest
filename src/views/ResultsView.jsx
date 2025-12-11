@@ -16,6 +16,7 @@ import {
   Chip,
   Divider,
 } from "@mui/material";
+
 import {
   PlayArrow,
   Leaderboard,
@@ -25,7 +26,9 @@ import {
   Cancel,
   AccountCircle,
 } from "@mui/icons-material";
+
 import ColorBends from "../components/background/ColorBends";
+import SplitText from "../components/SplitText";
 
 function ResultsView({
   gameStats,
@@ -81,14 +84,32 @@ function ResultsView({
         <Stack spacing={4}>
           {/* Header */}
           <Box sx={{ textAlign: "center" }}>
-            <Typography
-              variant="h3"
-              component="h1"
-              gutterBottom
-              color={newHighScore ? "success.main" : "inherit"}
-            >
-              {newHighScore ? "🎉 New Personal Best! 🎉" : "Good Job! 👏"}
-            </Typography>
+            {newHighScore ? (
+              <Typography
+                variant="h3"
+                component="h1"
+                gutterBottom
+                color="success.main"
+              >
+                🎉 New Personal Best! 🎉
+              </Typography>
+            ) : (
+              <Box sx={{ mb: 2 }}>
+                <SplitText
+                  text="Good Job!"
+                  className="text-2xl font-semibold text-center"
+                  delay={100}
+                  duration={0.6}
+                  ease="elastic.out(1, 0.3)"
+                  splitType="chars"
+                  from={{ opacity: 0, y: 40 }}
+                  to={{ opacity: 1, y: 0 }}
+                  threshold={0.1}
+                  rootMargin="-100px"
+                  textAlign="center"
+                />
+              </Box>
+            )}
             <Typography variant="h4" color="primary" gutterBottom>
               Final Score: {gameStats?.score || 0}
             </Typography>
