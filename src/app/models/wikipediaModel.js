@@ -30,6 +30,23 @@ async function convertImageToBase64(imageUrl) {
 }
 
 /**
+ * Parse and convert date templates to readable format
+ * Handles {{birth date|YYYY|M|D}}, {{death date|...}}, {{start date|...}}, etc.
+ *
+ * @param {string} input - The input string
+ * @returns {string} - String with date templates converted to readable dates
+ */
+function parseDateTemplates(input) {
+  const dateTemplateRegex =
+    /\{\{(birth date|death date|start date|end date|date)[^}]*\|(\d{4})\|(\d{1,2})\|(\d{1,2})[^}]*\}\}/gi;
+
+  return input.replace(dateTemplateRegex, (_, __, year, month, day) => {
+    const formattedDate = `${year}/${parseInt(month, 10)}/${parseInt(day, 10)}`;
+    return formattedDate;
+  });
+}
+
+/**
  * Remove all '{{...}}' templates from input string, handling nested templates
  * @param {string} input - The input string
  * @returns {string} - The cleaned string
@@ -101,17 +118,28 @@ function cleanWikitext(wikiText) {
   const parts = text.split("\n\n");
   let newText = parts.slice(1, 4).join("\n\n");
 
+  newText = parseDateTemplates(newText);
   newText = removeTemplates(newText);
   newText = removeRefs(newText);
   newText = removeHtmlTags(newText);
+
+  // Remove bold/italic markup: **text**, ''text''
   newText = newText.replace(/'{2,}/g, "");
+
+  // Remove headings like == Heading ==
   newText = newText.replace(/==+[^=]+==+/g, "");
+
+  // Handle links: [[Page|Display Text]] or [[Page]]
   newText = newText
     .replace(/\[\[[^|\]]*\|([^\]]+)\]\]/g, "$1")
     .replace(/\[\[([^\]]+)\]\]/g, "$1");
-  newText = decodeEntities(newText).trim();
 
-  return newText;
+  newText = decodeEntities(newText);
+
+  // Remove trailing semicolons after opening parentheses, common case: (; born 1900)
+  newText = newText.replace(/\(\s*;/g, "(");
+
+  return newText.trim();
 }
 
 /**
