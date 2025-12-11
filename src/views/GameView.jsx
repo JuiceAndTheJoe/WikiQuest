@@ -396,6 +396,12 @@ function GameView({
           onClose={onCloseResultFeedback}
           maxWidth="sm"
           fullWidth
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              onCloseResultFeedback();
+            }
+          }}
           PaperProps={{
             sx: {
               borderRadius: 3,
@@ -440,7 +446,7 @@ function GameView({
                 }}
               />
             )}
-            {lastResult.correctAnswer && (
+            {lastResult.correctAnswer && lastResult.correct && (
               <Typography
                 variant="h5"
                 sx={{
@@ -461,15 +467,26 @@ function GameView({
             >
               {lastResult.correct ? "Correct!" : "Wrong!"}
             </Typography>
+            {lastResult.correct ? null : (
+              <Typography
+                variant="h5"
+                sx={{
+                  color: "rgba(255, 255, 255, 0.9)",
+                }}
+              >
+                The answer was: {lastResult.correctAnswer}
+              </Typography>
+            )}
             <Typography
               variant="h5"
               sx={{
-                color: "rgba(255, 255, 255, 0.9)",
+                color: lastResult.correct ? "#00a90e" : "#d80000",
+                fontWeight: 600,
               }}
             >
               {lastResult.correct
                 ? `+${lastResult.scoreDelta} points`
-                : `The answer was: ${lastResult.correctAnswer}`}
+                : `${lastResult.scoreDelta} points`}
             </Typography>
             <Button
               variant="contained"
