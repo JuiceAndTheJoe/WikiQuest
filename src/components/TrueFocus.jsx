@@ -4,6 +4,7 @@ import "./TrueFocus.css";
 
 const TrueFocus = ({
   sentence = "True Focus",
+  words = null,
   separator = " ",
   manualMode = false,
   blurAmount = 5,
@@ -11,8 +12,9 @@ const TrueFocus = ({
   glowColor = "rgba(0, 255, 0, 0.6)",
   animationDuration = 0.5,
   pauseBetweenAnimations = 1,
+  gap = "1em",
 }) => {
-  const words = sentence.split(separator);
+  const wordList = words || sentence.split(separator);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lastActiveIndex, setLastActiveIndex] = useState(null);
   const containerRef = useRef(null);
@@ -28,14 +30,14 @@ const TrueFocus = ({
     if (!manualMode) {
       const interval = setInterval(
         () => {
-          setCurrentIndex((prev) => (prev + 1) % words.length);
+          setCurrentIndex((prev) => (prev + 1) % wordList.length);
         },
         (animationDuration + pauseBetweenAnimations) * 1000,
       );
 
       return () => clearInterval(interval);
     }
-  }, [manualMode, animationDuration, pauseBetweenAnimations, words.length]);
+  }, [manualMode, animationDuration, pauseBetweenAnimations, wordList.length]);
 
   useEffect(() => {
     if (currentIndex === null || currentIndex === -1) return;
@@ -51,7 +53,7 @@ const TrueFocus = ({
       width: activeRect.width,
       height: activeRect.height,
     });
-  }, [currentIndex, words.length]);
+  }, [currentIndex, wordList.length]);
 
   const handleMouseEnter = (index) => {
     if (manualMode) {
@@ -67,8 +69,8 @@ const TrueFocus = ({
   };
 
   return (
-    <div className="focus-container" ref={containerRef}>
-      {words.map((word, index) => {
+    <div className="focus-container" ref={containerRef} style={{ gap }}>
+      {wordList.map((word, index) => {
         const isActive = index === currentIndex;
         return (
           <span
