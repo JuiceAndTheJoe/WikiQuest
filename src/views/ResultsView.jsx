@@ -230,7 +230,8 @@ function ResultsView({
                                 {question.question}
                               </Typography>
                               <Typography variant="caption">
-                                Your answer: {question.userAnswer} • Score: +
+                                Your answer: {question.userAnswer} • Score:{" "}
+                                {question.score > 0 ? "+" : ""}
                                 {question.score} • Time:{" "}
                                 {Math.round((question.timeSpent || 0) / 1000)}s
                                 {question.hintsUsed > 0 &&
