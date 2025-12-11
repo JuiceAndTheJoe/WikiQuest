@@ -21,7 +21,6 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import ColorBends from "../components/background/ColorBends";
 import ElectricBorder from "../components/ElectricBorder";
 
 function GameView({
@@ -56,22 +55,28 @@ function GameView({
 
     // Disabled for streak 0-2
     if (currentStreak < 3) {
-      return { opacity: 0, speed: 0, chaos: 0, thickness: 0 };
+      return { opacity: 0, speed: 0, chaos: 0, thickness: 0, color: "#7df9ff" };
     }
 
-    // Mild at streak 3, then scales up
-    // streak 3: opacity 0.3, speed 0.5, chaos 0.2
-    // streak 5: opacity 0.5, speed 0.8, chaos 0.4
-    // streak 10: opacity 0.8, speed 1.5, chaos 0.8
-    // streak 15+: opacity 1, speed 2, chaos 1
+    // Mild at streak 3, scales up progressively, reaches max at streak 10
+    // streak 3: opacity 0.3, speed 0.5, chaos 0.2, color blue
+    // streak 5: opacity 0.5, speed 0.9, chaos 0.5, color cyan-green
+    // streak 7: opacity 0.7, speed 1.4, chaos 0.8, color yellow-orange
+    // streak 10+: opacity 1, speed 2, chaos 1, color red (MAX)
 
-    const normalizedStreak = Math.min(currentStreak - 3, 12) / 12; // 0-1 scale from streak 3-15
+    const normalizedStreak = Math.min(currentStreak - 3, 7) / 7; // 0-1 scale from streak 3-10
+
+    // Color progression: cyan/blue (200°) → green (120°) → yellow (60°) → orange (30°) → red (0°)
+    // Hue goes from 200 to 0 as normalizedStreak goes from 0 to 1
+    const hue = Math.round(200 * (1 - normalizedStreak));
+    const color = `hsl(${hue}, 100%, 50%)`;
 
     return {
       opacity: Math.min(0.3 + normalizedStreak * 0.7, 1),
-      speed: Math.min(0.5 + normalizedStreak * 1.5, 2),
-      chaos: Math.min(0.2 + normalizedStreak * 0.8, 1),
+      speed: Math.min(0.5 + normalizedStreak * 1.8, 2),
+      chaos: Math.min(0.2 + normalizedStreak * 1.0, 1),
       thickness: Math.min(1 + normalizedStreak * 1.5, 2.5),
+      color,
     };
   };
 
@@ -86,28 +91,6 @@ function GameView({
 
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
-      {/* Animated Background */}
-      <ColorBends
-        colors={["#d80000ff", "#00a90eff", "#0010bdff"]}
-        rotation={30}
-        speed={0.3}
-        scale={1.2}
-        frequency={1.4}
-        warpStrength={1.2}
-        mouseInfluence={0.8}
-        parallax={0.6}
-        noise={0}
-        transparent={false}
-        sx={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          zIndex: -1,
-        }}
-      />
-
       <Container maxWidth="lg" sx={{ py: 3, position: "relative", zIndex: 1 }}>
         <Button
           variant="contained"
@@ -135,7 +118,7 @@ function GameView({
             {/* Left Column - Question */}
             {borderConfig.opacity > 0 && (
               <ElectricBorder
-                color="#7df9ff"
+                color={borderConfig.color}
                 speed={borderConfig.speed}
                 chaos={borderConfig.chaos}
                 thickness={borderConfig.thickness}
@@ -442,7 +425,7 @@ function GameView({
             {/* Right Column - Hints */}
             {borderConfig.opacity > 0 && (
               <ElectricBorder
-                color="#7df9ff"
+                color={borderConfig.color}
                 speed={borderConfig.speed}
                 chaos={borderConfig.chaos}
                 thickness={borderConfig.thickness}
