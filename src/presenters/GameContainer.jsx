@@ -98,6 +98,7 @@ const mapState = (state) => {
     lives: typeof g.lives === "number" ? g.lives : MAX_LIVES,
     totalQuestions: g.totalQuestions || 0,
     correctAnswers: g.correctAnswers ?? g.correctCount ?? 0,
+    level: g.level || 1,
   };
 
   const hints = {

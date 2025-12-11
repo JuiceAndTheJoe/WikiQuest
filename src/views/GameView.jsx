@@ -42,6 +42,7 @@ function GameView({
   wikipediaError,
   showResultFeedback,
   onCloseResultFeedback,
+  difficulty,
 }) {
   const hasSummary = totalSummarySentences > 0;
   const canUseHint =
@@ -115,9 +116,24 @@ function GameView({
             >
               <Card elevation={0} sx={{ bgcolor: "transparent" }}>
                 <CardContent sx={{ p: 0 }}>
-                  <Typography variant="h5" gutterBottom>
-                    Who is this? 🔍
-                  </Typography>
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    alignItems="center"
+                    justifyContent="space-between"
+                    sx={{ mb: 2 }}
+                  >
+                    <Typography variant="h5" gutterBottom sx={{ m: 0 }}>
+                      Who is this? 🔍
+                    </Typography>
+                    {difficulty && (
+                      <Chip
+                        label={difficulty.toUpperCase()}
+                        color="primary"
+                        size="small"
+                      />
+                    )}
+                  </Stack>
 
                   {/* Wikipedia API Integration */}
                   <Typography variant="h6" component="h2" gutterBottom>

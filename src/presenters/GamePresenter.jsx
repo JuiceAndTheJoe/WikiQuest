@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GameView from "../views/GameView.jsx";
+import { getDifficulty } from "../app/features/game/gameUtils";
 
 const removeDiacritics = (value) =>
   value ? value.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : value;
@@ -58,6 +59,11 @@ function GamePresenter({
   const navigate = useNavigate();
   const [userGuess, setUserGuess] = useState("");
   const [showResultFeedback, setShowResultFeedback] = useState(false);
+
+  // Memoize difficulty to ensure it updates when level changes
+  const difficulty = useMemo(() => {
+    return getDifficulty(gameState?.level || 1);
+  }, [gameState?.level]);
 
   useEffect(() => {
     if (gameStatus === "game_over") {
@@ -161,6 +167,7 @@ function GamePresenter({
       wikipediaError={wikipediaError}
       showResultFeedback={showResultFeedback}
       onCloseResultFeedback={handleCloseResultFeedback}
+      difficulty={difficulty}
     />
   );
 }
