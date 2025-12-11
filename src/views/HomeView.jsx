@@ -44,7 +44,7 @@ function MenuView({
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
       {/* Animated Background */}
       <ColorBends
-        colors={["#d80000ff", "#00a90eff", "#0010bdff"]}
+        colors={["#420056ff", "#006cf0ff", "#6a00bbff"]}
         rotation={30}
         speed={0.3}
         scale={1.2}
@@ -77,7 +77,7 @@ function MenuView({
                 borderColor="#42a5f5"
                 glowColor="rgba(66, 165, 245, 0.6)"
                 animationDuration={0.8}
-                pauseBetweenAnimations={1.2}
+                pauseBetweenAnimations={1.7}
                 gap="0"
               />
             </Box>

@@ -99,6 +99,11 @@ const TrueFocus = ({
 
       <motion.div
         className="focus-frame"
+        initial={{
+          x: containerRef.current?.offsetWidth || 500,
+          y: -50,
+          opacity: 1,
+        }}
         animate={{
           x: focusRect.x,
           y: focusRect.y,
