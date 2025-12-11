@@ -5,7 +5,9 @@ import {
   MAX_LIVES,
 } from "../app/features/game/gameConstants";
 import {
+  advanceToNextQuestion,
   loadSavedGame,
+  skipQuestion,
   startNewGame,
   submitGuess,
   useHint,
@@ -127,7 +129,8 @@ const mapState = (state) => {
 const mapDispatch = (dispatch) => ({
   onSubmitGuess: (guess) => dispatch(submitGuess(guess)),
   onUseHint: () => dispatch(useHint()),
-  onNextQuestion: () => dispatch(startNewGame()),
+  onSkipQuestion: () => dispatch(skipQuestion()),
+  onNextQuestion: () => dispatch(advanceToNextQuestion()),
   startNewGame: () => dispatch(startNewGame()),
   loadSavedGame: (userId) => dispatch(loadSavedGame(userId)),
   fetchPage: (title) => dispatch(fetchWikipediaPage(title)),

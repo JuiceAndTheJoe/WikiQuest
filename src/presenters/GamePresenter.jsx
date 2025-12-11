@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import GameView from "../views/GameView";
+import GameView from "../views/GameView.jsx";
 
 const removeDiacritics = (value) =>
   value ? value.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : value;
@@ -49,6 +49,7 @@ function GamePresenter({
   lastResult,
   onSubmitGuess,
   onUseHint,
+  onSkipQuestion,
   onNextQuestion,
   gameStatus,
   hasAttemptedLoad,
@@ -56,6 +57,7 @@ function GamePresenter({
 }) {
   const navigate = useNavigate();
   const [userGuess, setUserGuess] = useState("");
+  const [showResultFeedback, setShowResultFeedback] = useState(false);
 
   useEffect(() => {
     if (gameStatus === "game_over") {
@@ -63,12 +65,32 @@ function GamePresenter({
     }
   }, [gameStatus, navigate]);
 
+  useEffect(() => {
+    if (lastResult) {
+      setShowResultFeedback(true);
+    }
+  }, [lastResult]);
+
+  useEffect(() => {
+    if (showResultFeedback) {
+      const timer = setTimeout(() => {
+        handleCloseResultFeedback();
+      }, 2500); // Auto-close after 2.5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [showResultFeedback]);
+
   const handleGuessChange = (guess) => setUserGuess(guess);
 
   const handleSubmitGuess = () => {
     if (!userGuess?.trim()) return;
     onSubmitGuess(userGuess.trim());
     setUserGuess("");
+  };
+
+  const handleSkipQuestion = () => {
+    onSkipQuestion();
   };
 
   const handleUseHint = () => {
@@ -84,6 +106,11 @@ function GamePresenter({
 
   const handleBackToHome = () => {
     navigate("/");
+  };
+
+  const handleCloseResultFeedback = () => {
+    setShowResultFeedback(false);
+    handleNextQuestion();
   };
 
   const { summary } = useMemo(() => {
@@ -122,6 +149,7 @@ function GamePresenter({
       onGuessChange={handleGuessChange}
       onSubmitGuess={handleSubmitGuess}
       onUseHint={handleUseHint}
+      onSkipQuestion={handleSkipQuestion}
       onNextQuestion={handleNextQuestion}
       onBackToHome={handleBackToHome}
       lastResult={lastResult}
@@ -131,6 +159,8 @@ function GamePresenter({
       hintsUsed={hints?.usedHints || 0}
       wikipediaLoading={wikipediaLoading}
       wikipediaError={wikipediaError}
+      showResultFeedback={showResultFeedback}
+      onCloseResultFeedback={handleCloseResultFeedback}
     />
   );
 }
