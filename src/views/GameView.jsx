@@ -34,14 +34,23 @@ function GameView({
   lastResult,
   wikipediaSummary,
   revealedSummarySentences,
+  totalSummarySentences,
   hintsUsed,
   wikipediaLoading,
   wikipediaError,
-  hasSummary,
-  canUseHint,
-  isGameOver,
-  blurAmount,
 }) {
+  const hasSummary = totalSummarySentences > 0;
+  const canUseHint =
+    hasSummary && hints && hints.availableHints > hints.usedHints;
+  const isGameOver = gameState?.lives <= 0;
+
+  const getBlurAmount = () => {
+    if (hintsUsed === 0) return 8;
+    if (hintsUsed === 1) return 5;
+    if (hintsUsed === 2) return 2;
+    return 0;
+  };
+
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
       {/* Animated Background */}
@@ -157,7 +166,7 @@ function GameView({
                                 WebkitUserSelect: "none",
                                 MozUserSelect: "none",
                                 msUserSelect: "none",
-                                filter: `blur(${blurAmount}px)`,
+                                filter: `blur(${getBlurAmount()}px)`,
                                 transition: "filter 0.3s ease",
                               }}
                             />
