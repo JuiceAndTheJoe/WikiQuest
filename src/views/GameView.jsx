@@ -467,24 +467,51 @@ function GameView({
                               />
                             ))}
                           </Stack>
-                          <Stack direction="row" spacing={2}>
+                          <Stack
+                            direction="row"
+                            sx={{
+                              width: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
                             <Box>
                               <Typography variant="h6">
                                 Score: {gameState?.score || 0}
                               </Typography>
-                            </Box>
-                            <Box>
                               <Typography variant="h6">
                                 🔥 {gameState?.streak || 0}
                               </Typography>
                             </Box>
                             {gameState?.streak >= 5 && (
-                              <Chip
-                                label={`${gameState?.streak >= 7 ? "2x" : "1.5x"} Multiplier`}
-                                color="success"
-                                size="small"
-                                sx={{ fontWeight: "bold" }}
-                              />
+                              <Box
+                                sx={{
+                                  marginLeft: "auto",
+                                }}
+                              >
+                                <Typography
+                                  variant="h2"
+                                  sx={{
+                                    fontWeight: "bold",
+                                    color:
+                                      gameState?.streak >= 7
+                                        ? "#ff9500"
+                                        : "#d4e157",
+                                    textShadow:
+                                      gameState?.streak >= 7
+                                        ? "0 0 10px rgba(255, 149, 0, 0.6)"
+                                        : "0 0 10px rgba(212, 225, 87, 0.6)",
+                                    animation:
+                                      "pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                                    "@keyframes pulse": {
+                                      "0%, 100%": { opacity: 1 },
+                                      "50%": { opacity: 0.7 },
+                                    },
+                                  }}
+                                >
+                                  {gameState?.streak >= 7 ? "2x" : "1.5x"}
+                                </Typography>
+                              </Box>
                             )}
                           </Stack>
                         </Stack>
