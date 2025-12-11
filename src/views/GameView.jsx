@@ -503,7 +503,9 @@ function GameView({
             >
               {lastResult.correct
                 ? `+${lastResult.scoreDelta} points`
-                : `${lastResult.scoreDelta * 10} points`}
+                : lastResult.guess === "[SKIPPED]"
+                  ? `${lastResult.scoreDelta * 10} points`
+                  : `${lastResult.scoreDelta} points`}
             </Typography>
             <Button
               variant="contained"
