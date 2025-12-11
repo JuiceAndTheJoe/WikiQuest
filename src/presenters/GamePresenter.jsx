@@ -71,6 +71,16 @@ function GamePresenter({
     }
   }, [lastResult]);
 
+  useEffect(() => {
+    if (showResultFeedback) {
+      const timer = setTimeout(() => {
+        handleCloseResultFeedback();
+      }, 2500); // Auto-close after 2.5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [showResultFeedback]);
+
   const handleGuessChange = (guess) => setUserGuess(guess);
 
   const handleSubmitGuess = () => {
