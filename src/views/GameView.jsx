@@ -478,6 +478,14 @@ function GameView({
                                 🔥 {gameState?.streak || 0}
                               </Typography>
                             </Box>
+                            {gameState?.streak >= 5 && (
+                              <Chip
+                                label={`${gameState?.streak >= 7 ? "2x" : "1.5x"} Multiplier`}
+                                color="success"
+                                size="small"
+                                sx={{ fontWeight: "bold" }}
+                              />
+                            )}
                           </Stack>
                         </Stack>
                         <Chip
@@ -868,7 +876,7 @@ function GameView({
               }}
             >
               {lastResult.correct
-                ? `+${lastResult.scoreDelta} points`
+                ? `+${lastResult.scoreDelta} points${lastResult.streakMultiplier > 1 ? ` (${lastResult.streakMultiplier}x)` : ""}`
                 : lastResult.guess === "[SKIPPED]"
                   ? `${lastResult.scoreDelta * 10} points`
                   : `${lastResult.scoreDelta} points`}
