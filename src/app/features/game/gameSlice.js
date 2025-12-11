@@ -196,11 +196,8 @@ const gameSlice = createSlice({
         state.level = (state.level || 1) + 1;
         // update highScore
         state.highScore = Math.max(state.highScore || 0, state.level - 1);
-        // pick next celeb based on new level
-        state.currentCeleb = pickRandom(poolForLevel(state.level));
+        // DON'T pick next celeb here - wait for advanceToNextQuestion
         state.lastAnsweredCeleb = rawTarget;
-        state.currentQuestionStartTime = Date.now();
-        state.hintsUsedThisQuestion = 0;
       } else {
         // wrong guess
         state.lastGuessResult = "wrong";
@@ -215,10 +212,8 @@ const gameSlice = createSlice({
           state.completedRuns = (state.completedRuns || 0) + 1;
           // keep currentCeleb for review
         } else {
+          // DON'T pick next celeb here - wait for advanceToNextQuestion
           state.lastAnsweredCeleb = rawTarget;
-          state.currentCeleb = pickRandom(poolForLevel(state.level));
-          state.currentQuestionStartTime = Date.now();
-          state.hintsUsedThisQuestion = 0;
         }
       }
 
@@ -239,6 +234,13 @@ const gameSlice = createSlice({
       if (state.hintsUsedThisQuestion >= MAX_HINTS_PER_QUESTION) return;
       state.hintsUsedThisQuestion += 1;
       state.totalHintsUsed = (state.totalHintsUsed || 0) + 1;
+    },
+    advanceToNextQuestion(state) {
+      if (!state.inGame) return;
+      if (state.lives <= 0) return; // Don't advance if game is over
+      state.currentCeleb = pickRandom(poolForLevel(state.level));
+      state.currentQuestionStartTime = Date.now();
+      state.hintsUsedThisQuestion = 0;
     },
     setSavedGameFlag(state, action) {
       state.hasSavedGame = action.payload;
@@ -290,6 +292,7 @@ export const {
   continueGame,
   submitGuess,
   useHint,
+  advanceToNextQuestion,
   setSavedGameFlag,
   resumeGame,
   updateLeaderboard,
