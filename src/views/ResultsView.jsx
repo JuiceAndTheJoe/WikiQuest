@@ -26,6 +26,7 @@ import {
   Cancel,
   AccountCircle,
 } from "@mui/icons-material";
+import ColorBends from "../components/background/ColorBends";
 
 function ResultsView({
   gameStats,
@@ -54,7 +55,30 @@ function ResultsView({
       : 0;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Box sx={{ position: "relative", minHeight: "100vh" }}>
+      {/* Animated Background */}
+      <ColorBends
+        colors={["#420056ff", "#006cf0ff", "#6a00bbff"]}
+        rotation={30}
+        speed={0.3}
+        scale={1.2}
+        frequency={1.4}
+        warpStrength={1.2}
+        mouseInfluence={0.8}
+        parallax={0.6}
+        noise={0}
+        transparent={false}
+        sx={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          zIndex: -1,
+        }}
+      />
+
+      <Container maxWidth="lg" sx={{ py: 4, position: "relative", zIndex: 1 }}>
       <Stack spacing={4}>
         {/* Header */}
         <Box sx={{ textAlign: "center" }}>
@@ -92,7 +116,14 @@ function ResultsView({
         >
           {/* Game Statistics */}
           <Box>
-            <Card elevation={3}>
+            <Card
+              elevation={3}
+              sx={{
+                bgcolor: "rgba(255, 255, 255, 0.08)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                backdropFilter: "blur(10px)",
+              }}
+            >
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h5" gutterBottom>
                   Game Statistics
@@ -109,7 +140,11 @@ function ResultsView({
                   <Box>
                     <Paper
                       elevation={1}
-                      sx={{ p: 2, bgcolor: "background.default" }}
+                      sx={{
+                        p: 2,
+                        bgcolor: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                      }}
                     >
                       <Stack spacing={2}>
                         <Box display="flex" justifyContent="space-between">
@@ -152,7 +187,11 @@ function ResultsView({
                   <Box>
                     <Paper
                       elevation={1}
-                      sx={{ p: 2, bgcolor: "background.default" }}
+                      sx={{
+                        p: 2,
+                        bgcolor: "rgba(255, 255, 255, 0.05)",
+                        border: "1px solid rgba(255, 255, 255, 0.1)",
+                      }}
                     >
                       <Stack spacing={2}>
                         <Box display="flex" justifyContent="space-between">
@@ -210,9 +249,14 @@ function ResultsView({
                           sx={{
                             p: 2,
                             bgcolor: question.correct
-                              ? "success.light"
-                              : "error.light",
-                            opacity: 0.8,
+                              ? "rgba(0, 169, 14, 0.15)"
+                              : "rgba(216, 0, 0, 0.15)",
+                            border: `1px solid ${
+                              question.correct
+                                ? "rgba(0, 169, 14, 0.3)"
+                                : "rgba(216, 0, 0, 0.3)"
+                            }`,
+                            opacity: 1,
                           }}
                         >
                           <Stack
@@ -260,7 +304,14 @@ function ResultsView({
           <Box>
             <Stack spacing={2}>
               {/* Overall User Stats */}
-              <Card elevation={2}>
+              <Card
+                elevation={2}
+                sx={{
+                  bgcolor: "rgba(255, 255, 255, 0.08)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  backdropFilter: "blur(10px)",
+                }}
+              >
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     Overall Statistics
@@ -302,7 +353,11 @@ function ResultsView({
                     <LinearProgress
                       variant="determinate"
                       value={((userStats?.highScore || 0) % 1000) / 10}
-                      sx={{ height: 8, borderRadius: 4 }}
+                      sx={{
+                        height: 8,
+                        borderRadius: 4,
+                        bgcolor: "rgba(255, 255, 255, 0.1)",
+                      }}
                     />
                   </Box>
                 </CardContent>
@@ -365,7 +420,8 @@ function ResultsView({
           </Box>
         </Box>
       </Stack>
-    </Container>
+      </Container>
+    </Box>
   );
 }
 
