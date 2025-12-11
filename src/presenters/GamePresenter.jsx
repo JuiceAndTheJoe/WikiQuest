@@ -16,19 +16,17 @@ const stripNameFromText = (text, name) => {
   for (const part of parts) {
     const re = new RegExp(
       `\\b${part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
-      "giu",
+      "giu"
     );
     sanitized = sanitized.replace(re, (match) => redactWord(match));
   }
-  return sanitized.replace(/\s{2,}/g, " ").trim();
+  return sanitized.trim();
 };
 
 const splitIntoSentences = (text) => {
   if (!text) return [];
-  const sentences = text.replace(/\s+/g, " ").match(/[^.!?]+[.!?]?/g);
-  return sentences
-    ? sentences.map((sentence) => sentence.trim()).filter(Boolean)
-    : [];
+  const paragraphs = text.split(/\n\n+/);
+  return paragraphs.map((para) => para.trim()).filter(Boolean);
 };
 
 const computeRevealCount = (hintsUsed, totalSentences) => {
@@ -120,8 +118,10 @@ function GamePresenter({
   }, [wikipediaData]);
 
   const sanitizedSummaryText = useMemo(() => {
-    if (!currentQuestion || !summary?.extract) return "";
-    return stripNameFromText(summary.extract, currentQuestion.person);
+    if (!currentQuestion) return "";
+    const sourceText = summary?.fullContent || summary?.extract || "";
+    if (!sourceText) return "";
+    return stripNameFromText(sourceText, currentQuestion.person);
   }, [summary, currentQuestion]);
 
   const summarySentences = useMemo(() => {
@@ -131,7 +131,7 @@ function GamePresenter({
   const revealedSummarySentences = useMemo(() => {
     const revealCount = computeRevealCount(
       hints?.usedHints || 0,
-      summarySentences.length,
+      summarySentences.length
     );
     return summarySentences.slice(0, revealCount);
   }, [summarySentences, hints?.usedHints]);

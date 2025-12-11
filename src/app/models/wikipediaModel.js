@@ -5,7 +5,7 @@
  */
 
 import { apiCall } from "../api";
-import { WIKIPEDIA_API_BASE } from "./constants";
+import { DETAILED_WIKIPEDIA_API_BASE, WIKIPEDIA_API_BASE } from "./constants";
 
 /**
  * Convert image URL to Base64 data URL to prevent URL inspection
@@ -30,6 +30,91 @@ async function convertImageToBase64(imageUrl) {
 }
 
 /**
+ * Remove all '{{...}}' templates from input string, handling nested templates
+ * @param {string} input - The input string
+ * @returns {string} - The cleaned string
+ */
+function removeTemplates(input) {
+  let out = "";
+  let depth = 0;
+
+  for (let i = 0; i < input.length; i++) {
+    if (input.startsWith("{{", i)) {
+      depth++;
+      i++;
+      continue;
+    }
+    if (input.startsWith("}}", i)) {
+      depth--;
+      i++;
+      continue;
+    }
+    if (depth === 0) out += input[i];
+  }
+
+  return out;
+}
+
+/**
+ * Remove <ref>...</ref> and self-closing <ref .../> tags from input
+ *
+ * @param {string} input - The input string
+ * @returns {string} - The cleaned string
+ */
+function removeRefs(input) {
+  input = input.replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, "");
+  return input.replace(/<ref[^>]*\/>/gi, "");
+}
+
+/**
+ * Remove HTML tags from input string
+ * @param {string} input - The input string
+ * @returns {string} - The cleaned string
+ */
+function removeHtmlTags(input) {
+  return input.replace(/<[^>]+>/g, "");
+}
+
+/**
+ * Decode HTML entities in input string
+ * @param {string} input - The input string
+ * @returns {string} - The decoded string
+ */
+function decodeEntities(input) {
+  return input
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
+/**
+ * Clean Wikipedia wikitext to extract plain summary
+ * @param {string} wikiText - The raw wikitext from Wikipedia
+ * @returns {string} - The cleaned plain text summary
+ */
+function cleanWikitext(wikiText) {
+  const text = wikiText;
+
+  const parts = text.split("\n\n");
+  let newText = parts.slice(1, 4).join("\n\n");
+
+  newText = removeTemplates(newText);
+  newText = removeRefs(newText);
+  newText = removeHtmlTags(newText);
+  newText = newText.replace(/'{2,}/g, "");
+  newText = newText.replace(/==+[^=]+==+/g, "");
+  newText = newText
+    .replace(/\[\[[^|\]]*\|([^\]]+)\]\]/g, "$1")
+    .replace(/\[\[([^\]]+)\]\]/g, "$1");
+  newText = decodeEntities(newText).trim();
+
+  return newText;
+}
+
+/**
  * Fetch page summary from Wikipedia
  *
  * @param {string} title - The title of the Wikipedia page
@@ -41,16 +126,22 @@ async function convertImageToBase64(imageUrl) {
 export async function getPageSummary(title, signal) {
   try {
     const encodedTitle = encodeURIComponent(title);
+
+    const detailed_url = `${DETAILED_WIKIPEDIA_API_BASE}/page/${encodedTitle}`;
     const url = `${WIKIPEDIA_API_BASE}/page/summary/${encodedTitle}`;
+
+    const detailedData = await apiCall(detailed_url, true, signal);
     const data = await apiCall(url, true, signal);
 
     // Convert thumbnail to Base64 to prevent URL inspection cheating
-    if (data.thumbnail && data.thumbnail.source) {
+    if (data.thumbnail?.source) {
       const base64Image = await convertImageToBase64(data.thumbnail.source);
       if (base64Image) {
         data.thumbnail.source = base64Image;
       }
     }
+
+    data.fullContent = cleanWikitext(detailedData.source);
 
     return data;
   } catch (error) {
