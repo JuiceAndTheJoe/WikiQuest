@@ -13,6 +13,8 @@ import {
   Chip,
   CircularProgress,
   Container,
+  Dialog,
+  DialogContent,
   Divider,
   LinearProgress,
   Paper,
@@ -38,6 +40,8 @@ function GameView({
   hintsUsed,
   wikipediaLoading,
   wikipediaError,
+  showResultFeedback,
+  onCloseResultFeedback,
 }) {
   const hasSummary = totalSummarySentences > 0;
   const canUseHint =
@@ -364,17 +368,6 @@ function GameView({
                         </Button>
                       )}
                     </Stack>
-
-                    {/* Last Result Feedback */}
-                    {lastResult && (
-                      <Alert
-                        severity={lastResult.correct ? "success" : "error"}
-                      >
-                        {lastResult.correct
-                          ? `Correct! +${lastResult.scoreDelta} points`
-                          : `Wrong! The answer was: ${lastResult.correctAnswer}`}
-                      </Alert>
-                    )}
                   </Stack>
                 </CardContent>
               </Card>
@@ -382,6 +375,85 @@ function GameView({
           </Box>
         </Stack>
       </Container>
+
+      {/* Last Result Feedback Modal */}
+      {lastResult && (
+        <Dialog
+          open={showResultFeedback}
+          onClose={onCloseResultFeedback}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              boxShadow: 6,
+              backgroundColor: lastResult.correct
+                ? "rgba(0, 169, 14, 0.2)"
+                : "rgba(216, 0, 0, 0.2)",
+            },
+          }}
+        >
+          <DialogContent
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 3,
+              py: 6,
+              px: 4,
+              textAlign: "center",
+            }}
+          >
+            {wikipediaSummary?.thumbnail && (
+              <Box
+                component="img"
+                src={wikipediaSummary.thumbnail.source}
+                alt="Celebrity"
+                sx={{
+                  maxWidth: "280px",
+                  maxHeight: "280px",
+                  borderRadius: 2,
+                  mb: 2,
+                  border: "3px solid white",
+                  boxShadow: 3,
+                }}
+              />
+            )}
+            <Typography
+              variant="h3"
+              sx={{
+                fontWeight: "bold",
+                color: "white",
+              }}
+            >
+              {lastResult.correct ? "Correct!" : "Wrong!"}
+            </Typography>
+            <Typography
+              variant="h5"
+              sx={{
+                color: "rgba(255, 255, 255, 0.9)",
+              }}
+            >
+              {lastResult.correct
+                ? `+${lastResult.scoreDelta} points`
+                : `The answer was: ${lastResult.correctAnswer}`}
+            </Typography>
+            <Button
+              variant="contained"
+              color={lastResult.correct ? "success" : "error"}
+              size="large"
+              onClick={onCloseResultFeedback}
+              sx={{
+                mt: 2,
+                px: 4,
+              }}
+            >
+              Continue
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </Box>
   );
 }

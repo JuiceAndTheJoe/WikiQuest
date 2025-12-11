@@ -56,12 +56,19 @@ function GamePresenter({
 }) {
   const navigate = useNavigate();
   const [userGuess, setUserGuess] = useState("");
+  const [showResultFeedback, setShowResultFeedback] = useState(false);
 
   useEffect(() => {
     if (gameStatus === "game_over") {
       navigate("/results");
     }
   }, [gameStatus, navigate]);
+
+  useEffect(() => {
+    if (lastResult) {
+      setShowResultFeedback(true);
+    }
+  }, [lastResult]);
 
   const handleGuessChange = (guess) => setUserGuess(guess);
 
@@ -84,6 +91,11 @@ function GamePresenter({
 
   const handleBackToHome = () => {
     navigate("/");
+  };
+
+  const handleCloseResultFeedback = () => {
+    setShowResultFeedback(false);
+    handleNextQuestion();
   };
 
   const { summary } = useMemo(() => {
@@ -131,6 +143,8 @@ function GamePresenter({
       hintsUsed={hints?.usedHints || 0}
       wikipediaLoading={wikipediaLoading}
       wikipediaError={wikipediaError}
+      showResultFeedback={showResultFeedback}
+      onCloseResultFeedback={handleCloseResultFeedback}
     />
   );
 }
