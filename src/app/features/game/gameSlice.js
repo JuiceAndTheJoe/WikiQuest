@@ -273,7 +273,7 @@ const gameSlice = createSlice({
 
       // Deduct score and life
       state.lastGuessResult = "skipped";
-      state.score = Math.max(0, (state.score || 0) + WRONG_ANSWER_PENALTY);
+      state.score = Math.max(0, (state.score || 0) + WRONG_ANSWER_PENALTY * 10);
       state.streak = 0;
       state.lives = Math.max(0, (state.lives || 0) - 1);
 
