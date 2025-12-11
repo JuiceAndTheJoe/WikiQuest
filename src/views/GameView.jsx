@@ -401,22 +401,24 @@ function GameView({
               onCloseResultFeedback();
             }
           }}
-          PaperProps={{
-            sx: {
-              borderRadius: 3,
-              boxShadow: 6,
-              border: "1px solid rgba(255, 255, 255, 0.2)",
-              backgroundColor:
-                lastResult.guess === "[SKIPPED]"
-                  ? "rgba(100, 100, 100, 0.3)"
-                  : lastResult.correct
-                    ? "rgba(0, 169, 14, 0.2)"
-                    : "rgba(216, 0, 0, 0.2)",
+          slotProps={{
+            paper: {
+              sx: {
+                borderRadius: 3,
+                boxShadow: 6,
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                backgroundColor:
+                  lastResult.guess === "[SKIPPED]"
+                    ? "rgba(100, 100, 100, 0.3)"
+                    : lastResult.correct
+                      ? "rgba(0, 169, 14, 0.2)"
+                      : "rgba(216, 0, 0, 0.2)",
+              },
             },
-          }}
-          BackdropProps={{
-            sx: {
-              backdropFilter: "blur(4px)",
+            backdrop: {
+              sx: {
+                backdropFilter: "blur(4px)",
+              },
             },
           }}
         >
