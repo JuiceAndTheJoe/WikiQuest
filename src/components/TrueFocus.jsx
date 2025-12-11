@@ -1,3 +1,6 @@
+// This component creates a focus effect where words in a sentence are highlighted one at a time.
+// Retrieved from ReactBits: https://reactbits.dev/components/true-focus
+
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import "./TrueFocus.css";
