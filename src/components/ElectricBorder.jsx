@@ -120,7 +120,7 @@ const ElectricBorder = ({
             <feTurbulence
               type="turbulence"
               baseFrequency="0.02"
-              numOctaves="10"
+              numOctaves="4"
               result="noise1"
               seed="1"
             />
@@ -137,7 +137,7 @@ const ElectricBorder = ({
             <feTurbulence
               type="turbulence"
               baseFrequency="0.02"
-              numOctaves="10"
+              numOctaves="4"
               result="noise2"
               seed="1"
             />
@@ -154,7 +154,7 @@ const ElectricBorder = ({
             <feTurbulence
               type="turbulence"
               baseFrequency="0.02"
-              numOctaves="10"
+              numOctaves="4"
               result="noise1"
               seed="2"
             />
@@ -171,7 +171,7 @@ const ElectricBorder = ({
             <feTurbulence
               type="turbulence"
               baseFrequency="0.02"
-              numOctaves="10"
+              numOctaves="4"
               result="noise2"
               seed="2"
             />

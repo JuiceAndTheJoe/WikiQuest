@@ -13,9 +13,9 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import QuestionCard from "./QuestionCard";
-import HintsPanel from "./HintsPanel";
-import CardWrapper from "./CardWrapper";
+import QuestionCard from "./components/QuestionCard";
+import HintsPanel from "./components/HintsPanel";
+import CardWrapper from "./components/CardWrapper";
 
 function GameView({
   gameState,

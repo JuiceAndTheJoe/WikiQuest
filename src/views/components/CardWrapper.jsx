@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Box } from "@mui/material";
-import ElectricBorder from "../components/ElectricBorder";
+import ElectricBorder from "../../components/ElectricBorder";
 
 const CardWrapper = memo(function CardWrapper({
   borderConfig,
