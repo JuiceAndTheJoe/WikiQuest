@@ -124,18 +124,6 @@ function ResultsView({
             <Typography variant="h4" color="primary" gutterBottom>
               Final Score: {gameStats?.score || 0}
             </Typography>
-            {newHighScore ? (
-              <Chip
-                icon={<EmojiEvents />}
-                label="New High Score!"
-                color="warning"
-                sx={{ fontSize: "1rem", py: 2 }}
-              />
-            ) : (
-              <Typography variant="body1" color="text.secondary">
-                Play again to beat your high score!
-              </Typography>
-            )}
           </Box>
 
           <Box
