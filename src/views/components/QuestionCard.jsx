@@ -112,26 +112,28 @@ const QuestionCard = memo(function QuestionCard({
                       Skip
                     </Button>
                   )}
+                  {wikipediaSummary.description && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ pt: 2 }}
+                    >
+                      {wikipediaSummary.description}
+                    </Typography>
+                  )}
                 </Stack>
                 {hintsUsed > 0 && (
-                  <>
-                    {wikipediaSummary.description && (
-                      <Typography variant="body2" color="text.secondary">
-                        {wikipediaSummary.description}
+                  <Stack spacing={1}>
+                    {revealedSummarySentences?.map((sentence, idx) => (
+                      <Typography
+                        key={`${sentence}-${idx}`}
+                        variant="body1"
+                        color="text.primary"
+                      >
+                        {sentence}
                       </Typography>
-                    )}
-                    <Stack spacing={1}>
-                      {revealedSummarySentences?.map((sentence, idx) => (
-                        <Typography
-                          key={`${sentence}-${idx}`}
-                          variant="body1"
-                          color="text.primary"
-                        >
-                          {sentence}
-                        </Typography>
-                      ))}
-                    </Stack>
-                  </>
+                    ))}
+                  </Stack>
                 )}
               </Stack>
             </Paper>
