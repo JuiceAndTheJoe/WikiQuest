@@ -129,50 +129,48 @@ const HintsPanel = memo(function HintsPanel({
                   🔥 {gameState?.streak || 0}
                 </Typography>
               </Box>
-              {gameState?.streak >= 2 && (
-                <Box
-                  sx={{
-                    marginLeft: "1rem",
-                  }}
-                >
-                  <Typography
-                    variant="h2"
-                    className={
-                      gameState?.streak >= 8
-                        ? "blink-rainbow-animation"
-                        : "pulse-animation"
-                    }
-                    sx={{
-                      fontWeight: "bold",
-                      color:
-                        gameState?.streak >= 8
-                          ? "#ff00ff"
-                          : gameState?.streak >= 7
-                            ? "#ff9500"
-                            : "#d4e157",
-                      textShadow:
-                        gameState?.streak >= 8
-                          ? "0 0 10px rgba(255, 0, 255, 0.8)"
-                          : gameState?.streak >= 7
-                            ? "0 0 10px rgba(255, 149, 0, 0.6)"
-                            : "0 0 10px rgba(212, 225, 87, 0.6)",
-                    }}
-                  >
-                    {gameState?.streak >= 8
-                      ? "3x 🚀"
-                      : gameState?.streak >= 4
-                        ? "2x"
-                        : "1.5x"}
-                  </Typography>
-                </Box>
-              )}
             </Stack>
           </Stack>
-          <Chip
-            icon={<Timer />}
-            label={`Question ${(gameState?.totalQuestions || 0) + 1}`}
-            color="primary"
-          />
+          <Stack direction="column" spacing={1} alignItems="flex-end">
+            <Chip
+              icon={<Timer />}
+              label={`Question ${(gameState?.totalQuestions || 0) + 1}`}
+              color="primary"
+            />
+            {gameState?.streak >= 2 && (
+              <Box>
+                <Typography
+                  variant="h2"
+                  className={
+                    gameState?.streak >= 8
+                      ? "blink-rainbow-animation"
+                      : "pulse-animation"
+                  }
+                  sx={{
+                    fontWeight: "bold",
+                    color:
+                      gameState?.streak >= 8
+                        ? "#ff00ff"
+                        : gameState?.streak >= 7
+                          ? "#ff9500"
+                          : "#d4e157",
+                    textShadow:
+                      gameState?.streak >= 8
+                        ? "0 0 10px rgba(255, 0, 255, 0.8)"
+                        : gameState?.streak >= 7
+                          ? "0 0 10px rgba(255, 149, 0, 0.6)"
+                          : "0 0 10px rgba(212, 225, 87, 0.6)",
+                  }}
+                >
+                  {gameState?.streak >= 8
+                    ? "3x 🚀"
+                    : gameState?.streak >= 4
+                      ? "2x"
+                      : "1.5x"}
+                </Typography>
+              </Box>
+            )}
+          </Stack>
         </Stack>
         <Stack spacing={1} sx={{ mb: 2 }}>
           <Box>
