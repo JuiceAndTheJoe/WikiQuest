@@ -1,6 +1,7 @@
 /**
  * GameView - Active quiz interface for WikiQuest
  * Pure component for displaying biography, hints, guess input, and score
+ * All logic and calculations are handled by GamePresenter
  */
 
 import { Home } from "@mui/icons-material";
@@ -37,51 +38,12 @@ function GameView({
   showResultFeedback,
   onCloseResultFeedback,
   difficulty,
+  borderConfig,
 }) {
   const hasSummary = totalSummarySentences > 0;
   const canUseHint =
     hasSummary && hints && hints.availableHints > hints.usedHints;
   const isGameOver = gameState?.lives <= 0;
-
-  // Calculate electric border intensity based on streak
-  const getElectricBorderConfig = (streak) => {
-    const currentStreak = streak || 0;
-
-    // Disabled for streak 0-2
-    if (currentStreak < 3) {
-      return { opacity: 0, speed: 0, chaos: 0, thickness: 0, color: "#7df9ff" };
-    }
-
-    // Mild at streak 3, scales up progressively, reaches max at streak 10
-    // streak 3: opacity 0.3, speed 0.5, chaos 0.2, color blue
-    // streak 5: opacity 0.5, speed 0.9, chaos 0.5, color cyan-green
-    // streak 7: opacity 0.7, speed 1.4, chaos 0.8, color yellow-orange
-    // streak 10+: opacity 1, speed 2, chaos 1, color red (MAX)
-
-    const normalizedStreak = Math.min(currentStreak - 3, 7) / 7; // 0-1 scale from streak 3-10
-
-    // Color progression: cyan/blue (200°) → green (120°) → yellow (60°) → orange (30°) → red (0°)
-    // Hue goes from 200 to 0 as normalizedStreak goes from 0 to 1
-    const hue = Math.round(200 * (1 - normalizedStreak));
-    const color = `hsl(${hue}, 100%, 50%)`;
-
-    return {
-      opacity: Math.min(0.3 + normalizedStreak * 0.7, 1),
-      speed: Math.min(0.5 + normalizedStreak * 1.8, 2),
-      chaos: Math.min(0.2 + normalizedStreak * 1.0, 1),
-      thickness: Math.min(1 + normalizedStreak * 1.5, 2.5),
-      color,
-    };
-  };
-
-  const borderConfig = getElectricBorderConfig(gameState?.streak);
-
-  const getBlurAmount = () => {
-    if (hintsUsed === 0) return 8;
-    if (hintsUsed === 1) return 5;
-    if (hintsUsed === 2) return 2;
-    return 0;
-  };
 
   return (
     <Box sx={{ position: "relative", minHeight: "100vh", bgcolor: "black" }}>
@@ -121,7 +83,6 @@ function GameView({
                 revealedSummarySentences={revealedSummarySentences}
                 onSkipQuestion={onSkipQuestion}
                 hints={hints}
-                getBlurAmount={getBlurAmount}
               />
             </CardWrapper>
 
