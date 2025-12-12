@@ -21,7 +21,6 @@ const QuestionCard = memo(function QuestionCard({
   revealedSummarySentences,
   onSkipQuestion,
   hints,
-  getBlurAmount,
 }) {
   // Memoize blur amount to prevent recalculation on every render
   const blurAmount = useMemo(() => {
