@@ -5,29 +5,8 @@
  */
 
 import { apiCall } from "../api";
-import { WIKIPEDIA_API_BASE } from "./constants";
-
-/**
- * Convert image URL to Base64 data URL to prevent URL inspection
- *
- * @param {string} imageUrl - The URL of the image to convert
- * @returns {Promise<string>} - Base64 data URL
- */
-async function convertImageToBase64(imageUrl) {
-  try {
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch (error) {
-    console.error("Error converting image to Base64:", error);
-    return null;
-  }
-}
+import { DETAILED_WIKIPEDIA_API_BASE, WIKIPEDIA_API_BASE } from "./constants";
+import { cleanWikitext, convertImageToBase64 } from "./wikipediaUtils";
 
 /**
  * Fetch page summary from Wikipedia
@@ -41,16 +20,22 @@ async function convertImageToBase64(imageUrl) {
 export async function getPageSummary(title, signal) {
   try {
     const encodedTitle = encodeURIComponent(title);
+
+    const detailed_url = `${DETAILED_WIKIPEDIA_API_BASE}/page/${encodedTitle}`;
     const url = `${WIKIPEDIA_API_BASE}/page/summary/${encodedTitle}`;
+
+    const detailedData = await apiCall(detailed_url, true, signal);
     const data = await apiCall(url, true, signal);
 
     // Convert thumbnail to Base64 to prevent URL inspection cheating
-    if (data.thumbnail && data.thumbnail.source) {
+    if (data.thumbnail?.source) {
       const base64Image = await convertImageToBase64(data.thumbnail.source);
       if (base64Image) {
         data.thumbnail.source = base64Image;
       }
     }
+
+    data.fullContent = cleanWikitext(detailedData.source);
 
     return data;
   } catch (error) {
