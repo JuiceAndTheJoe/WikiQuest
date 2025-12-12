@@ -91,6 +91,9 @@ function GamePresenter({
   const [userGuess, setUserGuess] = useState("");
   const [showResultFeedback, setShowResultFeedback] = useState(false);
 
+  // Extract streak value to ensure stable dependency
+  const currentStreak = gameState?.streak || 0;
+
   // Memoize difficulty to ensure it updates when level changes
   const difficulty = useMemo(() => {
     return getDifficulty(gameState?.level || 1);
@@ -98,8 +101,9 @@ function GamePresenter({
 
   // Memoize border config based on streak
   const borderConfig = useMemo(() => {
-    return getElectricBorderConfig(gameState?.streak);
-  }, [gameState?.streak]);
+    const config = getElectricBorderConfig(currentStreak);
+    return config;
+  }, [currentStreak]);
 
   useEffect(() => {
     if (gameStatus === "game_over") {

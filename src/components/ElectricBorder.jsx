@@ -84,15 +84,16 @@ const ElectricBorder = ({
 
   useEffect(() => {
     updateAnim();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [speed, chaos]);
+  }, [speed, chaos, thickness, color]);
 
   useLayoutEffect(() => {
     if (!rootRef.current) return;
     let resizeTimeout;
     const ro = new ResizeObserver(() => {
       clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(updateAnim, 100);
+      resizeTimeout = setTimeout(() => {
+        updateAnim();
+      }, 100);
     });
     ro.observe(rootRef.current);
     updateAnim();
@@ -100,8 +101,7 @@ const ElectricBorder = ({
       ro.disconnect();
       clearTimeout(resizeTimeout);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [speed, chaos, updateAnim]);
 
   const vars = {
     ["--electric-border-color"]: color,
