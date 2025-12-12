@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Lightbulb, Send, Timer, Favorite } from "@mui/icons-material";
-import "../components/ElectricBorder.css";
+import "../../components/ElectricBorder.css";
 
 const HintsPanel = memo(function HintsPanel({
   gameState,
