@@ -87,3 +87,56 @@
 .pulse-animation {
   animation: pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+@keyframes blink-rainbow {
+  0% {
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    opacity: 1;
+  }
+  12.5% {
+    color: #ff7f00;
+    text-shadow: 0 0 15px rgba(255, 127, 0, 0.8);
+    opacity: 0.9;
+  }
+  25% {
+    color: #ffff00;
+    text-shadow: 0 0 15px rgba(255, 255, 0, 0.8);
+    opacity: 1;
+  }
+  37.5% {
+    color: #00ff00;
+    text-shadow: 0 0 15px rgba(0, 255, 0, 0.8);
+    opacity: 0.9;
+  }
+  50% {
+    color: #00ffff;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+    opacity: 1;
+  }
+  62.5% {
+    color: #0000ff;
+    text-shadow: 0 0 15px rgba(0, 0, 255, 0.8);
+    opacity: 0.9;
+  }
+  75% {
+    color: #4b0082;
+    text-shadow: 0 0 15px rgba(75, 0, 130, 0.8);
+    opacity: 1;
+  }
+  87.5% {
+    color: #9400d3;
+    text-shadow: 0 0 15px rgba(148, 0, 211, 0.8);
+    opacity: 0.9;
+  }
+  100% {
+    color: #ff0000;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    opacity: 1;
+  }
+}
+
+.blink-rainbow-animation {
+  animation: blink-rainbow 0.6s linear infinite;
+  font-weight: bold;
+}

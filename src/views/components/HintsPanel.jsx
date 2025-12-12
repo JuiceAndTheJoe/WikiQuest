@@ -43,6 +43,22 @@ const HintsPanel = memo(function HintsPanel({
       )
     : 0;
 
+  // Calculate electric border color based on streak to match the border effect
+  const getTextboxColor = () => {
+    const streak = gameState?.streak || 0;
+    if (streak < 2) return null;
+    if (streak >= 8) {
+      // Rainbow color cycling to match the electric border
+      const time = Date.now() / 100;
+      const hue = time % 360;
+      return `hsl(${hue}, 100%, 50%)`;
+    }
+
+    const normalizedStreak = Math.min(streak - 2, 5) / 5; // 0-1 scale from streak 2-7
+    const hue = Math.round(200 * (1 - normalizedStreak));
+    return `hsl(${hue}, 100%, 50%)`;
+  };
+
   return (
     <Card elevation={0} sx={{ bgcolor: "transparent" }}>
       <CardContent sx={{ p: 0 }}>
@@ -78,7 +94,7 @@ const HintsPanel = memo(function HintsPanel({
                   🔥 {gameState?.streak || 0}
                 </Typography>
               </Box>
-              {gameState?.streak >= 5 && (
+              {gameState?.streak >= 2 && (
                 <Box
                   sx={{
                     marginLeft: "1rem",
@@ -86,17 +102,32 @@ const HintsPanel = memo(function HintsPanel({
                 >
                   <Typography
                     variant="h2"
-                    className="pulse-animation"
+                    className={
+                      gameState?.streak >= 8
+                        ? "blink-rainbow-animation"
+                        : "pulse-animation"
+                    }
                     sx={{
                       fontWeight: "bold",
-                      color: gameState?.streak >= 7 ? "#ff9500" : "#d4e157",
+                      color:
+                        gameState?.streak >= 8
+                          ? "#ff00ff"
+                          : gameState?.streak >= 7
+                            ? "#ff9500"
+                            : "#d4e157",
                       textShadow:
-                        gameState?.streak >= 7
-                          ? "0 0 10px rgba(255, 149, 0, 0.6)"
-                          : "0 0 10px rgba(212, 225, 87, 0.6)",
+                        gameState?.streak >= 8
+                          ? "0 0 10px rgba(255, 0, 255, 0.8)"
+                          : gameState?.streak >= 7
+                            ? "0 0 10px rgba(255, 149, 0, 0.6)"
+                            : "0 0 10px rgba(212, 225, 87, 0.6)",
                     }}
                   >
-                    {gameState?.streak >= 7 ? "2x" : "1.5x"}
+                    {gameState?.streak >= 8
+                      ? "3x 🚀"
+                      : gameState?.streak >= 4
+                        ? "2x"
+                        : "1.5x"}
                   </Typography>
                 </Box>
               )}
@@ -172,6 +203,45 @@ const HintsPanel = memo(function HintsPanel({
             onKeyDown={(e) => e.key === "Enter" && onSubmitGuess()}
             disabled={isGameOver}
             variant="outlined"
+            sx={{
+              "& .MuiFormLabel-root": {
+                color:
+                  gameState?.streak >= 4
+                    ? getTextboxColor
+                    : "rgba(255, 255, 255, 0.7)",
+                "&.Mui-focused": {
+                  color:
+                    gameState?.streak >= 4
+                      ? getTextboxColor
+                      : "rgba(255, 255, 255, 0.7)",
+                },
+              },
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor:
+                    gameState?.streak >= 4
+                      ? getTextboxColor
+                      : "rgba(255, 255, 255, 0.23)",
+                  borderWidth: gameState?.streak >= 4 ? "2px" : "1px",
+                },
+                "&:hover fieldset": {
+                  borderColor:
+                    gameState?.streak >= 4
+                      ? getTextboxColor
+                      : "rgba(255, 255, 255, 0.4)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor:
+                    gameState?.streak >= 4
+                      ? getTextboxColor
+                      : "rgba(255, 255, 255, 0.87)",
+                  boxShadow:
+                    gameState?.streak >= 4
+                      ? `0 0 15px ${getTextboxColor}66, inset 0 0 10px ${getTextboxColor}33`
+                      : "none",
+                },
+              },
+            }}
           />
 
           <Stack direction="row" spacing={2}>

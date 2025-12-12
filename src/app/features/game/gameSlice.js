@@ -167,9 +167,11 @@ const gameSlice = createSlice({
       // Calculate streak multiplier
       let streakMultiplier = 1;
       const currentStreak = state.streak || 0;
-      if (currentStreak >= 7) {
+      if (currentStreak >= 8) {
+        streakMultiplier = 3;
+      } else if (currentStreak >= 4) {
         streakMultiplier = 2;
-      } else if (currentStreak >= 5) {
+      } else if (currentStreak >= 2) {
         streakMultiplier = 1.5;
       }
 

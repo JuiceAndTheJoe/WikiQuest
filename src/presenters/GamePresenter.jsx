@@ -43,18 +43,35 @@ const computeRevealCount = (hintsUsed, totalSentences) => {
 const getElectricBorderConfig = (streak) => {
   const currentStreak = streak || 0;
 
-  // Disabled for streak 0-2
-  if (currentStreak < 3) {
+  // Disabled for streak 0-1
+  if (currentStreak < 2) {
     return { opacity: 0, speed: 0, chaos: 0, thickness: 0, color: "#7df9ff" };
   }
 
-  // Mild at streak 3, scales up progressively, reaches max at streak 10
-  // streak 3: opacity 0.3, speed 0.5, chaos 0.2, color blue
-  // streak 5: opacity 0.5, speed 0.9, chaos 0.5, color cyan-green
-  // streak 7: opacity 0.7, speed 1.4, chaos 0.8, color yellow-orange
-  // streak 10+: opacity 1, speed 2, chaos 1, color red (MAX)
+  // For streak 8+: Rainbow/blinking effect with max chaos and speed
+  if (currentStreak >= 8) {
+    // Rainbow color cycling
+    const time = Date.now() / 100; // Cycle through colors faster
+    const hue = time % 360;
+    const color = `hsl(${hue}, 100%, 50%)`;
 
-  const normalizedStreak = Math.min(currentStreak - 3, 7) / 7; // 0-1 scale from streak 3-10
+    return {
+      opacity: 1,
+      speed: 3, // Maximum chaos speed
+      chaos: 1.5, // Maximum chaos
+      thickness: 3,
+      color,
+      // Add blinking effect via opacity
+      animationOpacity: true,
+    };
+  }
+
+  // Mild at streak 2, scales up progressively, reaches max at streak 7
+  // streak 2: opacity 0.5, speed 1, chaos 0.5, color blue
+  // streak 4: opacity 0.6, speed 1.3, chaos 0.65, color cyan-green
+  // streak 7: opacity 0.85, speed 1.8, chaos 0.9, color red (MAX)
+
+  const normalizedStreak = Math.min(currentStreak - 2, 5) / 5; // 0-1 scale from streak 2-7
 
   // Color progression: cyan/blue (200°) → green (120°) → yellow (60°) → orange (30°) → red (0°)
   // Hue goes from 200 to 0 as normalizedStreak goes from 0 to 1
@@ -62,10 +79,10 @@ const getElectricBorderConfig = (streak) => {
   const color = `hsl(${hue}, 100%, 50%)`;
 
   return {
-    opacity: Math.min(0.3 + normalizedStreak * 0.7, 1),
-    speed: Math.min(0.5 + normalizedStreak * 1.8, 2),
-    chaos: Math.min(0.2 + normalizedStreak * 1.0, 1),
-    thickness: Math.min(1 + normalizedStreak * 1.5, 2.5),
+    opacity: Math.min(0.5 + normalizedStreak * 0.35, 1),
+    speed: Math.min(1 + normalizedStreak * 0.8, 1.8),
+    chaos: Math.min(0.5 + normalizedStreak * 0.4, 0.9),
+    thickness: Math.min(1.5 + normalizedStreak * 1.5, 3),
     color,
   };
 };
