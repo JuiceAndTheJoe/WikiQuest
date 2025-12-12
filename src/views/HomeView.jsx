@@ -26,6 +26,7 @@ import {
   Close,
 } from "@mui/icons-material";
 import ColorBends from "../components/background/ColorBends";
+import TrueFocus from "../components/TrueFocus";
 
 // Pure view: receives interaction handlers & data via props from Presenter.
 function MenuView({
@@ -43,7 +44,7 @@ function MenuView({
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
       {/* Animated Background */}
       <ColorBends
-        colors={["#d80000ff", "#00a90eff", "#0010bdff"]}
+        colors={["#420056ff", "#006cf0ff", "#6a00bbff"]}
         rotation={30}
         speed={0.3}
         scale={1.2}
@@ -67,23 +68,19 @@ function MenuView({
         <Stack spacing={4}>
           {/* Header */}
           <Box sx={{ textAlign: "center" }}>
-            <Typography
-              variant="h2"
-              component="h1"
-              gutterBottom
-              sx={{
-                fontWeight: "bold",
-                background: "linear-gradient(45deg, #4d77a1ff, #42a5f5)",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
-              <Quiz
-                sx={{ fontSize: "inherit", mr: 1, verticalAlign: "bottom" }}
+            <Box sx={{ mb: 3 }}>
+              <TrueFocus
+                sentence="WikiQuest"
+                words={["Wiki", "Quest"]}
+                manualMode={false}
+                blurAmount={8}
+                borderColor="#42a5f5"
+                glowColor="rgba(66, 165, 245, 0.6)"
+                animationDuration={0.8}
+                pauseBetweenAnimations={1.7}
+                gap="0"
               />
-              WikiQuest
-            </Typography>
+            </Box>
             <Typography variant="h5" color="text.secondary" gutterBottom>
               Guess famous people based on their Wikipedia biographies. Use
               hints wisely to maximize your score!

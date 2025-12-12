@@ -1,0 +1,14 @@
+.split-text-container {
+  display: inline-block;
+  word-break: break-word;
+  font-size: 4rem;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  white-space: pre-wrap;
+}
+
+.split-text-char {
+  display: inline-block;
+  will-change: transform, opacity;
+}
