@@ -64,41 +64,6 @@ function removeTemplates(input) {
 }
 
 /**
- * Remove <ref>...</ref> and self-closing <ref .../> tags from input
- *
- * @param {string} input - The input string
- * @returns {string} - The cleaned string
- */
-function removeRefs(input) {
-  input = input.replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, "");
-  return input.replace(/<ref[^>]*\/>/gi, "");
-}
-
-/**
- * Remove HTML tags from input string
- * @param {string} input - The input string
- * @returns {string} - The cleaned string
- */
-function removeHtmlTags(input) {
-  return input.replace(/<[^>]+>/g, "");
-}
-
-/**
- * Decode HTML entities in input string
- * @param {string} input - The input string
- * @returns {string} - The decoded string
- */
-function decodeEntities(input) {
-  return input
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&apos;/g, "'")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">");
-}
-
-/**
  * Clean Wikipedia wikitext to extract plain summary
  * @param {string} wikiText - The raw wikitext from Wikipedia
  * @returns {string} - The cleaned plain text summary
@@ -106,14 +71,17 @@ function decodeEntities(input) {
 export function cleanWikitext(wikiText) {
   const text = wikiText;
 
-  const parts = text.split("\n\n");
-  
-  let newText = parts.slice(1, 4).reverse().join("\n\n");
+  let newText = text.split("\n\n").slice(1, 4).reverse().join("\n\n");
 
   newText = parseDateTemplates(newText);
   newText = removeTemplates(newText);
-  newText = removeRefs(newText);
-  newText = removeHtmlTags(newText);
+
+  // Remove <ref>...</ref> and self-closing <ref/> tags with their content
+  newText = newText.replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, "");
+  newText = newText.replace(/<ref[^>]*\/>/gi, "");
+
+  // Remove only HTML tags, not their content
+  newText = newText.replace(/<[^>]+>/g, "");
 
   // Remove bold/italic markup: **text**, ''text''
   newText = newText.replace(/'{2,}/g, "");
@@ -126,7 +94,13 @@ export function cleanWikitext(wikiText) {
     .replace(/\[\[[^|\]]*\|([^\]]+)\]\]/g, "$1")
     .replace(/\[\[([^\]]+)\]\]/g, "$1");
 
-  newText = decodeEntities(newText);
+  // Decode HTML entities
+  newText = newText.replace(/&nbsp;/g, " ");
+  newText = newText.replace(/&amp;/g, "&");
+  newText = newText.replace(/&quot;/g, '"');
+  newText = newText.replace(/&apos;/g, "'");
+  newText = newText.replace(/&lt;/g, "<");
+  newText = newText.replace(/&gt;/g, ">");
 
   // Remove trailing semicolons after opening parentheses, common case: (; born 1900)
   newText = newText.replace(/\(\s*;/g, "(");
