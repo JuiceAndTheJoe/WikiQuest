@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import { memo, useMemo, useRef, useEffect } from "react";
 import {
   Box,
   Button,
@@ -25,6 +25,41 @@ const HintsPanel = memo(function HintsPanel({
   onUseHint,
   onNextQuestion,
 }) {
+  const textFieldRef = useRef(null);
+  const prevStreakRef = useRef(gameState?.streak || 0);
+  const hadFocusRef = useRef(false);
+
+  // Track if streak crosses threshold (4 or 8) and remember if textbox had focus
+  useEffect(() => {
+    const currentStreak = gameState?.streak || 0;
+    const prevStreak = prevStreakRef.current;
+
+    // Check if we're crossing a threshold where animation starts/stops
+    const crossesThreshold =
+      (prevStreak < 4 && currentStreak >= 4) || // Animation starts
+      (prevStreak >= 4 && currentStreak < 4) || // Animation stops
+      (prevStreak < 8 && currentStreak >= 8) || // Rainbow animation starts
+      (prevStreak >= 8 && currentStreak < 8); // Rainbow animation stops
+
+    if (crossesThreshold && !isGameOver) {
+      hadFocusRef.current = document.activeElement === textFieldRef.current;
+    }
+
+    prevStreakRef.current = currentStreak;
+  }, [gameState?.streak, isGameOver]);
+
+  // Re-focus if we were focused before threshold cross
+  useEffect(() => {
+    if (hadFocusRef.current && textFieldRef.current && !isGameOver) {
+      // Use setTimeout to ensure focus happens after re-render
+      const timer = setTimeout(() => {
+        textFieldRef.current?.focus();
+        hadFocusRef.current = false;
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [gameState?.streak, isGameOver]);
+
   // Memoize hearts array to prevent re-renders
   const hearts = useMemo(
     () => [...Array(gameState?.lives || 3)],
