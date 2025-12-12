@@ -81,15 +81,15 @@ const HintsPanel = memo(function HintsPanel({
   // Calculate electric border color based on streak to match the border effect
   const getTextboxColor = () => {
     const streak = gameState?.streak || 0;
-    if (streak < 2) return null;
-    if (streak >= 8) {
+    if (streak < 1) return null;
+    if (streak >= 6) {
       // Rainbow color cycling to match the electric border
       const time = Date.now() / 100;
       const hue = time % 360;
       return `hsl(${hue}, 100%, 50%)`;
     }
 
-    const normalizedStreak = Math.min(streak - 2, 5) / 5; // 0-1 scale from streak 2-7
+    const normalizedStreak = Math.min(streak - 1, 4) / 4; // 0-1 scale from streak 1-5
     const hue = Math.round(200 * (1 - normalizedStreak));
     return `hsl(${hue}, 100%, 50%)`;
   };
@@ -142,27 +142,27 @@ const HintsPanel = memo(function HintsPanel({
                 <Typography
                   variant="h2"
                   className={
-                    gameState?.streak >= 8
+                    gameState?.streak >= 6
                       ? "blink-rainbow-animation"
                       : "pulse-animation"
                   }
                   sx={{
                     fontWeight: "bold",
                     color:
-                      gameState?.streak >= 8
+                      gameState?.streak >= 6
                         ? "#ff00ff"
-                        : gameState?.streak >= 7
+                        : gameState?.streak >= 4
                           ? "#ff9500"
                           : "#d4e157",
                     textShadow:
-                      gameState?.streak >= 8
+                      gameState?.streak >= 6
                         ? "0 0 10px rgba(255, 0, 255, 0.8)"
-                        : gameState?.streak >= 7
+                        : gameState?.streak >= 4
                           ? "0 0 10px rgba(255, 149, 0, 0.6)"
                           : "0 0 10px rgba(212, 225, 87, 0.6)",
                   }}
                 >
-                  {gameState?.streak >= 8
+                  {gameState?.streak >= 6
                     ? "3x 🚀"
                     : gameState?.streak >= 4
                       ? "2x"
