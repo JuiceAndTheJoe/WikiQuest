@@ -81,7 +81,7 @@ const HintsPanel = memo(function HintsPanel({
               {gameState?.streak >= 5 && (
                 <Box
                   sx={{
-                    marginLeft: "auto",
+                    marginLeft: "1rem",
                   }}
                 >
                   <Typography
