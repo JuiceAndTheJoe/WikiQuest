@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import ResultsView from "../views/resultsView.jsx";
+import ResultsView from "../views/ResultsView.jsx";
 
 // Presenter for ResultsView: manages game results and navigation
 function ResultsPresenter({
