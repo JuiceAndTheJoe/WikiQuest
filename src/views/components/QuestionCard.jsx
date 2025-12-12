@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import {
   Box,
   Button,
@@ -23,6 +23,14 @@ const QuestionCard = memo(function QuestionCard({
   hints,
   getBlurAmount,
 }) {
+  // Memoize blur amount to prevent recalculation on every render
+  const blurAmount = useMemo(() => {
+    if (hintsUsed === 0) return 8;
+    if (hintsUsed === 1) return 5;
+    if (hintsUsed === 2) return 2;
+    return 0;
+  }, [hintsUsed]);
+
   return (
     <Card elevation={0} sx={{ bgcolor: "transparent" }}>
       <CardContent sx={{ p: 0 }}>
@@ -90,7 +98,7 @@ const QuestionCard = memo(function QuestionCard({
                         WebkitUserSelect: "none",
                         MozUserSelect: "none",
                         msUserSelect: "none",
-                        filter: `blur(${getBlurAmount()}px)`,
+                        filter: `blur(${blurAmount}px)`,
                         transition: "filter 0.3s ease",
                       }}
                     />

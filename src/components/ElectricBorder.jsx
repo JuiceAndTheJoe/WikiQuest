@@ -89,10 +89,17 @@ const ElectricBorder = ({
 
   useLayoutEffect(() => {
     if (!rootRef.current) return;
-    const ro = new ResizeObserver(() => updateAnim());
+    let resizeTimeout;
+    const ro = new ResizeObserver(() => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(updateAnim, 100);
+    });
     ro.observe(rootRef.current);
     updateAnim();
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      clearTimeout(resizeTimeout);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
