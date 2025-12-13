@@ -8,7 +8,10 @@ import {
   signInAnonymously,
 } from "firebase/auth";
 import { auth } from "../../../firebaseConfig";
-import { migrateAnonymousData } from "../../models/leaderboardModel";
+import {
+  migrateAnonymousData,
+  updateUserProfile,
+} from "../../models/leaderboardModel";
 
 // Async thunks for Firebase auth operations
 export const loginUser = createAsyncThunk(
@@ -122,9 +125,6 @@ export const convertGuestToAccount = createAsyncThunk(
         );
 
         // When linking, the UID stays the same, but we need to update Firestore with the email
-        // Import dynamically to avoid circular dependency
-        const { updateUserProfile } =
-          await import("../../models/leaderboardModel");
         await updateUserProfile(userCredential.user.uid, {
           email: userCredential.user.email,
           displayName: userCredential.user.displayName,
