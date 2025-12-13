@@ -3,7 +3,6 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Alert from "@mui/material/Alert";
-import PrimaryButton from "../components/PrimaryButton";
 import Button from "@mui/material/Button";
 
 // Pure view: all data and handlers are provided by presenter
@@ -65,9 +64,15 @@ function LoginView({
           slotProps={{ htmlInput: { minLength: 6 } }}
         />
 
-        <PrimaryButton type="submit" disabled={loading}>
+        <Button
+          type="submit"
+          disabled={loading}
+          variant="contained"
+          color="primary"
+          sx={{ textTransform: "none" }}
+        >
           {loading ? "Processing..." : isRegisterMode ? "Register" : "Login"}
-        </PrimaryButton>
+        </Button>
 
         <Button
           variant="text"
