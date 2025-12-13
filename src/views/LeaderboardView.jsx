@@ -144,7 +144,9 @@ function LeaderboardView({
                       <Typography variant="h6">
                         {currentUser?.isAnonymous
                           ? "Guest Player"
-                          : currentUser?.email || "You"}
+                          : currentUser?.displayName ||
+                            currentUser?.email ||
+                            "You"}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         Your Current Rank: {` #${userRank.rank}`}
@@ -271,8 +273,12 @@ function LeaderboardView({
           {leaderboardData && leaderboardData.length > 0 && (
             <Card elevation={3}>
               <CardContent sx={{ p: 0 }}>
-                <TableContainer component={Paper} elevation={0}>
-                  <Table>
+                <TableContainer
+                  component={Paper}
+                  elevation={0}
+                  sx={{ maxHeight: 620, overflowY: "auto" }}
+                >
+                  <Table stickyHeader>
                     <TableHead sx={{ bgcolor: "grey.600" }}>
                       <TableRow>
                         <TableCell>
@@ -299,6 +305,7 @@ function LeaderboardView({
                       {leaderboardData.map((player, index) => {
                         const rank = index + 1;
                         const isCurrentUser =
+                          player.id === currentUser?.uid ||
                           player.email === currentUser?.email;
 
                         return (

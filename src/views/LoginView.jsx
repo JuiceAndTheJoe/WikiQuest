@@ -4,16 +4,19 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import { USERNAME_MAX_LENGTH } from "../app/models/constants";
 
 // Pure view: all data and handlers are provided by presenter
 function LoginView({
   email,
   password,
   isRegisterMode,
+  displayName,
   loading,
   error,
   onEmailChange,
   onPasswordChange,
+  onDisplayNameChange,
   onToggleMode,
   onSubmit,
   onClearError,
@@ -63,6 +66,21 @@ function LoginView({
           disabled={loading}
           slotProps={{ htmlInput: { minLength: 6 } }}
         />
+
+        {isRegisterMode && (
+          <TextField
+            label="Username"
+            value={displayName}
+            onChange={(e) => onDisplayNameChange(e.target.value)}
+            required
+            fullWidth
+            disabled={loading}
+            helperText="This name will appear on the leaderboard and must be unique."
+            slotProps={{
+              htmlInput: { maxLength: USERNAME_MAX_LENGTH },
+            }}
+          />
+        )}
 
         <Button
           type="submit"

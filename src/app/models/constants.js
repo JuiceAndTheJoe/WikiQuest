@@ -2,6 +2,8 @@
 export const USER_COLLECTION = "users";
 export const SESSION_COLLECTION = "session";
 export const SESSION_GAME_DOC_ID = "currentGame";
+export const DISPLAY_NAME_COLLECTION = "displayNames";
+export const USERNAME_MAX_LENGTH = 30;
 
 /* API Constants */
 export const DETAILED_WIKIPEDIA_API_BASE =

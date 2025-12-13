@@ -7,6 +7,7 @@ import {
   fetchUserStats,
   fetchLeaderboard,
 } from "../app/features/game/gameSlice";
+import { changeDisplayName } from "../app/features/auth/authSlice";
 import HomePresenter from "./HomePresenter";
 
 const HomeContainer = (props) => {
@@ -55,6 +56,7 @@ const mapDispatch = (dispatch) => ({
   loadSavedGame: (params) => dispatch(loadSavedGame(params)),
   fetchUserStats: (userId) => dispatch(fetchUserStats(userId)),
   fetchLeaderboard: () => dispatch(fetchLeaderboard()),
+  onChangeDisplayName: (payload) => dispatch(changeDisplayName(payload)),
   onLogout: () => dispatch(logoutUser()),
 });
 

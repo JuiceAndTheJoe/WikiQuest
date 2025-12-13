@@ -13,6 +13,16 @@ import { saveGameResult } from "../models/leaderboardModel";
 
 let lastPersistedRunId = null;
 
+// Persist only the gameplay-relevant slice to avoid caching UI/leaderboard state
+const serializeGameState = (gameState = {}) => {
+  const rest = { ...gameState };
+  delete rest.leaderboardData;
+  delete rest.leaderboardLoading;
+  delete rest.leaderboardError;
+  delete rest.userStats;
+  return rest;
+};
+
 const persistenceMiddleware = (store) => (next) => (action) => {
   const result = next(action);
   const state = store.getState();
@@ -21,7 +31,7 @@ const persistenceMiddleware = (store) => (next) => (action) => {
   // Watch for game start to save initial state
   if (action.type === startNewGame.type && userId && !state.game.hasSavedGame) {
     // Save to Firestore for all users (anonymous and authenticated)
-    saveCurrentGameState(userId, { ...state.game })
+    saveCurrentGameState(userId, serializeGameState(state.game))
       .then(() => {
         store.dispatch(setSavedGameFlag(true));
       })
@@ -32,7 +42,7 @@ const persistenceMiddleware = (store) => (next) => (action) => {
 
   // On hint usage, save current game state
   if (action.type === useHint.type && userId) {
-    saveCurrentGameState(userId, { ...state.game }).catch((err) => {
+    saveCurrentGameState(userId, serializeGameState(state.game)).catch((err) => {
       console.warn("Failed to save game state after hint", err);
     });
   }
@@ -42,7 +52,7 @@ const persistenceMiddleware = (store) => (next) => (action) => {
     const lastResult = state.game?.lastResultDetail;
 
     if (lastResult) {
-      saveCurrentGameState(userId, { ...state.game }).catch((err) => {
+      saveCurrentGameState(userId, serializeGameState(state.game)).catch((err) => {
         console.warn("Failed to save current game state", err);
       });
     }

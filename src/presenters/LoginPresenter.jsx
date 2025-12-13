@@ -15,6 +15,7 @@ function LoginPresenter({
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const navigate = useNavigate();
 
@@ -28,6 +29,9 @@ function LoginPresenter({
   const handleSubmit = (e) => {
     e.preventDefault();
     const payload = { email, password };
+    if (isRegisterMode) {
+      payload.displayName = displayName;
+    }
 
     // If user is anonymous, convert their account
     if (user?.isAnonymous) {
@@ -58,10 +62,12 @@ function LoginPresenter({
       email={email}
       password={password}
       isRegisterMode={isRegisterMode}
+      displayName={displayName}
       loading={loading}
       error={error}
       onEmailChange={setEmail}
       onPasswordChange={setPassword}
+      onDisplayNameChange={setDisplayName}
       onToggleMode={handleToggleMode}
       onSubmit={handleSubmit}
       onClearError={onClearError}

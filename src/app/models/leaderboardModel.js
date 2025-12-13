@@ -18,14 +18,15 @@ import { USER_COLLECTION } from "./constants";
  * @param {number} maxCount - Maximum number of leaderboard entries to fetch
  * @returns {Promise<Array< { userId: string, email: string, name: string, highScore: string, gamesPlayed: string, averageScore: string, accuracy: string, lastPlayed: string  } >>} - Array of leaderboard entries
  */
-export async function getLeaderboard(maxCount = 10) {
+export async function getLeaderboard(maxCount = null) {
   try {
     const leaderboardRef = collection(db, USER_COLLECTION);
-    const q = query(
-      leaderboardRef,
-      orderBy("highScore", "desc"),
-      limit(maxCount * 2), // Fetch more to account for filtering anonymous users
-    );
+    const constraints = [orderBy("highScore", "desc")];
+    if (maxCount && Number.isFinite(maxCount)) {
+      constraints.push(limit(maxCount));
+    }
+
+    const q = query(leaderboardRef, ...constraints);
     const snapshot = await getDocs(q);
 
     const leaderboard = [];
@@ -40,6 +41,7 @@ export async function getLeaderboard(maxCount = 10) {
       leaderboard.push({
         userId: doc.id,
         email: data.email,
+        displayName: data.displayName || null,
         name: data.displayName || data.email || "Player",
         highScore: data.highScore || 0,
         gamesPlayed: data.gamesPlayed || 0,
@@ -49,8 +51,10 @@ export async function getLeaderboard(maxCount = 10) {
       });
     });
 
-    // Limit to requested count after filtering
-    return leaderboard.slice(0, maxCount);
+    // Limit to requested count after filtering (if provided)
+    return maxCount && Number.isFinite(maxCount)
+      ? leaderboard.slice(0, maxCount)
+      : leaderboard;
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
     throw error;
@@ -64,13 +68,14 @@ export async function getLeaderboard(maxCount = 10) {
  * @param {number} maxCount - Maximum number of leaderboard entries
  * @returns {function} Unsubscribe function
  */
-export function subscribeToLeaderboard(callback, maxCount = 10) {
+export function subscribeToLeaderboard(callback, maxCount = null) {
   const leaderboardRef = collection(db, USER_COLLECTION);
-  const q = query(
-    leaderboardRef,
-    orderBy("highScore", "desc"),
-    limit(maxCount * 2), // Fetch more to account for filtering
-  );
+  const constraints = [orderBy("highScore", "desc")];
+  if (maxCount && Number.isFinite(maxCount)) {
+    constraints.push(limit(maxCount));
+  }
+
+  const q = query(leaderboardRef, ...constraints);
 
   return onSnapshot(
     q,
@@ -87,6 +92,7 @@ export function subscribeToLeaderboard(callback, maxCount = 10) {
         leaderboard.push({
           userId: doc.id,
           email: data.email,
+          displayName: data.displayName || null,
           name: data.displayName || data.email || "Player",
           highScore: data.highScore || 0,
           gamesPlayed: data.gamesPlayed || 0,
@@ -96,8 +102,12 @@ export function subscribeToLeaderboard(callback, maxCount = 10) {
         });
       });
 
-      // Limit to requested count after filtering
-      callback(leaderboard.slice(0, maxCount));
+      // Limit to requested count after filtering (if provided)
+      const limited =
+        maxCount && Number.isFinite(maxCount)
+          ? leaderboard.slice(0, maxCount)
+          : leaderboard;
+      callback(limited);
     },
     (error) => {
       console.error("Error in leaderboard subscription:", error);
