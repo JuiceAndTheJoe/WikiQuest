@@ -19,7 +19,6 @@ import {
   PlayArrow,
   Leaderboard,
   Person,
-  Quiz,
   ExitToApp,
   EmojiEvents,
   Help,
