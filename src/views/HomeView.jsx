@@ -11,15 +11,17 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
+  TextField,
+  Alert,
   Stack,
   Typography,
   Avatar,
 } from "@mui/material";
+import { USERNAME_MAX_LENGTH } from "../app/models/constants";
 import {
   PlayArrow,
   Leaderboard,
   Person,
-  Quiz,
   ExitToApp,
   EmojiEvents,
   Help,
@@ -35,11 +37,32 @@ function MenuView({
   onStartGame,
   onViewLeaderboard,
   onCreateAccount,
+  onOpenDisplayNameModal,
+  onCloseDisplayNameModal,
+  onSubmitDisplayName,
+  onDisplayNameChange,
+  displayNameValue,
+  displayNameError,
+  displayNameSaving,
+  isDisplayNameModalOpen,
   userStats = { gamesPlayed: 0, highScore: 0 },
   leaderboardData = [],
 }) {
   const [openHowToPlay, setOpenHowToPlay] = useState(false);
   const isAnonymous = user?.isAnonymous || false;
+
+  const getRankIcon = (rank) => {
+    switch (rank) {
+      case 1:
+        return "🥇";
+      case 2:
+        return "🥈";
+      case 3:
+        return "🥉";
+      default:
+        return `#${rank}`;
+    }
+  };
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
       {/* Animated Background */}
@@ -140,7 +163,7 @@ function MenuView({
                         fontWeight="bold"
                         sx={{ minWidth: 30 }}
                       >
-                        #{index + 1}
+                        {getRankIcon(index + 1)}
                       </Typography>
                       <Box>
                         <Typography variant="body2" fontWeight="bold">
@@ -224,7 +247,7 @@ function MenuView({
                         <Typography variant="h6">
                           {isAnonymous
                             ? "Guest Player"
-                            : user?.email || "Player"}
+                            : user?.displayName || user?.email || "Player"}
                         </Typography>
                         {isAnonymous ? (
                           <Typography variant="body2" color="text.secondary">
@@ -267,20 +290,85 @@ function MenuView({
                         Sign In or Create Account
                       </Button>
                     ) : (
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        endIcon={<ExitToApp />}
-                        onClick={onLogout}
+                      <Stack
+                        direction={{ xs: "column", sm: "row" }}
+                        spacing={1}
                       >
-                        Logout
-                      </Button>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={onOpenDisplayNameModal}
+                          disabled={displayNameSaving}
+                        >
+                          Change username
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          endIcon={<ExitToApp />}
+                          onClick={onLogout}
+                        >
+                          Logout
+                        </Button>
+                      </Stack>
                     )}
                   </Stack>
                 </Stack>
               </Box>
             </Stack>
           </Stack>
+
+          {/* Change Username Modal */}
+          <Dialog
+            open={isDisplayNameModalOpen}
+            onClose={onCloseDisplayNameModal}
+            maxWidth="xs"
+            fullWidth
+          >
+            <DialogTitle>Change username</DialogTitle>
+            <DialogContent>
+              <Stack
+                spacing={2}
+                component="form"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  onSubmitDisplayName();
+                }}
+              >
+                {displayNameError && (
+                  <Alert severity="error">{displayNameError}</Alert>
+                )}
+                <TextField
+                  label="New username"
+                  value={displayNameValue}
+                  onChange={(e) => onDisplayNameChange(e.target.value)}
+                  helperText="This name will appear on the leaderboard and must be unique."
+                  fullWidth
+                  autoFocus
+                  disabled={displayNameSaving}
+                  slotProps={{
+                    htmlInput: { maxLength: USERNAME_MAX_LENGTH },
+                  }}
+                />
+                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                  <Button
+                    variant="text"
+                    onClick={onCloseDisplayNameModal}
+                    disabled={displayNameSaving}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={displayNameSaving}
+                  >
+                    {displayNameSaving ? "Saving..." : "Save"}
+                  </Button>
+                </Stack>
+              </Stack>
+            </DialogContent>
+          </Dialog>
 
           {/* How to Play Modal */}
           <Dialog

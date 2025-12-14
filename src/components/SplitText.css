@@ -1,5 +1,6 @@
 .split-text-container {
   display: inline-block;
+  /* eslint-disable-next-line css/use-baseline */
   word-break: break-word;
   font-size: 4rem;
   font-weight: bold;

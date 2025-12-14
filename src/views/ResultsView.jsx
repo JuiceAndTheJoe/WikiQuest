@@ -21,7 +21,6 @@ import {
   PlayArrow,
   Leaderboard,
   Home,
-  EmojiEvents,
   CheckCircle,
   Cancel,
   AccountCircle,

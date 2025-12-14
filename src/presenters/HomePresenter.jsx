@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import HomeView from "../views/HomeView";
 
@@ -10,8 +10,13 @@ function HomePresenter({
   leaderboardData,
   onStartGame,
   onLogout,
+  onChangeDisplayName,
 }) {
   const navigate = useNavigate();
+  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
+  const [pendingName, setPendingName] = useState(user?.displayName || "");
+  const [nameError, setNameError] = useState("");
+  const [savingName, setSavingName] = useState(false);
 
   const handleStartGame = useCallback(() => {
     onStartGame?.();
@@ -30,6 +35,38 @@ function HomePresenter({
     navigate("/login");
   }, [navigate]);
 
+  const handleOpenNameModal = useCallback(() => {
+    setPendingName(user?.displayName || "");
+    setNameError("");
+    setIsNameModalOpen(true);
+  }, [user?.displayName]);
+
+  const handleCloseNameModal = useCallback(() => {
+    if (savingName) return;
+    setIsNameModalOpen(false);
+  }, [savingName]);
+
+  const handleSubmitName = useCallback(() => {
+    const trimmed = (pendingName || "").trim();
+    if (!trimmed) {
+      setNameError("Display name cannot be empty");
+      return;
+    }
+
+    setSavingName(true);
+    setNameError("");
+    onChangeDisplayName({ displayName: trimmed })
+      .unwrap()
+      .then(() => {
+        setSavingName(false);
+        setIsNameModalOpen(false);
+      })
+      .catch((err) => {
+        setSavingName(false);
+        setNameError(err || "Could not update display name");
+      });
+  }, [pendingName, onChangeDisplayName]);
+
   return (
     <HomeView
       user={user}
@@ -38,6 +75,14 @@ function HomePresenter({
       onResumeGame={handleResumeGame}
       onViewLeaderboard={handleViewLeaderboard}
       onCreateAccount={handleCreateAccount}
+      onOpenDisplayNameModal={handleOpenNameModal}
+      onCloseDisplayNameModal={handleCloseNameModal}
+      onSubmitDisplayName={handleSubmitName}
+      onDisplayNameChange={setPendingName}
+      displayNameValue={pendingName}
+      displayNameError={nameError}
+      displayNameSaving={savingName}
+      isDisplayNameModalOpen={isNameModalOpen}
       userStats={userStats}
       hasSavedGame={hasSavedGame}
       leaderboardData={leaderboardData}

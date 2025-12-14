@@ -6,9 +6,71 @@ import {
   EmailAuthProvider,
   linkWithCredential,
   signInAnonymously,
+  updateProfile,
+  deleteUser,
 } from "firebase/auth";
 import { auth } from "../../../firebaseConfig";
-import { migrateAnonymousData } from "../../models/leaderboardModel";
+import {
+  migrateAnonymousData,
+  updateUserProfile,
+} from "../../models/leaderboardModel";
+import { claimDisplayName, releaseDisplayName } from "../../models/userModel";
+import { USERNAME_MAX_LENGTH } from "../../models/constants";
+
+// Change display name (unique) for authenticated users
+export const changeDisplayName = createAsyncThunk(
+  "auth/changeDisplayName",
+  async ({ displayName }, { getState, rejectWithValue }) => {
+    try {
+      const trimmed = (displayName || "").trim();
+      if (!trimmed) {
+        throw new Error("Display name is required");
+      }
+      if (trimmed.length > USERNAME_MAX_LENGTH) {
+        throw new Error(`Display name must be ${USERNAME_MAX_LENGTH} characters or less`);
+      }
+
+      const user = auth.currentUser;
+      const stateUser = getState().auth.user;
+
+      if (!user || stateUser?.isAnonymous) {
+        throw new Error("You must be signed in to change display name");
+      }
+
+      // Reserve name (will throw if taken)
+      await claimDisplayName(user.uid, trimmed);
+
+      // Update Firebase Auth profile
+      await updateProfile(user, { displayName: trimmed });
+
+      // Update Firestore user profile
+      await updateUserProfile(user.uid, {
+        email: user.email,
+        displayName: trimmed,
+      });
+
+      // Release old display name if different
+      const oldName = stateUser?.displayName;
+      if (oldName && oldName.trim().toLowerCase() !== trimmed.toLowerCase()) {
+        try {
+          await releaseDisplayName(user.uid, oldName);
+        } catch (releaseError) {
+          // Non-blocking: log but don't fail the user-facing flow
+          console.warn("Failed to release previous display name", releaseError);
+        }
+      }
+
+      return {
+        uid: user.uid,
+        email: user.email,
+        displayName: trimmed,
+        isAnonymous: false,
+      };
+    } catch (error) {
+      return rejectWithValue(error.message || "Failed to change display name");
+    }
+  },
+);
 
 // Async thunks for Firebase auth operations
 export const loginUser = createAsyncThunk(
@@ -23,6 +85,7 @@ export const loginUser = createAsyncThunk(
       return {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
+        displayName: userCredential.user.displayName,
         isAnonymous: false,
       };
     } catch (error) {
@@ -33,19 +96,45 @@ export const loginUser = createAsyncThunk(
 
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password, displayName }, { rejectWithValue }) => {
+    let userCredential;
     try {
-      const userCredential = await createUserWithEmailAndPassword(
+      const trimmedName = (displayName || "").trim();
+      if (!trimmedName) {
+        throw new Error("Display name is required");
+      }
+      if (trimmedName.length > USERNAME_MAX_LENGTH) {
+        throw new Error(`Display name must be ${USERNAME_MAX_LENGTH} characters or less`);
+      }
+
+      userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password,
       );
+
+      await claimDisplayName(userCredential.user.uid, trimmedName);
+      await updateProfile(userCredential.user, { displayName: trimmedName });
+      await updateUserProfile(userCredential.user.uid, {
+        email: userCredential.user.email,
+        displayName: trimmedName,
+      });
+
       return {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
+        displayName: trimmedName,
         isAnonymous: false,
       };
     } catch (error) {
+      // If account was created but we failed to claim the name, clean up to avoid orphaned users
+      if (userCredential?.user) {
+        try {
+          await deleteUser(userCredential.user);
+        } catch (cleanupError) {
+          console.warn("Failed to clean up user after registration error", cleanupError);
+        }
+      }
       return rejectWithValue(error.message);
     }
   },
@@ -64,6 +153,7 @@ export const loginAsGuest = createAsyncThunk(
       return {
         uid: userCredential.user.uid,
         email: userCredential.user.email,
+        displayName: userCredential.user.displayName,
         isAnonymous: true,
       };
     } catch (error) {
@@ -75,7 +165,7 @@ export const loginAsGuest = createAsyncThunk(
 // Convert anonymous account to permanent account using Firebase account linking
 export const convertGuestToAccount = createAsyncThunk(
   "auth/convertGuestToAccount",
-  async ({ email, password, isLogin }, { rejectWithValue }) => {
+  async ({ email, password, isLogin, displayName }, { rejectWithValue }) => {
     try {
       const currentUser = auth.currentUser;
 
@@ -111,9 +201,21 @@ export const convertGuestToAccount = createAsyncThunk(
         return {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
+          displayName: userCredential.user.displayName,
           isAnonymous: false,
         };
       } else {
+        const trimmedName = (displayName || "").trim();
+        if (!trimmedName) {
+          throw new Error("Display name is required");
+        }
+        if (trimmedName.length > USERNAME_MAX_LENGTH) {
+          throw new Error(`Display name must be ${USERNAME_MAX_LENGTH} characters or less`);
+        }
+
+        // Reserve display name before linking to avoid assigning credentials if the name is taken
+        await claimDisplayName(currentUser.uid, trimmedName);
+
         // Link anonymous account with email/password credential
         const credential = EmailAuthProvider.credential(email, password);
         const userCredential = await linkWithCredential(
@@ -121,18 +223,17 @@ export const convertGuestToAccount = createAsyncThunk(
           credential,
         );
 
+        await updateProfile(userCredential.user, { displayName: trimmedName });
         // When linking, the UID stays the same, but we need to update Firestore with the email
-        // Import dynamically to avoid circular dependency
-        const { updateUserProfile } =
-          await import("../../models/leaderboardModel");
         await updateUserProfile(userCredential.user.uid, {
           email: userCredential.user.email,
-          displayName: userCredential.user.displayName,
+          displayName: trimmedName,
         });
 
         return {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
+          displayName: trimmedName,
           isAnonymous: false,
           linkedFromAnonymous: true,
         };
@@ -219,6 +320,22 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(convertGuestToAccount.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Change display name
+      .addCase(changeDisplayName.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(changeDisplayName.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = {
+          ...state.user,
+          ...action.payload,
+        };
+      })
+      .addCase(changeDisplayName.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -322,7 +322,12 @@ const gameSlice = createSlice({
         state.loadingGameState = false;
         const savedState = action.payload;
         if (savedState) {
-          Object.assign(state, savedState);
+          const sanitized = { ...savedState };
+          delete sanitized.leaderboardData;
+          delete sanitized.leaderboardLoading;
+          delete sanitized.leaderboardError;
+          delete sanitized.userStats;
+          Object.assign(state, sanitized);
           state.hasSavedGame = true;
         } else {
           state.hasSavedGame = false;
