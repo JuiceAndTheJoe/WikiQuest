@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GameView from "../views/GameView.jsx";
+import { getDifficulty } from "../app/features/game/gameUtils";
 
 const removeDiacritics = (value) =>
   value ? value.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : value;
@@ -36,6 +37,54 @@ const computeRevealCount = (hintsUsed, totalSentences) => {
   return totalSentences;
 };
 
+// Calculate electric border intensity based on streak
+const getElectricBorderConfig = (streak) => {
+  const currentStreak = streak || 0;
+
+  // Disabled for streak 0
+  if (currentStreak < 1) {
+    return { opacity: 0, speed: 0, chaos: 0, thickness: 0, color: "#7df9ff" };
+  }
+
+  // For streak 6+: Rainbow/blinking effect with max chaos and speed
+  if (currentStreak >= 6) {
+    // Rainbow color cycling
+    const time = Date.now() / 100; // Cycle through colors faster
+    const hue = time % 360;
+    const color = `hsl(${hue}, 100%, 50%)`;
+
+    return {
+      opacity: 1,
+      speed: 3, // Maximum chaos speed
+      chaos: 1.5, // Maximum chaos
+      thickness: 3,
+      color,
+      // Add blinking effect via opacity
+      animationOpacity: true,
+    };
+  }
+
+  // Mild at streak 1, scales up progressively, reaches max at streak 5
+  // streak 1: opacity 0.5, speed 1, chaos 0.5, color blue
+  // streak 3: opacity 0.6, speed 1.3, chaos 0.65, color cyan-green
+  // streak 5: opacity 0.85, speed 1.8, chaos 0.9, color red (MAX)
+
+  const normalizedStreak = Math.min(currentStreak - 1, 4) / 4; // 0-1 scale from streak 1-5
+
+  // Color progression: cyan/blue (200°) → green (120°) → yellow (60°) → orange (30°) → red (0°)
+  // Hue goes from 200 to 0 as normalizedStreak goes from 0 to 1
+  const hue = Math.round(200 * (1 - normalizedStreak));
+  const color = `hsl(${hue}, 100%, 50%)`;
+
+  return {
+    opacity: Math.min(0.5 + normalizedStreak * 0.35, 1),
+    speed: Math.min(1 + normalizedStreak * 0.8, 1.8),
+    chaos: Math.min(0.5 + normalizedStreak * 0.4, 0.9),
+    thickness: Math.min(1.5 + normalizedStreak * 1.5, 3),
+    color,
+  };
+};
+
 // Presenter for GameView: manages game logic and Wikipedia data
 function GamePresenter({
   wikipediaData,
@@ -56,6 +105,20 @@ function GamePresenter({
   const navigate = useNavigate();
   const [userGuess, setUserGuess] = useState("");
   const [showResultFeedback, setShowResultFeedback] = useState(false);
+
+  // Extract streak value to ensure stable dependency
+  const currentStreak = gameState?.streak || 0;
+
+  // Memoize difficulty to ensure it updates when level changes
+  const difficulty = useMemo(() => {
+    return getDifficulty(gameState?.level || 1);
+  }, [gameState?.level]);
+
+  // Memoize border config based on streak
+  const borderConfig = useMemo(() => {
+    const config = getElectricBorderConfig(currentStreak);
+    return config;
+  }, [currentStreak]);
 
   useEffect(() => {
     if (gameStatus === "game_over") {
@@ -161,6 +224,8 @@ function GamePresenter({
       wikipediaError={wikipediaError}
       showResultFeedback={showResultFeedback}
       onCloseResultFeedback={handleCloseResultFeedback}
+      difficulty={difficulty}
+      borderConfig={borderConfig}
     />
   );
 }

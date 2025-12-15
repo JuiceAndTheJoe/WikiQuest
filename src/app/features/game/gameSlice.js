@@ -163,7 +163,21 @@ const gameSlice = createSlice({
         MIN_SCORE,
         BASE_SCORE - (state.hintsUsedThisQuestion || 0) * HINT_PENALTY,
       );
-      const scoreDelta = correctGuess ? baseScoreDelta : WRONG_ANSWER_PENALTY;
+
+      // Calculate streak multiplier
+      let streakMultiplier = 1;
+      const currentStreak = state.streak || 0;
+      if (currentStreak >= 6) {
+        streakMultiplier = 3;
+      } else if (currentStreak >= 4) {
+        streakMultiplier = 2;
+      } else if (currentStreak >= 2) {
+        streakMultiplier = 1.5;
+      }
+
+      const scoreDelta = correctGuess
+        ? Math.round(baseScoreDelta * streakMultiplier)
+        : WRONG_ANSWER_PENALTY;
 
       const questionEntry = {
         id: `${questionNumber}-${now}`,
@@ -176,6 +190,7 @@ const gameSlice = createSlice({
         questionNumber,
         level: state.level,
         scoreDelta,
+        streakMultiplier: correctGuess ? streakMultiplier : 1,
       };
 
       state.questionsLog = state.questionsLog || [];
@@ -187,7 +202,7 @@ const gameSlice = createSlice({
         state.lastGuessResult = "correct";
         state.correctCount = (state.correctCount || 0) + 1;
         state.correctAnswers = (state.correctAnswers || 0) + 1;
-        state.score = (state.score || 0) + baseScoreDelta;
+        state.score = (state.score || 0) + scoreDelta;
         state.streak = (state.streak || 0) + 1;
         state.bestStreak = Math.max(state.bestStreak || 0, state.streak || 0);
         // add a life up to 3
@@ -225,6 +240,7 @@ const gameSlice = createSlice({
         finalScore: state.score || 0,
         hintsUsed: hintsUsedThisAttempt,
         timeTakenMs,
+        streakMultiplier: correctGuess ? streakMultiplier : 1,
       };
     },
     useHint(state) {
