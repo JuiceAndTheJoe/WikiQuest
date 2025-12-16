@@ -64,7 +64,7 @@ const initialState = {
   inGame: false,
   status: "idle",
   level: 1,
-  lives: 3,
+  lives: MAX_LIVES,
   correctCount: 0,
   correctAnswers: 0,
   totalQuestions: 0,
