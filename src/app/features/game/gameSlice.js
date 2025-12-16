@@ -343,6 +343,8 @@ const gameSlice = createSlice({
           delete sanitized.leaderboardLoading;
           delete sanitized.leaderboardError;
           delete sanitized.userStats;
+          delete sanitized.loadingGameState;
+          delete sanitized.hasSavedGame;
           Object.assign(state, sanitized);
           state.hasSavedGame = true;
         } else {

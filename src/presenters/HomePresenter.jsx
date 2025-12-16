@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { clearSavedGameState } from "../app/models/gameProgressModel";
 import HomeView from "../views/HomeView";
 
 // Presenter for MenuView: manages navigation and user stats
@@ -11,6 +12,7 @@ function HomePresenter({
   onStartGame,
   onLogout,
   onChangeDisplayName,
+  onClearSavedGame,
 }) {
   const navigate = useNavigate();
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
@@ -18,10 +20,19 @@ function HomePresenter({
   const [nameError, setNameError] = useState("");
   const [savingName, setSavingName] = useState(false);
 
-  const handleStartGame = useCallback(() => {
+  const handleStartGame = useCallback(async () => {
+    if (user?.uid) {
+      try {
+        await clearSavedGameState(user.uid);
+        onClearSavedGame?.();
+      } catch (err) {
+        console.warn("Failed to clear saved game", err);
+      }
+    }
+
     onStartGame?.();
     navigate("/game");
-  }, [onStartGame, navigate]);
+  }, [onStartGame, onClearSavedGame, navigate, user?.uid]);
 
   const handleResumeGame = useCallback(() => {
     navigate("/game");

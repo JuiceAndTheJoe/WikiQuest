@@ -20,6 +20,8 @@ const serializeGameState = (gameState = {}) => {
   delete rest.leaderboardLoading;
   delete rest.leaderboardError;
   delete rest.userStats;
+  delete rest.loadingGameState;
+  delete rest.hasSavedGame;
   return rest;
 };
 

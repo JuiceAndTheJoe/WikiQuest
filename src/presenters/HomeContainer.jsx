@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { connect } from "react-redux";
-import { logoutUser } from "../app/features/auth/authSlice";
+import { changeDisplayName, logoutUser } from "../app/features/auth/authSlice";
 import {
-  loadSavedGame,
-  startNewGame,
-  fetchUserStats,
   fetchLeaderboard,
+  fetchUserStats,
+  loadSavedGame,
+  setSavedGameFlag,
+  startNewGame,
 } from "../app/features/game/gameSlice";
-import { changeDisplayName } from "../app/features/auth/authSlice";
 import HomePresenter from "./HomePresenter";
 
 const HomeContainer = (props) => {
@@ -53,6 +53,7 @@ const mapState = (state) => {
 
 const mapDispatch = (dispatch) => ({
   onStartGame: () => dispatch(startNewGame()),
+  onClearSavedGame: () => dispatch(setSavedGameFlag(false)),
   loadSavedGame: (params) => dispatch(loadSavedGame(params)),
   fetchUserStats: (userId) => dispatch(fetchUserStats(userId)),
   fetchLeaderboard: () => dispatch(fetchLeaderboard()),
