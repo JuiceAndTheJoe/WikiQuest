@@ -205,8 +205,6 @@ const gameSlice = createSlice({
         state.score = (state.score || 0) + scoreDelta;
         state.streak = (state.streak || 0) + 1;
         state.bestStreak = Math.max(state.bestStreak || 0, state.streak || 0);
-        // add a life up to 3
-        state.lives = Math.min(3, (state.lives || 0) + 1);
         // advance level
         state.level = (state.level || 1) + 1;
         // update highScore
