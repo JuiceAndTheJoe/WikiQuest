@@ -30,11 +30,12 @@ const splitIntoSentences = (text) => {
   return paragraphs.map((para) => para.trim()).filter(Boolean);
 };
 
-const computeRevealCount = (hintsUsed, totalSentences) => {
-  if (!totalSentences || hintsUsed <= 0) return 0;
-  if (hintsUsed === 1) return Math.min(1, totalSentences);
-  if (hintsUsed === 2) return Math.min(2, totalSentences);
-  return totalSentences;
+const computeRevealCount = (hintsUsed, totalParagraphs) => {
+  if (!totalParagraphs) return 0;
+  if (hintsUsed === 0) return Math.min(1, totalParagraphs);
+  if (hintsUsed === 1) return Math.min(2, totalParagraphs);
+  if (hintsUsed === 2) return Math.min(3, totalParagraphs);
+  return totalParagraphs;
 };
 
 // Calculate electric border intensity based on streak

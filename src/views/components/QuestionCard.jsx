@@ -22,12 +22,17 @@ const QuestionCard = memo(function QuestionCard({
   onSkipQuestion,
   hints,
 }) {
-  // Memoize blur amount to prevent recalculation on every render
-  const blurAmount = useMemo(() => {
-    if (hintsUsed === 0) return 8;
-    if (hintsUsed === 1) return 5;
-    if (hintsUsed === 2) return 2;
-    return 0;
+  const imageConfig = useMemo(() => {
+    if (hintsUsed === 0) {
+      return { visible: false, blur: 0 };
+    }
+    if (hintsUsed === 1) {
+      return { visible: true, blur: 5 };
+    }
+    if (hintsUsed === 2) {
+      return { visible: true, blur: 2 };
+    }
+    return { visible: true, blur: 0 };
   }, [hintsUsed]);
 
   return (
@@ -81,7 +86,7 @@ const QuestionCard = memo(function QuestionCard({
             >
               <Stack spacing={1.5}>
                 <Stack spacing={1} alignItems="center">
-                  {wikipediaSummary.thumbnail && (
+                  {wikipediaSummary.thumbnail && imageConfig.visible && (
                     <Box
                       component="img"
                       src={wikipediaSummary.thumbnail.source}
@@ -97,7 +102,7 @@ const QuestionCard = memo(function QuestionCard({
                         WebkitUserSelect: "none",
                         MozUserSelect: "none",
                         msUserSelect: "none",
-                        filter: `blur(${blurAmount}px)`,
+                        filter: `blur(${imageConfig.blur}px)`,
                         transition: "filter 0.3s ease",
                       }}
                     />
@@ -122,17 +127,30 @@ const QuestionCard = memo(function QuestionCard({
                     </Typography>
                   )}
                 </Stack>
-                {hintsUsed > 0 && (
+                {revealedSummarySentences?.length > 0 && (
                   <Stack spacing={1}>
-                    {revealedSummarySentences?.map((sentence, idx) => (
-                      <Typography
-                        key={`${sentence}-${idx}`}
-                        variant="body1"
-                        color="text.primary"
-                      >
-                        {sentence}
-                      </Typography>
-                    ))}
+                    {revealedSummarySentences?.map((sentence, idx) => {
+                      const backgrounds = [
+                        "rgba(209, 107, 165, 0.15)",
+                        "rgba(134, 168, 231, 0.15)",
+                        "rgba(95, 251, 241, 0.15)",
+                      ];
+
+                      return (
+                        <Box
+                          key={`${sentence}-${idx}`}
+                          sx={{
+                            p: 1.5,
+                            borderRadius: 1,
+                            bgcolor: backgrounds[idx % backgrounds.length],
+                          }}
+                        >
+                          <Typography variant="body1" color="text.primary">
+                            {sentence}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
                   </Stack>
                 )}
               </Stack>
@@ -143,7 +161,7 @@ const QuestionCard = memo(function QuestionCard({
                 color="text.secondary"
                 sx={{ fontStyle: "italic" }}
               >
-                Use hints to gradually reveal the biography text.
+                Use hints to reveal the image and more biography text.
               </Typography>
             )}
             {!hasSummary && !wikipediaLoading && (
