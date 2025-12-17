@@ -254,7 +254,7 @@ function ResultsView({
                   </Typography>
                   <Box sx={{ maxHeight: 300, overflow: "auto" }}>
                     {gameHistory && gameHistory.length > 0 ? (
-                      <Stack spacing={1}>
+                      <Stack spacing={1} sx={{ pt: 0.5 }}>
                         {gameHistory.map((question, index) => (
                           <Link
                             key={index}
