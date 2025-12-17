@@ -2,6 +2,33 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import LeaderboardView from "../views/LeaderboardView";
 
+// Helper functions
+const getRankIcon = (rank) => {
+  switch (rank) {
+    case 1:
+      return "🥇";
+    case 2:
+      return "🥈";
+    case 3:
+      return "🥉";
+    default:
+      return `#${rank}`;
+  }
+};
+
+const getRankColor = (rank) => {
+  switch (rank) {
+    case 1:
+      return "warning.main"; // Gold
+    case 2:
+      return "grey.500"; // Silver
+    case 3:
+      return "error.main"; // Bronze
+    default:
+      return "text.primary";
+  }
+};
+
 // Presenter for LeaderboardView: manages leaderboard data and navigation
 function LeaderboardPresenter({ user, leaderboardData, loading, error }) {
   const navigate = useNavigate();
@@ -34,6 +61,31 @@ function LeaderboardPresenter({ user, leaderboardData, loading, error }) {
     };
   }, [normalizedData, user]);
 
+  // Calculate community statistics
+  const communityStats = useMemo(() => {
+    if (!normalizedData || normalizedData.length === 0) {
+      return {
+        totalPlayers: 0,
+        highestScore: 0,
+        totalGamesPlayed: 0,
+        averageAccuracy: 0,
+      };
+    }
+
+    return {
+      totalPlayers: normalizedData.length,
+      highestScore: Math.max(...normalizedData.map((p) => p.highScore || 0)),
+      totalGamesPlayed: normalizedData.reduce(
+        (sum, p) => sum + (p.gamesPlayed || 0),
+        0,
+      ),
+      averageAccuracy: Math.round(
+        normalizedData.reduce((sum, p) => sum + (p.accuracy || 0), 0) /
+          normalizedData.length,
+      ),
+    };
+  }, [normalizedData]);
+
   const handleBackToMenu = () => {
     navigate("/");
   };
@@ -46,6 +98,9 @@ function LeaderboardPresenter({ user, leaderboardData, loading, error }) {
       userRank={userRank}
       currentUser={user}
       onBackToMenu={handleBackToMenu}
+      getRankIcon={getRankIcon}
+      getRankColor={getRankColor}
+      communityStats={communityStats}
     />
   );
 }
