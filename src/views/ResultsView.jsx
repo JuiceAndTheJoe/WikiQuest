@@ -15,6 +15,7 @@ import {
   Typography,
   Chip,
   Divider,
+  Link,
 } from "@mui/material";
 
 import {
@@ -28,6 +29,15 @@ import {
 
 import ColorBends from "../components/background/ColorBends";
 import SplitText from "../components/SplitText";
+
+// Helper function to generate Wikipedia URL
+const getWikipediaUrl = (celebName) => {
+  const sanitizedName = celebName
+    .trim()
+    .replace(/\s+/g, "_")
+    .replace(/[^\w_]/g, "");
+  return `https://en.wikipedia.org/wiki/${sanitizedName}`;
+};
 
 function ResultsView({
   gameStats,
@@ -263,48 +273,91 @@ function ResultsView({
                     {gameHistory && gameHistory.length > 0 ? (
                       <Stack spacing={1}>
                         {gameHistory.map((question, index) => (
-                          <Paper
+                          <Link
                             key={index}
-                            elevation={0}
+                            href={getWikipediaUrl(question.question)}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             sx={{
-                              p: 2,
-                              bgcolor: question.correct
-                                ? "rgba(0, 169, 14, 0.15)"
-                                : "rgba(216, 0, 0, 0.15)",
-                              border: `1px solid ${
-                                question.correct
-                                  ? "rgba(0, 169, 14, 0.3)"
-                                  : "rgba(216, 0, 0, 0.3)"
-                              }`,
-                              opacity: 1,
+                              textDecoration: "none",
+                              display: "block",
+                              transition:
+                                "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                              "&:hover": {
+                                transform: "translateY(-2px)",
+                                boxShadow: question.correct
+                                  ? "0 8px 16px rgba(0, 169, 14, 0.3)"
+                                  : "0 8px 16px rgba(216, 0, 0, 0.3)",
+                              },
                             }}
                           >
-                            <Stack
-                              direction="row"
-                              spacing={2}
-                              alignItems="center"
+                            <Paper
+                              elevation={0}
+                              sx={{
+                                p: 2,
+                                bgcolor: question.correct
+                                  ? "rgba(0, 169, 14, 0.15)"
+                                  : "rgba(216, 0, 0, 0.15)",
+                                border: `2px solid ${
+                                  question.correct
+                                    ? "rgba(0, 169, 14, 0.3)"
+                                    : "rgba(216, 0, 0, 0.3)"
+                                }`,
+                                opacity: 1,
+                                transition:
+                                  "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                                cursor: "pointer",
+                                "&:hover": {
+                                  borderColor: question.correct
+                                    ? "rgba(0, 169, 14, 0.8)"
+                                    : "rgba(216, 0, 0, 0.8)",
+                                  bgcolor: question.correct
+                                    ? "rgba(0, 169, 14, 0.25)"
+                                    : "rgba(216, 0, 0, 0.25)",
+                                },
+                              }}
                             >
-                              {question.correct ? (
-                                <CheckCircle color="success" />
-                              ) : (
-                                <Cancel color="error" />
-                              )}
-                              <Box sx={{ flex: 1 }}>
-                                <Typography variant="body2" fontWeight="bold">
-                                  {question.question}
-                                </Typography>
-                                <Typography variant="caption">
-                                  Your answer: {question.userAnswer} • Score:{" "}
-                                  {question.score > 0 ? "+" : ""}
-                                  {question.score} • Time:{" "}
-                                  {Math.round((question.timeSpent || 0) / 1000)}
-                                  s
-                                  {question.hintsUsed > 0 &&
-                                    ` • Hints used: ${question.hintsUsed}`}
-                                </Typography>
-                              </Box>
-                            </Stack>
-                          </Paper>
+                              <Stack
+                                direction="row"
+                                spacing={2}
+                                alignItems="center"
+                              >
+                                {question.correct ? (
+                                  <CheckCircle color="success" />
+                                ) : (
+                                  <Cancel color="error" />
+                                )}
+                                <Box sx={{ flex: 1 }}>
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      gap: 0.8,
+                                    }}
+                                  >
+                                    <Typography
+                                      variant="body2"
+                                      fontWeight="bold"
+                                      component="span"
+                                    >
+                                      {question.question}
+                                    </Typography>
+                                  </Box>
+                                  <Typography variant="caption">
+                                    Your answer: {question.userAnswer} • Score:{" "}
+                                    {question.score > 0 ? "+" : ""}
+                                    {question.score} • Time:{" "}
+                                    {Math.round(
+                                      (question.timeSpent || 0) / 1000,
+                                    )}
+                                    s
+                                    {question.hintsUsed > 0 &&
+                                      ` • Hints used: ${question.hintsUsed}`}
+                                  </Typography>
+                                </Box>
+                              </Stack>
+                            </Paper>
+                          </Link>
                         ))}
                       </Stack>
                     ) : (
