@@ -1,4 +1,5 @@
 import { memo, useMemo, useRef, useEffect } from "react";
+import { MAX_LIVES } from "../../app/features/game/gameConstants";
 import {
   Box,
   Button,
@@ -62,8 +63,8 @@ const HintsPanel = memo(function HintsPanel({
 
   // Memoize hearts array to prevent re-renders
   const hearts = useMemo(
-    () => [...Array(gameState?.lives || MAX_LIVES)],
-    [gameState?.lives]
+    () => [...Array(gameState?.lives ?? MAX_LIVES)],
+    [gameState?.lives],
   );
 
   // Memoize hints left array
