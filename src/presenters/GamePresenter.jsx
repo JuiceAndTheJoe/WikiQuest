@@ -12,12 +12,17 @@ const stripNameFromText = (text, name) => {
   if (!text) return "";
   const normalized = removeDiacritics(text);
   if (!name) return normalized;
-  const parts = name.replace(/_/g, " ").split(/\s+/).filter(Boolean);
+  // Normalize the name as well, then extract parts and remove disambiguation info (e.g., "(actor)")
+  const normalizedName = removeDiacritics(name);
+  const cleanName = normalizedName
+    .replace(/\s*\([^)]*\)/g, "")
+    .replace(/_/g, " ");
+  const parts = cleanName.split(/\s+/).filter(Boolean);
   let sanitized = normalized;
   for (const part of parts) {
     const re = new RegExp(
       `\\b${part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
-      "giu"
+      "giu",
     );
     sanitized = sanitized.replace(re, (match) => redactWord(match));
   }
@@ -195,7 +200,7 @@ function GamePresenter({
   const revealedSummarySentences = useMemo(() => {
     const revealCount = computeRevealCount(
       hints?.usedHints || 0,
-      summarySentences.length
+      summarySentences.length,
     );
     return summarySentences.slice(0, revealCount);
   }, [summarySentences, hints?.usedHints]);
