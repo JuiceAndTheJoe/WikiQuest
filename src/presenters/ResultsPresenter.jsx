@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import ResultsView from "../views/ResultsView.jsx";
 
 // Helper function to generate Wikipedia URL
@@ -18,8 +18,15 @@ function ResultsPresenter({
   newHighScore,
   onStartNewGame,
   user,
+  hasGameResult,
 }) {
   const navigate = useNavigate();
+
+  // Redirect to home if there's no game result to display
+  if (!hasGameResult) {
+    return <Navigate to="/" replace />;
+  }
+
   const safeGameStats = gameStats || {
     score: 0,
     totalQuestions: 0,
