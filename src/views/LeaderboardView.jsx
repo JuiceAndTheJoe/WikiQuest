@@ -24,6 +24,7 @@ import {
 } from "@mui/material";
 import { ArrowBack, TrendingUp, Person } from "@mui/icons-material";
 import ColorBends from "../components/background/ColorBends";
+import SplitText from "../components/SplitText";
 
 function LeaderboardView({
   leaderboardData,
@@ -32,38 +33,15 @@ function LeaderboardView({
   userRank,
   currentUser,
   onBackToMenu,
+  getRankIcon,
+  getRankColor,
+  communityStats,
 }) {
-  const getRankIcon = (rank) => {
-    switch (rank) {
-      case 1:
-        return "🥇";
-      case 2:
-        return "🥈";
-      case 3:
-        return "🥉";
-      default:
-        return `#${rank}`;
-    }
-  };
-
-  const getRankColor = (rank) => {
-    switch (rank) {
-      case 1:
-        return "warning.main"; // Gold
-      case 2:
-        return "grey.500"; // Silver
-      case 3:
-        return "error.main"; // Bronze
-      default:
-        return "text.primary";
-    }
-  };
-
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
       {/* Animated Background */}
       <ColorBends
-        colors={["#d80000ff", "#00a90eff", "#0010bdff"]}
+        colors={["#420056ff", "#006cf0ff", "#6a00bbff"]}
         rotation={30}
         speed={0.3}
         scale={1.2}
@@ -100,9 +78,21 @@ function LeaderboardView({
             >
               Back to Menu
             </Button>
-            <Typography variant="h3" component="h1">
-              Leaderboard 📶
-            </Typography>
+            <SplitText
+              text="Leaderboard"
+              className="text-4xl font-semibold text-center"
+              delay={100}
+              duration={0.6}
+              ease="elastic.out(1, 0.3)"
+              splitType="chars"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              threshold={0.1}
+              rootMargin="-100px"
+              textAlign="center"
+              repeat={-1}
+              repeatDelay={2.5}
+            />
           </Box>
 
           {/* User Rank & Community Stats Section */}
@@ -192,7 +182,7 @@ function LeaderboardView({
                       Total Players
                     </Typography>
                     <Typography variant="h5" fontWeight="bold">
-                      {leaderboardData.length}
+                      {communityStats.totalPlayers}
                     </Typography>
                   </Box>
                   <Box>
@@ -204,9 +194,7 @@ function LeaderboardView({
                       fontWeight="bold"
                       color="warning.main"
                     >
-                      {Math.max(
-                        ...leaderboardData.map((p) => p.highScore || 0),
-                      ).toLocaleString()}
+                      {communityStats.highestScore.toLocaleString()}
                     </Typography>
                   </Box>
                   <Box>
@@ -214,9 +202,7 @@ function LeaderboardView({
                       Total Games Played
                     </Typography>
                     <Typography variant="h5" fontWeight="bold">
-                      {leaderboardData
-                        .reduce((sum, p) => sum + (p.gamesPlayed || 0), 0)
-                        .toLocaleString()}
+                      {communityStats.totalGamesPlayed.toLocaleString()}
                     </Typography>
                   </Box>
                   <Box>
@@ -224,13 +210,7 @@ function LeaderboardView({
                       Average Accuracy
                     </Typography>
                     <Typography variant="h5" fontWeight="bold">
-                      {Math.round(
-                        leaderboardData.reduce(
-                          (sum, p) => sum + (p.accuracy || 0),
-                          0,
-                        ) / leaderboardData.length,
-                      )}
-                      %
+                      {communityStats.averageAccuracy}%
                     </Typography>
                   </Box>
                 </Box>
