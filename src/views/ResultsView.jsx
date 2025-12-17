@@ -30,15 +30,6 @@ import {
 import ColorBends from "../components/background/ColorBends";
 import SplitText from "../components/SplitText";
 
-// Helper function to generate Wikipedia URL
-const getWikipediaUrl = (celebName) => {
-  const sanitizedName = celebName
-    .trim()
-    .replace(/\s+/g, "_")
-    .replace(/[^\w_]/g, "");
-  return `https://en.wikipedia.org/wiki/${sanitizedName}`;
-};
-
 function ResultsView({
   gameStats,
   gameHistory,
@@ -49,22 +40,12 @@ function ResultsView({
   newHighScore = false,
   user,
   onCreateAccount,
+  isAnonymous,
+  accuracy,
+  gameTimeSeconds,
+  avgTimePerQuestion,
+  getWikipediaUrl,
 }) {
-  const isAnonymous = user?.isAnonymous || false;
-  const accuracy =
-    gameStats?.totalQuestions > 0
-      ? Math.round((gameStats.correctAnswers / gameStats.totalQuestions) * 100)
-      : 0;
-
-  const gameTime = gameStats?.gameTime
-    ? Math.round(gameStats.gameTime / 1000)
-    : 0;
-
-  const avgTimePerQuestion =
-    gameStats?.totalQuestions > 0 && gameTime > 0
-      ? Math.round(gameTime / gameStats.totalQuestions)
-      : 0;
-
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
       {/* Animated Background */}
@@ -227,8 +208,10 @@ function ResultsView({
                           <Box display="flex" justifyContent="space-between">
                             <Typography variant="body1">Game Time:</Typography>
                             <Typography variant="h6" fontWeight="bold">
-                              {Math.floor(gameTime / 60)}:
-                              {(gameTime % 60).toString().padStart(2, "0")}
+                              {Math.floor(gameTimeSeconds / 60)}:
+                              {(gameTimeSeconds % 60)
+                                .toString()
+                                .padStart(2, "0")}
                             </Typography>
                           </Box>
                           <Box display="flex" justifyContent="space-between">
