@@ -62,8 +62,8 @@ const HintsPanel = memo(function HintsPanel({
 
   // Memoize hearts array to prevent re-renders
   const hearts = useMemo(
-    () => [...Array(gameState?.lives || 3)],
-    [gameState?.lives],
+    () => [...Array(gameState?.lives || MAX_LIVES)],
+    [gameState?.lives]
   );
 
   // Memoize hints left array
