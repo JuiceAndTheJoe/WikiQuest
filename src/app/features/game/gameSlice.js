@@ -345,6 +345,8 @@ const gameSlice = createSlice({
           delete sanitized.userStats;
           delete sanitized.loadingGameState;
           delete sanitized.hasSavedGame;
+          delete sanitized.lastGuessResult;
+          delete sanitized.lastResultDetail;
           Object.assign(state, sanitized);
           state.hasSavedGame = true;
         } else {

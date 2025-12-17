@@ -1,4 +1,5 @@
 import {
+  advanceToNextQuestion,
   fetchLeaderboard,
   setSavedGameFlag,
   startNewGame,
@@ -22,6 +23,8 @@ const serializeGameState = (gameState = {}) => {
   delete rest.userStats;
   delete rest.loadingGameState;
   delete rest.hasSavedGame;
+  delete rest.lastGuessResult;
+  delete rest.lastResultDetail;
   return rest;
 };
 
@@ -44,20 +47,33 @@ const persistenceMiddleware = (store) => (next) => (action) => {
 
   // On hint usage, save current game state
   if (action.type === useHint.type && userId) {
-    saveCurrentGameState(userId, serializeGameState(state.game)).catch((err) => {
-      console.warn("Failed to save game state after hint", err);
-    });
+    saveCurrentGameState(userId, serializeGameState(state.game)).catch(
+      (err) => {
+        console.warn("Failed to save game state after hint", err);
+      }
+    );
   }
 
   // After each guess, update user stats and save guess history
   if (action.type === submitGuess.type && userId) {
     const lastResult = state.game?.lastResultDetail;
 
-    if (lastResult) {
-      saveCurrentGameState(userId, serializeGameState(state.game)).catch((err) => {
-        console.warn("Failed to save current game state", err);
-      });
+    if (!lastResult) {
+      saveCurrentGameState(userId, serializeGameState(state.game)).catch(
+        (err) => {
+          console.warn("Failed to save current game state", err);
+        }
+      );
     }
+  }
+
+  // On advancing to next question, persist current game state
+  if (action.type === advanceToNextQuestion.type && userId) {
+    saveCurrentGameState(userId, serializeGameState(state.game)).catch(
+      (err) => {
+        console.warn("Failed to save current game state", err);
+      }
+    );
   }
 
   // On game end, persist results and clear saved state
