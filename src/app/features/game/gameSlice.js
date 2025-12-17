@@ -12,6 +12,7 @@ import {
 } from "./gameConstants";
 import {
   buildRunSummary,
+  extractBaseName,
   formatCelebDisplayName,
   normalizeLetters,
   pickRandom,
@@ -128,7 +129,9 @@ const gameSlice = createSlice({
       const guess = rawGuess.toLowerCase();
       const rawTarget = String(state.currentCeleb || "").trim();
 
-      const target = normalizeLetters(rawTarget);
+      // Extract base name for comparison (removes disambiguation info like "_(musician)")
+      const baseTarget = extractBaseName(rawTarget);
+      const target = normalizeLetters(baseTarget);
       const guessLetters = normalizeLetters(guess);
 
       if (!state.inGame || !state.currentCeleb) {
