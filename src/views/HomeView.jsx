@@ -334,6 +334,7 @@ function MenuView({
                   e.preventDefault();
                   onSubmitDisplayName();
                 }}
+                sx={{ mt: 1 }}
               >
                 {displayNameError && (
                   <Alert severity="error">{displayNameError}</Alert>
