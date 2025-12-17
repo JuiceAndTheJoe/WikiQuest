@@ -1,6 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import ResultsView from "../views/ResultsView.jsx";
 
+// Helper function to generate Wikipedia URL
+const getWikipediaUrl = (celebName) => {
+  const sanitizedName = celebName
+    .trim()
+    .replace(/\s+/g, "_")
+    .replace(/[^\w_]/g, "");
+  return `https://en.wikipedia.org/wiki/${sanitizedName}`;
+};
+
 // Presenter for ResultsView: manages game results and navigation
 function ResultsPresenter({
   gameStats,
@@ -26,6 +35,25 @@ function ResultsPresenter({
     averageScore: 0,
   };
 
+  // Calculate derived values
+  const isAnonymous = user?.isAnonymous || false;
+  const accuracy =
+    safeGameStats.totalQuestions > 0
+      ? Math.round(
+          (safeGameStats.correctAnswers / safeGameStats.totalQuestions) * 100,
+        )
+      : 0;
+
+  const gameTimeSeconds = safeGameStats.gameTime
+    ? Math.round(safeGameStats.gameTime / 1000)
+    : 0;
+
+  const avgTimePerQuestion =
+    safeGameStats.totalQuestions > 0 && gameTimeSeconds > 0
+      ? Math.round(gameTimeSeconds / safeGameStats.totalQuestions)
+      : 0;
+
+  // Event handlers
   const handlePlayAgain = () => {
     if (typeof onStartNewGame === "function") {
       onStartNewGame();
@@ -45,19 +73,26 @@ function ResultsPresenter({
     navigate("/login");
   };
 
-  return (
-    <ResultsView
-      gameStats={safeGameStats}
-      gameHistory={safeHistory}
-      userStats={safeUserStats}
-      onPlayAgain={handlePlayAgain}
-      onViewLeaderboard={handleViewLeaderboard}
-      onBackToMenu={handleBackToMenu}
-      onCreateAccount={handleCreateAccount}
-      newHighScore={newHighScore}
-      user={user}
-    />
-  );
+  // Prepare view props
+  const viewProps = {
+    gameStats: safeGameStats,
+    gameHistory: safeHistory,
+    userStats: safeUserStats,
+    onPlayAgain: handlePlayAgain,
+    onViewLeaderboard: handleViewLeaderboard,
+    onBackToMenu: handleBackToMenu,
+    onCreateAccount: handleCreateAccount,
+    newHighScore,
+    user,
+    // Calculated values
+    isAnonymous,
+    accuracy,
+    gameTimeSeconds,
+    avgTimePerQuestion,
+    getWikipediaUrl,
+  };
+
+  return <ResultsView {...viewProps} />;
 }
 
 export default ResultsPresenter;
