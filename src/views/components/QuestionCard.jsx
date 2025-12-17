@@ -27,12 +27,12 @@ const QuestionCard = memo(function QuestionCard({
       return { visible: false, blur: 0 };
     }
     if (hintsUsed === 1) {
-      return { visible: true, blur: 8 };
-    }
-    if (hintsUsed === 2) {
       return { visible: true, blur: 5 };
     }
-    return { visible: true, blur: 2 };
+    if (hintsUsed === 2) {
+      return { visible: true, blur: 2 };
+    }
+    return { visible: true, blur: 0 };
   }, [hintsUsed]);
 
   return (
