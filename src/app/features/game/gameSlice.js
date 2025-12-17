@@ -255,6 +255,9 @@ const gameSlice = createSlice({
       state.currentCeleb = pickRandom(poolForLevel(state.level));
       state.currentQuestionStartTime = Date.now();
       state.hintsUsedThisQuestion = 0;
+      state.lastGuessResult = null;
+      state.lastResultDetail = null;
+      state.lastAnsweredCeleb = null;
     },
     skipQuestion(state) {
       if (!state.inGame || !state.currentCeleb) return;
