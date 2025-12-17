@@ -295,7 +295,22 @@ function LeaderboardView({
                               bgcolor: isCurrentUser
                                 ? "action.selected"
                                 : "inherit",
-                              "&:hover": { bgcolor: "action.hover" },
+                              transition:
+                                rank <= 3
+                                  ? "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
+                                  : "none",
+                              "&:hover": {
+                                bgcolor: "action.hover",
+                                ...(rank <= 3 && {
+                                  transform: "translateY(-2px)",
+                                  boxShadow:
+                                    rank === 1
+                                      ? "inset 0 0 16px rgba(255, 191, 0, 0.86)"
+                                      : rank === 2
+                                        ? "inset 0 0 16px rgba(255, 255, 255, 0.69)"
+                                        : "inset 0 0 16px rgba(157, 71, 0, 1)",
+                                }),
+                              },
                             }}
                           >
                             <TableCell>
