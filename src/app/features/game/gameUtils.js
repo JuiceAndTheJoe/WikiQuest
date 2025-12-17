@@ -38,15 +38,29 @@ export function poolForLevel(level) {
 }
 
 /**
+ * Extracts the base name without disambiguation info
+ * e.g., "Drake_(musician)" -> "Drake", "Chris_Evans_(actor)" -> "Chris_Evans"
+ *
+ * @param {string | null | undefined} value - celeb name value
+ * @returns {string} - base name without disambiguation
+ */
+export function extractBaseName(value) {
+  if (!value) return "";
+
+  return value.replace(/\s*\([^)]*\)/g, "").trim();
+}
+
+/**
  * Formats celeb name for display
  *
  * @param {string | null | undefined} value - celeb name value
- * @returns {string} - formatted celeb name
+ * @returns {string} - formatted celeb name (underscores to spaces, parentheses removed)
  */
 export function formatCelebDisplayName(value) {
   if (!value) return "";
 
   return value
+    .replace(/\s*\([^)]*\)/g, "")
     .replace(/_/g, " ")
     .replace(/\s{2,}/g, " ")
     .trim();
