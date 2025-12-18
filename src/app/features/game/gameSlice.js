@@ -256,6 +256,9 @@ const gameSlice = createSlice({
       state.currentCeleb = pickRandom(poolForLevel(state.level));
       state.currentQuestionStartTime = Date.now();
       state.hintsUsedThisQuestion = 0;
+      state.lastGuessResult = null;
+      state.lastResultDetail = null;
+      state.lastAnsweredCeleb = null;
     },
     skipQuestion(state) {
       if (!state.inGame || !state.currentCeleb) return;
@@ -344,6 +347,10 @@ const gameSlice = createSlice({
           delete sanitized.leaderboardLoading;
           delete sanitized.leaderboardError;
           delete sanitized.userStats;
+          delete sanitized.loadingGameState;
+          delete sanitized.hasSavedGame;
+          delete sanitized.lastGuessResult;
+          delete sanitized.lastResultDetail;
           Object.assign(state, sanitized);
           state.hasSavedGame = true;
         } else {

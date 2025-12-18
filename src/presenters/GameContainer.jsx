@@ -38,16 +38,11 @@ const GameContainer = (props) => {
 
   // Load previous game or start new game on mount
   useEffect(() => {
-    if (
-      props.user?.uid &&
-      !inGame &&
-      gameStatus !== "game_over" &&
-      !hasAttemptedLoad
-    ) {
-      loadSavedGame(props.user.uid);
+    if (props.user?.uid && gameStatus !== "game_over" && !hasAttemptedLoad) {
+      loadSavedGame({ userId: props.user.uid });
       setHasAttemptedLoad(true);
     }
-  }, [props.user?.uid, loadSavedGame, inGame, gameStatus]);
+  }, [props.user?.uid, loadSavedGame, gameStatus, hasAttemptedLoad]);
 
   useEffect(() => {
     if (
@@ -59,7 +54,14 @@ const GameContainer = (props) => {
     ) {
       startNewGame();
     }
-  }, [loadingGameState, hasSavedGame, inGame, gameStatus, startNewGame]);
+  }, [
+    hasAttemptedLoad,
+    loadingGameState,
+    hasSavedGame,
+    inGame,
+    gameStatus,
+    startNewGame,
+  ]);
 
   useEffect(() => {
     if (!currentCelebRaw || loadingGameState || !inGame) return;
@@ -124,6 +126,8 @@ const mapState = (state) => {
     wikipediaData: state.wikipedia?.pageData || null,
     wikipediaLoading: state.wikipedia?.loading || false,
     wikipediaError: state.wikipedia?.error || null,
+    loadingGameState: g.loadingGameState || false,
+    hasSavedGame: g.hasSavedGame || false,
   };
 };
 
@@ -133,7 +137,7 @@ const mapDispatch = (dispatch) => ({
   onSkipQuestion: () => dispatch(skipQuestion()),
   onNextQuestion: () => dispatch(advanceToNextQuestion()),
   startNewGame: () => dispatch(startNewGame()),
-  loadSavedGame: (userId) => dispatch(loadSavedGame(userId)),
+  loadSavedGame: (params) => dispatch(loadSavedGame(params)),
   fetchPage: (title) => dispatch(fetchWikipediaPage(title)),
 });
 

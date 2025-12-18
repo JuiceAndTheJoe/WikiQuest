@@ -35,6 +35,7 @@ function MenuView({
   user,
   onLogout,
   onStartGame,
+  onResumeGame,
   onViewLeaderboard,
   onCreateAccount,
   onOpenDisplayNameModal,
@@ -47,6 +48,7 @@ function MenuView({
   isDisplayNameModalOpen,
   userStats = { gamesPlayed: 0, highScore: 0 },
   leaderboardData = [],
+  hasSavedGame = false,
 }) {
   const [openHowToPlay, setOpenHowToPlay] = useState(false);
   const isAnonymous = user?.isAnonymous || false;
@@ -210,6 +212,16 @@ function MenuView({
               >
                 Start Quiz
               </Button>
+              {hasSavedGame && (
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={onResumeGame}
+                  sx={{ py: 1.5, flex: 1 }}
+                >
+                  Continue Saved Game
+                </Button>
+              )}
               <Button
                 variant="outlined"
                 endIcon={<Help />}
