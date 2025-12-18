@@ -484,7 +484,7 @@ function MenuView({
                 <br />
                 <br />
                 <strong>The goal:</strong> Get as many correct as you can! But
-                be careful... 3 wrong answers means your game is over. Build
+                be careful... 5 wrong answers means your game is over. Build
                 your streak, climb the leaderboard, and prove you&apos;re a true
                 WikiQuest champion! 🏆
               </Typography>
