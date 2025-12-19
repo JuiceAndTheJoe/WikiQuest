@@ -57,7 +57,7 @@ function GameView({
               onClick={onBackToHome}
               sx={{ fontWeight: "bold", alignSelf: "flex-start" }}
             >
-              Back to Home
+              Back to Menu
             </Button>
           </Box>
           <Box
