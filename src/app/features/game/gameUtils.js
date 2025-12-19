@@ -38,6 +38,40 @@ export function poolForLevel(level) {
 }
 
 /**
+ * Generates a normalized key for a celeb name so duplicates
+ * with disambiguation or different spacing map to the same entry.
+ *
+ * @param {string} value - celeb name value
+ * @returns {string} - normalized key
+ */
+export function celebKey(value) {
+  return normalizeLetters(extractBaseName(value));
+}
+
+/**
+ * Picks a celeb for the given level that has not been used in the
+ * current game run yet. Falls back to the full pool if exhausted.
+ *
+ * @param {number} level - current game level
+ * @param {Array<string>} askedCelebKeys - list of normalized celeb keys already asked
+ * @returns {string|null} - unused celeb or a fallback if pool is exhausted
+ */
+export function pickUniqueCeleb(level, askedCelebKeys = []) {
+  const pool = poolForLevel(level);
+  if (!pool || pool.length === 0) return null;
+
+  const used = new Set((askedCelebKeys || []).filter(Boolean));
+  const candidates = pool.filter((name) => !used.has(celebKey(name)));
+
+  if (candidates.length > 0) {
+    return pickRandom(candidates);
+  }
+
+  // If the pool is exhausted, allow fallback to keep the game playable
+  return pickRandom(pool);
+}
+
+/**
  * Extracts the base name without disambiguation info
  * e.g., "Drake_(musician)" -> "Drake", "Chris_Evans_(actor)" -> "Chris_Evans"
  *
