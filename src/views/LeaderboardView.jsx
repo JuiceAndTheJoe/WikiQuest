@@ -72,9 +72,11 @@ function LeaderboardView({
             }}
           >
             <Button
-              variant="outlined"
+              size="large"
+              variant="contained"
               startIcon={<ArrowBack />}
               onClick={onBackToMenu}
+              sx={{ fontWeight: "bold" }}
             >
               Back to Menu
             </Button>
