@@ -293,16 +293,25 @@ function LeaderboardView({
                         return (
                           <TableRow
                             key={player.id || index}
-                            sx={{
+                            sx={(theme) => ({
                               bgcolor: isCurrentUser
-                                ? "action.selected"
+                                ? theme.palette.action.selected
                                 : "inherit",
                               transition:
                                 rank <= 3
                                   ? "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)"
                                   : "none",
                               "&:hover": {
-                                bgcolor: "action.hover",
+                                bgcolor: isCurrentUser
+                                  ? theme.palette.action.selected
+                                  : theme.palette.action.hover,
+                                ...(isCurrentUser && {
+                                  filter: "brightness(1.08)",
+                                  boxShadow:
+                                    theme.palette.mode === "dark"
+                                      ? "0 0 0 1px rgba(255, 255, 255, 0.14)"
+                                      : "0 0 0 1px rgba(0, 0, 0, 0.08)",
+                                }),
                                 ...(rank <= 3 && {
                                   transform: "translateY(-2px)",
                                   boxShadow:
@@ -313,7 +322,7 @@ function LeaderboardView({
                                         : "inset 0 0 16px rgba(157, 71, 0, 1)",
                                 }),
                               },
-                            }}
+                            })}
                           >
                             <TableCell>
                               <Typography
