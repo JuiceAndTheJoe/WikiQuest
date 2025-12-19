@@ -131,9 +131,9 @@ const QuestionCard = memo(function QuestionCard({
                   <Stack spacing={1}>
                     {revealedSummarySentences?.map((sentence, idx) => {
                       const backgrounds = [
-                        "rgba(209, 107, 165, 0.15)",
-                        "rgba(134, 168, 231, 0.15)",
-                        "rgba(95, 251, 241, 0.15)",
+                        "rgba(209, 107, 165, 0.25)",
+                        "rgba(134, 168, 231, 0.25)",
+                        "rgba(95, 251, 241, 0.25)",
                       ];
 
                       return (

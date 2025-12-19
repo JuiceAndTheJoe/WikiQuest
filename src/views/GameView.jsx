@@ -17,11 +17,13 @@ import {
 import QuestionCard from "./components/QuestionCard";
 import HintsPanel from "./components/HintsPanel";
 import CardWrapper from "./components/CardWrapper";
+import ColorBends from "../components/background/ColorBends";
 
 function GameView({
   gameState,
   hints,
   userGuess,
+  themeMode,
   onGuessChange,
   onSubmitGuess,
   onUseHint,
@@ -44,9 +46,35 @@ function GameView({
   const canUseHint =
     hasSummary && hints && hints.availableHints > hints.usedHints;
   const isGameOver = gameState?.lives <= 0;
+  const isDark = themeMode === "dark";
 
   return (
-    <Box sx={{ position: "relative", minHeight: "100vh", bgcolor: "black" }}>
+    <Box sx={{ position: "relative", minHeight: "100vh" }}>
+      {/* Animated Background with invert filter for light mode */}
+      <Box
+        sx={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          zIndex: -1,
+          filter: isDark ? "none" : "invert(1)",
+        }}
+      >
+        <ColorBends
+          colors={["#420056ff", "#006cf0ff", "#6a00bbff"]}
+          rotation={30}
+          speed={0.3}
+          scale={1.2}
+          frequency={1.4}
+          warpStrength={1.2}
+          mouseInfluence={0.8}
+          parallax={0.6}
+          noise={0}
+          transparent={false}
+        />
+      </Box>
       <Container maxWidth="lg" sx={{ py: 3, position: "relative", zIndex: 1 }}>
         <Stack spacing={3}>
           <Box sx={{ display: "flex", justifyContent: "flex-start" }}>

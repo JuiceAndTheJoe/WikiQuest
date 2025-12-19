@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import ElectricBorder from "../../components/ElectricBorder";
 
 const CardWrapper = memo(function CardWrapper({
@@ -7,8 +7,18 @@ const CardWrapper = memo(function CardWrapper({
   flex = 2,
   children,
 }) {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+  
   const content = (
-    <Box sx={{ bgcolor: "rgba(255, 255, 255, 0.1)", p: 3 }}>{children}</Box>
+    <Box 
+      sx={{ 
+        bgcolor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.95)", 
+        p: 3 
+      }}
+    >
+      {children}
+    </Box>
   );
 
   // Always render ElectricBorder to preserve child component state (especially focus)

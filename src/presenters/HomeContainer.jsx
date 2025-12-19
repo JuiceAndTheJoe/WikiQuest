@@ -41,6 +41,7 @@ const mapState = (state) => {
   const g = state.game || {};
   return {
     user: state.auth.user,
+    themeMode: state.theme.mode,
     hasSavedGame: g.hasSavedGame || false,
     loadingGameState: g.loadingGameState || false,
     userStats: g.userStats || {

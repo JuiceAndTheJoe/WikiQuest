@@ -9,6 +9,7 @@ import {
   convertGuestToAccount,
 } from "../app/features/auth/authSlice";
 import { setSavedGameFlag } from "../app/features/game/gameSlice";
+import { setTheme } from "../app/features/theme/themeSlice";
 import { hasSavedGame } from "../app/models/gameProgressModel";
 import AppPresenter from "./AppPresenter";
 
@@ -28,6 +29,14 @@ function AppContainer({
   useEffect(() => {
     const unsubscribe = initAuthListener(dispatch);
     return () => unsubscribe();
+  }, [dispatch]);
+
+  // Load theme preference from localStorage on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("themeMode");
+    if (savedTheme && (savedTheme === "dark" || savedTheme === "light")) {
+      dispatch(setTheme(savedTheme));
+    }
   }, [dispatch]);
 
   // Check for saved game when user changes (works for both anonymous and authenticated users)

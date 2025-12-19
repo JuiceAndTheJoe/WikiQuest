@@ -88,6 +88,7 @@ const mapState = (state) => {
     userStats,
     newHighScore,
     user: state.auth.user,
+    themeMode: state.theme.mode,
     hasGameResult: !!g.lastGameResult,
   };
 };

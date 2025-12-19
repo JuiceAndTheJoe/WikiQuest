@@ -36,21 +36,14 @@ function LeaderboardView({
   getRankIcon,
   getRankColor,
   communityStats,
+  themeMode,
 }) {
+  const isDark = themeMode === "dark";
+
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
-      {/* Animated Background */}
-      <ColorBends
-        colors={["#420056ff", "#006cf0ff", "#6a00bbff"]}
-        rotation={30}
-        speed={0.3}
-        scale={1.2}
-        frequency={1.4}
-        warpStrength={1.2}
-        mouseInfluence={0.8}
-        parallax={0.6}
-        noise={0}
-        transparent={false}
+      {/* Animated Background with invert filter for light mode */}
+      <Box
         sx={{
           position: "fixed",
           top: 0,
@@ -58,8 +51,22 @@ function LeaderboardView({
           width: "100vw",
           height: "100vh",
           zIndex: -1,
+          filter: isDark ? "none" : "invert(1)",
         }}
-      />
+      >
+        <ColorBends
+          colors={["#420056ff", "#006cf0ff", "#6a00bbff"]}
+          rotation={30}
+          speed={0.3}
+          scale={1.2}
+          frequency={1.4}
+          warpStrength={1.2}
+          mouseInfluence={0.8}
+          parallax={0.6}
+          noise={0}
+          transparent={false}
+        />
+      </Box>
 
       <Container maxWidth="lg" sx={{ py: 4, position: "relative", zIndex: 1 }}>
         <Stack spacing={4}>
@@ -83,6 +90,7 @@ function LeaderboardView({
             <SplitText
               text="Leaderboard"
               className="text-4xl font-semibold text-center"
+              color={isDark ? "white" : "black"}
               delay={100}
               duration={0.6}
               ease="elastic.out(1, 0.3)"

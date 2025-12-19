@@ -11,6 +11,7 @@ import {
   saveCurrentGameState,
 } from "../models/gameProgressModel";
 import { saveGameResult } from "../models/leaderboardModel";
+import { setTheme } from "../features/theme/themeSlice";
 
 let lastPersistedRunId = null;
 
@@ -107,6 +108,16 @@ const persistenceMiddleware = (store) => (next) => (action) => {
           err,
         );
       });
+  }
+
+  // Watch for theme changes and persist to localStorage
+  if (action.type === setTheme.type) {
+    const themeMode = state.theme.mode;
+    try {
+      localStorage.setItem("themeMode", themeMode);
+    } catch (err) {
+      console.warn("Failed to save theme preference to localStorage", err);
+    }
   }
 
   return result;

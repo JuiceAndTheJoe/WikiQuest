@@ -6,6 +6,7 @@ import HomeView from "../views/HomeView";
 // Presenter for MenuView: manages navigation and user stats
 function HomePresenter({
   user,
+  themeMode,
   userStats,
   hasSavedGame,
   leaderboardData,
@@ -81,6 +82,7 @@ function HomePresenter({
   return (
     <HomeView
       user={user}
+      themeMode={themeMode}
       onLogout={onLogout}
       onStartGame={handleStartGame}
       onResumeGame={handleResumeGame}

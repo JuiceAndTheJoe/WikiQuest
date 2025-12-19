@@ -111,6 +111,7 @@ const mapState = (state) => {
 
   return {
     user: state.auth.user,
+    themeMode: state.theme.mode,
     inGame: g.inGame,
     gameStatus: g.status,
     currentCelebRaw: g.currentCeleb,

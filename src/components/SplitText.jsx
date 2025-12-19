@@ -17,8 +17,7 @@ const SplitText = ({
   to = { opacity: 1, y: 0 },
   textAlign = "center",
   repeat = 0,
-  repeatDelay = 0.5,
-  onLetterAnimationComplete,
+  repeatDelay = 0.5,  color = "white",  onLetterAnimationComplete,
 }) => {
   const containerRef = useRef(null);
   const splitCharsRef = useRef([]);
@@ -86,8 +85,7 @@ const SplitText = ({
       ref={containerRef}
       className={`split-text-container ${className}`}
       style={{
-        textAlign,
-        display: "inline-block",
+        textAlign,        color,        display: "inline-block",
       }}
     />
   );

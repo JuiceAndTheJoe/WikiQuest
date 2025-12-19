@@ -4,6 +4,7 @@ import LeaderboardContainer from "./LeaderboardContainer";
 import GameContainer from "./GameContainer";
 import ResultsContainer from "./ResultsContainer";
 import LoginPresenter from "./LoginPresenter";
+import AppHeader from "../components/AppHeader";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
@@ -35,6 +36,7 @@ function AppPresenter({
 
   return (
     <div className="app">
+      <AppHeader />
       <Routes>
         <Route
           path="/login"

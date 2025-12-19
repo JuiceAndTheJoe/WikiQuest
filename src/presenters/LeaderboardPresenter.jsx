@@ -30,7 +30,7 @@ const getRankColor = (rank) => {
 };
 
 // Presenter for LeaderboardView: manages leaderboard data and navigation
-function LeaderboardPresenter({ user, leaderboardData, loading, error }) {
+function LeaderboardPresenter({ user, leaderboardData, loading, error, themeMode }) {
   const navigate = useNavigate();
 
   const normalizedData = useMemo(() => {
@@ -97,6 +97,7 @@ function LeaderboardPresenter({ user, leaderboardData, loading, error }) {
       error={error}
       userRank={userRank}
       currentUser={user}
+      themeMode={themeMode}
       onBackToMenu={handleBackToMenu}
       getRankIcon={getRankIcon}
       getRankColor={getRankColor}

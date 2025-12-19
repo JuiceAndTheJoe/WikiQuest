@@ -237,17 +237,17 @@ const HintsPanel = memo(function HintsPanel({
             onKeyDown={(e) => e.key === "Enter" && onSubmitGuess()}
             disabled={isGameOver}
             variant="outlined"
-            sx={{
+            sx={(theme) => ({
               "& .MuiFormLabel-root": {
                 color:
                   gameState?.streak >= 4
                     ? getTextboxColor
-                    : "rgba(255, 255, 255, 0.7)",
+                    : theme.palette.text.secondary,
                 "&.Mui-focused": {
                   color:
                     gameState?.streak >= 4
                       ? getTextboxColor
-                      : "rgba(255, 255, 255, 0.7)",
+                      : theme.palette.text.secondary,
                 },
               },
               "& .MuiOutlinedInput-root": {
@@ -255,27 +255,31 @@ const HintsPanel = memo(function HintsPanel({
                   borderColor:
                     gameState?.streak >= 4
                       ? getTextboxColor
-                      : "rgba(255, 255, 255, 0.23)",
+                      : theme.palette.mode === "dark"
+                      ? "rgba(255, 255, 255, 0.23)"
+                      : "rgba(0, 0, 0, 0.23)",
                   borderWidth: gameState?.streak >= 4 ? "2px" : "1px",
                 },
                 "&:hover fieldset": {
                   borderColor:
                     gameState?.streak >= 4
                       ? getTextboxColor
-                      : "rgba(255, 255, 255, 0.4)",
+                      : theme.palette.mode === "dark"
+                      ? "rgba(255, 255, 255, 0.4)"
+                      : "rgba(0, 0, 0, 0.4)",
                 },
                 "&.Mui-focused fieldset": {
                   borderColor:
                     gameState?.streak >= 4
                       ? getTextboxColor
-                      : "rgba(255, 255, 255, 0.87)",
+                      : theme.palette.primary.main,
                   boxShadow:
                     gameState?.streak >= 4
                       ? `0 0 15px ${getTextboxColor}66, inset 0 0 10px ${getTextboxColor}33`
                       : "none",
                 },
               },
-            }}
+            })}
           />
 
           <Stack direction="row" spacing={2}>

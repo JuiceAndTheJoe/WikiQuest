@@ -20,6 +20,7 @@ function ResultsPresenter({
   onStartNewGame,
   user,
   hasGameResult,
+  themeMode,
 }) {
   const [isRestarting, setIsRestarting] = useState(false);
   const navigate = useNavigate();
@@ -88,6 +89,7 @@ function ResultsPresenter({
     gameStats: safeGameStats,
     gameHistory: safeHistory,
     userStats: safeUserStats,
+    themeMode,
     onPlayAgain: handlePlayAgain,
     onViewLeaderboard: handleViewLeaderboard,
     onBackToMenu: handleBackToMenu,

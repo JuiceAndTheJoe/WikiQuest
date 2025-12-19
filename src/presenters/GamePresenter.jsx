@@ -107,6 +107,7 @@ function GamePresenter({
   gameStatus,
   hasAttemptedLoad,
   loadingGameState,
+  themeMode,
 }) {
   const navigate = useNavigate();
   const [userGuess, setUserGuess] = useState("");
@@ -214,6 +215,7 @@ function GamePresenter({
       currentQuestion={currentQuestion}
       gameState={gameState}
       hints={hints}
+      themeMode={themeMode}
       userGuess={userGuess}
       onGuessChange={handleGuessChange}
       onSubmitGuess={handleSubmitGuess}

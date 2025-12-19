@@ -1,5 +1,6 @@
 // This component creates a dynamic background with colorful bending patterns using Three.js and GLSL shaders.
 // Retrieved from ReactBits: https://reactbits.dev/backgrounds/color-bends
+// MODIFIED: Added backgroundColor prop to support light/dark theme modes
 
 import { useEffect, useRef } from "react";
 import { Box } from "@mui/material";
@@ -111,6 +112,7 @@ export default function ColorBends({
   noise = 0,
   transparent = true,
   autoRotate = 0,
+  backgroundColor = "#000000", // ADDED: Custom prop for theme support (black default, white for light mode)
   sx,
   ...boxProps
 }) {
@@ -170,7 +172,9 @@ export default function ColorBends({
     rendererRef.current = renderer;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setClearColor(0x000000, transparent ? 0 : 1);
+    // MODIFIED: Use backgroundColor prop instead of hardcoded black for theme support
+    const bgColor = new THREE.Color(backgroundColor);
+    renderer.setClearColor(bgColor, transparent ? 0 : 1);
     renderer.domElement.style.width = "100%";
     renderer.domElement.style.height = "100%";
     renderer.domElement.style.display = "block";
@@ -277,7 +281,11 @@ export default function ColorBends({
     material.uniforms.uColorCount.value = arr.length;
 
     material.uniforms.uTransparent.value = transparent ? 1 : 0;
-    if (renderer) renderer.setClearColor(0x000000, transparent ? 0 : 1);
+    // MODIFIED: Update clear color when backgroundColor changes for theme switching
+    if (renderer) {
+      const bgColor = new THREE.Color(backgroundColor);
+      renderer.setClearColor(bgColor, transparent ? 0 : 1);
+    }
   }, [
     rotation,
     autoRotate,
@@ -290,6 +298,7 @@ export default function ColorBends({
     noise,
     colors,
     transparent,
+    backgroundColor, // ADDED: Include in dependency array for theme updates
   ]);
 
   useEffect(() => {

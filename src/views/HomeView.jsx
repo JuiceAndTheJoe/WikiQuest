@@ -33,6 +33,7 @@ import TrueFocus from "../components/TrueFocus";
 // Pure view: receives interaction handlers & data via props from Presenter.
 function MenuView({
   user,
+  themeMode,
   onLogout,
   onStartGame,
   onResumeGame,
@@ -65,20 +66,13 @@ function MenuView({
         return `#${rank}`;
     }
   };
+
+  const isDark = themeMode === "dark";
+
   return (
     <Box sx={{ position: "relative", minHeight: "100vh" }}>
-      {/* Animated Background */}
-      <ColorBends
-        colors={["#420056ff", "#006cf0ff", "#6a00bbff"]}
-        rotation={30}
-        speed={0.3}
-        scale={1.2}
-        frequency={1.4}
-        warpStrength={1.2}
-        mouseInfluence={0.8}
-        parallax={0.6}
-        noise={0}
-        transparent={false}
+      {/* Animated Background with invert filter for light mode */}
+      <Box
         sx={{
           position: "fixed",
           top: 0,
@@ -86,8 +80,22 @@ function MenuView({
           width: "100vw",
           height: "100vh",
           zIndex: -1,
+          filter: isDark ? "none" : "invert(1)",
         }}
-      />
+      >
+        <ColorBends
+          colors={["#420056ff", "#006cf0ff", "#6a00bbff"]}
+          rotation={30}
+          speed={0.3}
+          scale={1.2}
+          frequency={1.4}
+          warpStrength={1.2}
+          mouseInfluence={0.8}
+          parallax={0.6}
+          noise={0}
+          transparent={false}
+        />
+      </Box>
 
       <Container maxWidth="lg" sx={{ py: 4, position: "relative", zIndex: 1 }}>
         <Stack spacing={4}>
@@ -122,9 +130,9 @@ function MenuView({
             <Box
               sx={{
                 p: 3,
-                bgcolor: "rgba(255, 255, 255, 0.1)",
+                bgcolor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.95)",
                 borderRadius: 2,
-                border: "1px solid rgba(255, 255, 255, 0.2)",
+                border: isDark ? "1px solid rgba(255, 255, 255, 0.2)" : "1px solid rgba(0, 0, 0, 0.2)",
                 flex: { xs: 1, md: 0.5 },
                 display: "flex",
                 flexDirection: "column",
@@ -155,7 +163,7 @@ function MenuView({
                     alignItems="center"
                     sx={{
                       p: 1.5,
-                      bgcolor: "rgba(255, 255, 255, 0.05)",
+                      bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)",
                       borderRadius: 1,
                     }}
                   >
