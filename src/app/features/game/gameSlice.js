@@ -15,8 +15,8 @@ import {
   extractBaseName,
   formatCelebDisplayName,
   normalizeLetters,
-  pickRandom,
-  poolForLevel,
+  pickUniqueCeleb,
+  celebKey,
   validateGuess,
 } from "./gameUtils";
 
@@ -75,6 +75,7 @@ const initialState = {
   highScore: 0,
   completedRuns: 0,
   currentCeleb: null, // string name
+  askedCelebKeys: [], // normalized keys of celebs already asked in this run
   lastGuessResult: null, // 'correct' | 'wrong' | null
   lastResultDetail: null,
   lastAnsweredCeleb: null,
@@ -121,8 +122,13 @@ const gameSlice = createSlice({
       state.totalHintsUsed = 0;
       state.lastGameResult = null;
       state.hasSavedGame = false;
-      const pool = poolForLevel(state.level);
-      state.currentCeleb = pickRandom(pool);
+      state.askedCelebKeys = [];
+
+      const nextCeleb = pickUniqueCeleb(state.level, state.askedCelebKeys);
+      state.currentCeleb = nextCeleb;
+      if (nextCeleb) {
+        state.askedCelebKeys.push(celebKey(nextCeleb));
+      }
     },
     submitGuess(state, action) {
       const rawGuess = String(action.payload || "").trim();
@@ -253,7 +259,11 @@ const gameSlice = createSlice({
     advanceToNextQuestion(state) {
       if (!state.inGame) return;
       if (state.lives <= 0) return; // Don't advance if game is over
-      state.currentCeleb = pickRandom(poolForLevel(state.level));
+      const nextCeleb = pickUniqueCeleb(state.level, state.askedCelebKeys);
+      state.currentCeleb = nextCeleb;
+      if (nextCeleb) {
+        state.askedCelebKeys.push(celebKey(nextCeleb));
+      }
       state.currentQuestionStartTime = Date.now();
       state.hintsUsedThisQuestion = 0;
       state.lastGuessResult = null;
@@ -352,6 +362,7 @@ const gameSlice = createSlice({
           delete sanitized.lastGuessResult;
           delete sanitized.lastResultDetail;
           Object.assign(state, sanitized);
+          state.askedCelebKeys = sanitized.askedCelebKeys || [];
           state.hasSavedGame = true;
         } else {
           state.hasSavedGame = false;
