@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import ResultsView from "../views/ResultsView.jsx";
 
@@ -20,10 +21,11 @@ function ResultsPresenter({
   user,
   hasGameResult,
 }) {
+  const [isRestarting, setIsRestarting] = useState(false);
   const navigate = useNavigate();
 
   // Redirect to home if there's no game result to display
-  if (!hasGameResult) {
+  if (!hasGameResult && !isRestarting) {
     return <Navigate to="/" replace />;
   }
 
@@ -62,6 +64,7 @@ function ResultsPresenter({
 
   // Event handlers
   const handlePlayAgain = () => {
+    setIsRestarting(true);
     if (typeof onStartNewGame === "function") {
       onStartNewGame();
     }
