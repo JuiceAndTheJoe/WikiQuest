@@ -38,7 +38,6 @@ function ResultsView({
   onViewLeaderboard,
   onBackToMenu,
   newHighScore = false,
-  user,
   onCreateAccount,
   isAnonymous,
   accuracy,
