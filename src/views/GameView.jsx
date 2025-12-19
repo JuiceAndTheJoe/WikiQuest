@@ -4,7 +4,7 @@
  * All logic and calculations are handled by GamePresenter
  */
 
-import { Home } from "@mui/icons-material";
+import { ArrowBack } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -48,22 +48,18 @@ function GameView({
   return (
     <Box sx={{ position: "relative", minHeight: "100vh", bgcolor: "black" }}>
       <Container maxWidth="lg" sx={{ py: 3, position: "relative", zIndex: 1 }}>
-        <Button
-          variant="contained"
-          size="large"
-          startIcon={<Home />}
-          onClick={onBackToHome}
-          sx={{
-            position: "fixed",
-            left: 16,
-            top: 16,
-            zIndex: 10,
-            fontWeight: "bold",
-          }}
-        >
-          Home
-        </Button>
         <Stack spacing={3}>
+          <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<ArrowBack />}
+              onClick={onBackToHome}
+              sx={{ fontWeight: "bold", alignSelf: "flex-start" }}
+            >
+              Back to Home
+            </Button>
+          </Box>
           <Box
             sx={{
               display: "flex",
