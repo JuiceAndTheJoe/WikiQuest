@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { connect } from "react-redux";
 import { changeDisplayName, logoutUser } from "../app/features/auth/authSlice";
 import {
@@ -19,13 +19,22 @@ const HomeContainer = (props) => {
     loadingGameState,
   } = props;
 
+  const lastLoadedForUserRef = useRef(null);
+
   // Check for saved game, fetch user stats, and load leaderboard on mount
   useEffect(() => {
-    if (user?.uid && !loadingGameState) {
-      loadSavedGame({ userId: user.uid });
-      fetchUserStats(user.uid);
-      fetchLeaderboard();
-    }
+    const currentUid = user?.uid;
+
+    if (!currentUid || loadingGameState) return;
+
+    // Avoid re-running the fetch cycle after every loadSavedGame resolution
+    if (lastLoadedForUserRef.current === currentUid) return;
+
+    lastLoadedForUserRef.current = currentUid;
+
+    loadSavedGame({ userId: currentUid });
+    fetchUserStats(currentUid);
+    fetchLeaderboard();
   }, [
     user?.uid,
     loadSavedGame,
