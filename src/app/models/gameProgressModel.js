@@ -42,6 +42,10 @@ export async function updateUserStatsAfterGuess(userId, guessData) {
     // Update current game in progress stats
     const currentGameStats = existing.currentGameStats || {};
     const newScore = (currentGameStats.score || 0) + guessData.scoreDelta;
+    const highestLevelReached = Math.max(
+      existing.levelReached || 1,
+      guessData.level || 1
+    );
 
     transaction.set(
       userRef,
@@ -50,6 +54,7 @@ export async function updateUserStatsAfterGuess(userId, guessData) {
         totalCorrectAnswers,
         accuracy,
         lastPlayed: Date.now(),
+        levelReached: highestLevelReached,
         currentGameStats: {
           score: newScore,
           level: guessData.level || 1,

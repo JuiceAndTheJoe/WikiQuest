@@ -40,6 +40,7 @@ export const fetchUserStats = createAsyncThunk(
         totalScore: data.totalScore || 0,
         averageScore: data.averageScore || 0,
         accuracy: data.accuracy || 0,
+        highestLevelReached: data.levelReached || 1,
       };
     }
     return {
@@ -48,6 +49,7 @@ export const fetchUserStats = createAsyncThunk(
       totalScore: 0,
       averageScore: 0,
       accuracy: 0,
+      highestLevelReached: 1,
     };
   },
 );
@@ -95,6 +97,7 @@ const initialState = {
     totalScore: 0,
     averageScore: 0,
     accuracy: 0,
+    highestLevelReached: 1,
   },
 };
 
