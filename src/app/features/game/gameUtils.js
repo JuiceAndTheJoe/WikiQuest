@@ -13,6 +13,50 @@ export function getDifficulty(level) {
 }
 
 /**
+ * Calculates score multiplier based on current streak
+ *
+ * @param {number} streak - current correct answer streak
+ * @returns {number} - score multiplier
+ */
+export function getStreakMultiplier(streak) {
+  if (streak >= 6) {
+    return 3;
+  } else if (streak >= 4) {
+    return 2;
+  } else if (streak >= 2) {
+    return 1.5;
+  }
+
+  return 1;
+}
+
+/**
+ * Calculates difficulty multiplier based on game level
+ *
+ * @param {number} level - current game level
+ * @returns {number} - difficulty multiplier
+ */
+export function getDifficultyMultiplier(level) {
+  if (level >= 11) return 1.5;
+  if (level >= 6) return 1.2;
+  return 1;
+}
+
+/**
+ * Calculates level multiplier based on game level
+ *
+ * @description Levels above 11 increase multiplier by 15% each
+ * @param {number} level - current game level
+ * @returns {number} - level multiplier
+ */
+export function getLevelMultiplier(level) {
+  if (level <= 11) return 1;
+
+  const levelsAbove11 = level - 11;
+  return 1.15 ** levelsAbove11;
+}
+
+/**
  * Picks a random element from the given array
  *
  * @param {Array<T>} arr - array to pick from

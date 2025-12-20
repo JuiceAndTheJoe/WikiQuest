@@ -138,36 +138,32 @@ const HintsPanel = memo(function HintsPanel({
               label={`Question ${(gameState?.totalQuestions || 0) + 1}`}
               color="primary"
             />
-            {gameState?.streak >= 2 && (
+            {gameState?.currentMultiplier > 1 && (
               <Box>
                 <Typography
                   variant="h2"
                   className={
-                    gameState?.streak >= 6
+                    gameState?.currentMultiplier >= 3
                       ? "blink-rainbow-animation"
                       : "pulse-animation"
                   }
                   sx={{
                     fontWeight: "bold",
                     color:
-                      gameState?.streak >= 6
-                        ? "#ff00ff"
-                        : gameState?.streak >= 4
-                          ? "#ff9500"
-                          : "#d4e157",
+                      gameState?.currentMultiplier >= 3
+                        ? "#00ffff"
+                        : gameState?.currentMultiplier >= 2
+                          ? "#ffd700"
+                          : "#90ee90",
                     textShadow:
-                      gameState?.streak >= 6
-                        ? "0 0 10px rgba(255, 0, 255, 0.8)"
-                        : gameState?.streak >= 4
-                          ? "0 0 10px rgba(255, 149, 0, 0.6)"
-                          : "0 0 10px rgba(212, 225, 87, 0.6)",
+                      gameState?.currentMultiplier >= 3
+                        ? "0 0 15px rgba(0, 255, 255, 0.9)"
+                        : gameState?.currentMultiplier >= 2
+                          ? "0 0 12px rgba(255, 215, 0, 0.7)"
+                          : "0 0 8px rgba(144, 238, 144, 0.5)",
                   }}
                 >
-                  {gameState?.streak >= 6
-                    ? "3x 🚀"
-                    : gameState?.streak >= 4
-                      ? "2x"
-                      : "1.5x"}
+                  {`x${gameState?.currentMultiplier.toFixed(1)}`}
                 </Typography>
               </Box>
             )}

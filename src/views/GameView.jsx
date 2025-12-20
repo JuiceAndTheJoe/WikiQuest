@@ -215,7 +215,7 @@ function GameView({
               }}
             >
               {lastResult.correct
-                ? `+${lastResult.scoreDelta} points${lastResult.streakMultiplier > 1 ? ` (${lastResult.streakMultiplier}x)` : ""}`
+                ? `+${lastResult.scoreDelta} points${lastResult.currentMultiplier > 1 ? ` (${lastResult.currentMultiplier.toFixed(1)}x)` : ""}`
                 : lastResult.guess === "[SKIPPED]"
                   ? `${lastResult.scoreDelta * 10} points`
                   : `${lastResult.scoreDelta} points`}
