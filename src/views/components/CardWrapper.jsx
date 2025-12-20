@@ -11,10 +11,13 @@ const CardWrapper = memo(function CardWrapper({
   const isDark = theme.palette.mode === "dark";
   
   const content = (
-    <Box 
-      sx={{ 
-        bgcolor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.95)", 
-        p: 3 
+    <Box
+      sx={{
+        bgcolor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.95)",
+        p: 3,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       {children}
@@ -30,7 +33,7 @@ const CardWrapper = memo(function CardWrapper({
       chaos={borderConfig.chaos}
       thickness={borderConfig.thickness}
       effectOpacity={borderConfig.opacity}
-      style={{ flex, borderRadius: 8 }}
+      style={{ flex, borderRadius: 8, height: "100%" }}
     >
       {content}
     </ElectricBorder>

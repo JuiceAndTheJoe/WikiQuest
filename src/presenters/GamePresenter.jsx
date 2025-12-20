@@ -128,12 +128,6 @@ function GamePresenter({
   }, [currentStreak]);
 
   useEffect(() => {
-    if (gameStatus === "game_over") {
-      navigate("/results");
-    }
-  }, [gameStatus, navigate]);
-
-  useEffect(() => {
     if (lastResult) {
       setShowResultFeedback(true);
     }
@@ -178,6 +172,12 @@ function GamePresenter({
 
   const handleCloseResultFeedback = () => {
     setShowResultFeedback(false);
+
+    if (gameStatus === "game_over") {
+      navigate("/results");
+      return;
+    }
+
     handleNextQuestion();
   };
 

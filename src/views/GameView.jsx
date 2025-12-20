@@ -93,6 +93,7 @@ function GameView({
               display: "flex",
               gap: 3,
               flexDirection: { xs: "column", md: "row" },
+              alignItems: "stretch",
             }}
           >
             {/* Left Column - Question */}
