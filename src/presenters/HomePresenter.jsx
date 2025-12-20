@@ -38,8 +38,13 @@ function HomePresenter({
 
   const isDifficultyUnlocked = useCallback(
     (difficulty) => {
+      if (difficulty === "EASY") return true;
+
       const difficultyMap = getDifficulty(userStats.highestLevelReached);
-      return difficultyMap === difficulty;
+      return (
+        difficultyMap === difficulty ||
+        (difficulty === "MEDIUM" && difficultyMap === "HARD")
+      );
     },
     [userStats]
   );
