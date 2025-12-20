@@ -236,7 +236,7 @@ function MenuView({
                     fontWeight: 600,
                   }}
                 >
-                  Select Difficulty
+                  Select Starting Difficulty
                 </Typography>
 
                 <Stack spacing={2} sx={{ width: "100%" }}>
