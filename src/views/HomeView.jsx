@@ -355,7 +355,7 @@ function MenuView({
                   fontSize: "1.1rem",
                 }}
               >
-                Start Quiz
+                Start New Quiz
               </Button>
               {hasSavedGame && (
                 <Button
