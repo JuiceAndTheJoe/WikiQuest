@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getDifficulty } from "../app/features/game/gameUtils";
 import { clearSavedGameState } from "../app/models/gameProgressModel";
 import HomeView from "../views/HomeView";
 
