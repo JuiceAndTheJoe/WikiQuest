@@ -101,6 +101,7 @@ const mapState = (state) => {
     totalQuestions: g.totalQuestions || 0,
     correctAnswers: g.correctAnswers ?? g.correctCount ?? 0,
     level: g.level || 1,
+    currentMultiplier: g.currentMultiplier || 1,
   };
 
   const hints = {
