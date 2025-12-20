@@ -3,30 +3,31 @@
  * Pure component for game start, leaderboard access, and user info display
  */
 
-import { useState } from "react";
 import {
+  Close,
+  EmojiEvents,
+  ExitToApp,
+  Help,
+  Leaderboard,
+  Lock,
+  Person,
+  PlayArrow,
+} from "@mui/icons-material";
+import {
+  Alert,
+  Avatar,
   Box,
   Button,
   Container,
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
-  Alert,
   Stack,
+  TextField,
   Typography,
-  Avatar,
 } from "@mui/material";
+import { useState } from "react";
 import { USERNAME_MAX_LENGTH } from "../app/models/constants";
-import {
-  PlayArrow,
-  Leaderboard,
-  Person,
-  ExitToApp,
-  EmojiEvents,
-  Help,
-  Close,
-} from "@mui/icons-material";
 import ColorBends from "../components/background/ColorBends";
 import TrueFocus from "../components/TrueFocus";
 
@@ -226,44 +227,123 @@ function MenuView({
                 width: "100%",
               }}
             >
-              <Stack
-                sx={{
-                  width: "100%",
-                  flexDirection: "row",
-                  gap: 1,
-                }}
-              >
-                <Button
-                  variant={
-                    selectedDifficulty === "EASY" ? "contained" : "outlined"
-                  }
-                  onClick={() => onSelectDifficulty("EASY")}
-                  fullWidth
+              <Stack spacing={2}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    textAlign: "center",
+                    color: "rgba(255, 255, 255, 0.9)",
+                    fontWeight: 600,
+                  }}
                 >
-                  🟢 EASY - Start from Level 1
-                </Button>
+                  Select Difficulty
+                </Typography>
 
-                <Button
-                  variant={
-                    selectedDifficulty === "MEDIUM" ? "contained" : "outlined"
-                  }
-                  onClick={() => onSelectDifficulty("MEDIUM")}
-                  fullWidth
-                  disabled={!isDifficultyUnlocked("MEDIUM")}
-                >
-                  🟡 MEDIUM - Start from Level 6
-                </Button>
+                <Stack spacing={2} sx={{ width: "100%" }}>
+                  <Box
+                    sx={{
+                      borderRadius: 1,
+                    }}
+                  >
+                    <Button
+                      variant={
+                        selectedDifficulty === "EASY" ? "contained" : "outlined"
+                      }
+                      onClick={() => onSelectDifficulty("EASY")}
+                      fullWidth
+                    >
+                      🟢 EASY
+                    </Button>
+                  </Box>
 
-                <Button
-                  variant={
-                    selectedDifficulty === "HARD" ? "contained" : "outlined"
-                  }
-                  onClick={() => onSelectDifficulty("HARD")}
-                  fullWidth
-                  disabled={!isDifficultyUnlocked("HARD")}
-                >
-                  🔴 HARD - Start from Level 11
-                </Button>
+                  <Box
+                    sx={{
+                      p: !isDifficultyUnlocked("MEDIUM") ? 1.5 : 0,
+                      bgcolor: !isDifficultyUnlocked("MEDIUM")
+                        ? "rgba(255, 255, 255, 0.05)"
+                        : "transparent",
+                      borderRadius: 1,
+                      border: !isDifficultyUnlocked("MEDIUM")
+                        ? "1px solid rgba(255, 255, 255, 0.1)"
+                        : "none",
+                    }}
+                  >
+                    <Button
+                      variant={
+                        selectedDifficulty === "MEDIUM"
+                          ? "contained"
+                          : "outlined"
+                      }
+                      onClick={() => onSelectDifficulty("MEDIUM")}
+                      fullWidth
+                      disabled={!isDifficultyUnlocked("MEDIUM")}
+                      startIcon={
+                        !isDifficultyUnlocked("MEDIUM") ? <Lock /> : null
+                      }
+                    >
+                      🟡 MEDIUM
+                    </Button>
+                    {!isDifficultyUnlocked("MEDIUM") && (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
+                          textAlign: "center",
+                          color: "rgba(255, 255, 255, 0.7)",
+                          mt: 1,
+                          fontStyle: "italic",
+                          px: 1,
+                        }}
+                      >
+                        Unlocks when you reach Medium difficulty for the first
+                        time
+                      </Typography>
+                    )}
+                  </Box>
+
+                  <Box
+                    sx={{
+                      p: !isDifficultyUnlocked("HARD") ? 1.5 : 0,
+                      bgcolor: !isDifficultyUnlocked("HARD")
+                        ? "rgba(255, 255, 255, 0.05)"
+                        : "transparent",
+                      borderRadius: 1,
+                      border: !isDifficultyUnlocked("HARD")
+                        ? "1px solid rgba(255, 255, 255, 0.1)"
+                        : "none",
+                    }}
+                  >
+                    <Button
+                      variant={
+                        selectedDifficulty === "HARD" ? "contained" : "outlined"
+                      }
+                      onClick={() => onSelectDifficulty("HARD")}
+                      fullWidth
+                      disabled={!isDifficultyUnlocked("HARD")}
+                      startIcon={
+                        !isDifficultyUnlocked("HARD") ? <Lock /> : null
+                      }
+                    >
+                      🔴 HARD
+                    </Button>
+                    {!isDifficultyUnlocked("HARD") && (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
+                          textAlign: "center",
+                          color: "rgba(255, 255, 255, 0.7)",
+                          mt: 1,
+                          fontStyle: "italic",
+                          px: 1,
+                        }}
+                      >
+                        Unlocks when you reach Hard difficulty for the first
+                        time
+                      </Typography>
+                    )}
+                  </Box>
+                </Stack>
               </Stack>
               <Button
                 variant="contained"
@@ -546,6 +626,12 @@ function MenuView({
                 <br />
                 Stuck? No worries, use a hint! Just know that hints come at a
                 cost to your score. 💡
+                <br />
+                <br />
+                <strong>Unlocking starting difficulty levels:</strong> As you
+                play and complete games at each difficulty, you&apos;ll unlock
+                the next level for future games. So keep playing to access
+                Medium and Hard modes!
                 <br />
                 <br />
                 <strong>The goal:</strong> Get as many correct as you can! But
