@@ -101,6 +101,7 @@ const mapState = (state) => {
     totalQuestions: g.totalQuestions || 0,
     correctAnswers: g.correctAnswers ?? g.correctCount ?? 0,
     level: g.level || 1,
+    currentMultiplier: g.currentMultiplier || 1,
   };
 
   const hints = {
@@ -137,7 +138,7 @@ const mapDispatch = (dispatch) => ({
   onUseHint: () => dispatch(useHint()),
   onSkipQuestion: () => dispatch(skipQuestion()),
   onNextQuestion: () => dispatch(advanceToNextQuestion()),
-  startNewGame: () => dispatch(startNewGame()),
+  startNewGame: (params) => dispatch(startNewGame(params)),
   loadSavedGame: (params) => dispatch(loadSavedGame(params)),
   fetchPage: (title) => dispatch(fetchWikipediaPage(title)),
 });

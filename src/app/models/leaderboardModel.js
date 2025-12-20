@@ -43,6 +43,7 @@ export async function getLeaderboard(maxCount = null) {
         email: data.email,
         displayName: data.displayName || null,
         name: data.displayName || data.email || "Player",
+        levelReached: data.levelReached || 1,
         highScore: data.highScore || 0,
         gamesPlayed: data.gamesPlayed || 0,
         averageScore: data.averageScore || 0,
@@ -94,6 +95,7 @@ export function subscribeToLeaderboard(callback, maxCount = null) {
           email: data.email,
           displayName: data.displayName || null,
           name: data.displayName || data.email || "Player",
+          levelReached: data.levelReached || 1,
           highScore: data.highScore || 0,
           gamesPlayed: data.gamesPlayed || 0,
           averageScore: data.averageScore || 0,
@@ -138,6 +140,10 @@ export async function saveGameResult(userId, summary = {}, userProfile = {}) {
       const safeScore = summary.finalScore || 0;
       const safeCorrect = summary.correctAnswers || 0;
       const safeQuestions = summary.totalQuestions || 0;
+      const highestLevelReached = Math.max(
+        existing.levelReached || 1,
+        summary.levelReached || 1
+      );
 
       const totalScore = (existing.totalScore || 0) + safeScore;
       const gamesPlayed = (existing.gamesPlayed || 0) + 1;
@@ -157,6 +163,7 @@ export async function saveGameResult(userId, summary = {}, userProfile = {}) {
           email: userProfile.email || existing.email || null,
           displayName: userProfile.displayName || existing.displayName || null,
           highScore: Math.max(existing.highScore || 0, safeScore),
+          levelReached: highestLevelReached,
           gamesPlayed,
           totalScore,
           averageScore,
@@ -216,6 +223,10 @@ export async function migrateAnonymousData(
 
     // Merge the data - taking the best of both
     const totalScore = (authData.totalScore || 0) + (anonData.totalScore || 0);
+    const highestLevelReached = Math.max(
+      authData.levelReached || 1,
+      anonData.levelReached || 1
+    );
     const gamesPlayed =
       (authData.gamesPlayed || 0) + (anonData.gamesPlayed || 0);
     const totalCorrectAnswers =
@@ -244,6 +255,7 @@ export async function migrateAnonymousData(
         {
           email: userProfile.email || authData.email || null,
           displayName: userProfile.displayName || authData.displayName || null,
+          levelReached: highestLevelReached,
           highScore,
           gamesPlayed,
           totalScore,

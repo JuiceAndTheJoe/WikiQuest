@@ -51,7 +51,13 @@ const QuestionCard = memo(function QuestionCard({
           {difficulty && (
             <Chip
               label={difficulty.toUpperCase()}
-              color="primary"
+              color={
+                difficulty === "EASY"
+                  ? "success"
+                  : difficulty === "MEDIUM"
+                    ? "warning"
+                    : "error"
+              }
               size="small"
             />
           )}

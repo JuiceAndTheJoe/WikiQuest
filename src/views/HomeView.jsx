@@ -3,30 +3,31 @@
  * Pure component for game start, leaderboard access, and user info display
  */
 
-import { useState } from "react";
 import {
+  Close,
+  EmojiEvents,
+  ExitToApp,
+  Help,
+  Leaderboard,
+  Lock,
+  Person,
+  PlayArrow,
+} from "@mui/icons-material";
+import {
+  Alert,
+  Avatar,
   Box,
   Button,
   Container,
   Dialog,
   DialogContent,
   DialogTitle,
-  TextField,
-  Alert,
   Stack,
+  TextField,
   Typography,
-  Avatar,
 } from "@mui/material";
+import { useState } from "react";
 import { USERNAME_MAX_LENGTH } from "../app/models/constants";
-import {
-  PlayArrow,
-  Leaderboard,
-  Person,
-  ExitToApp,
-  EmojiEvents,
-  Help,
-  Close,
-} from "@mui/icons-material";
 import ColorBends from "../components/background/ColorBends";
 import TrueFocus from "../components/TrueFocus";
 
@@ -50,6 +51,9 @@ function MenuView({
   userStats = { gamesPlayed: 0, highScore: 0 },
   leaderboardData = [],
   hasSavedGame = false,
+  isDifficultyUnlocked,
+  selectedDifficulty,
+  onSelectDifficulty,
 }) {
   const [openHowToPlay, setOpenHowToPlay] = useState(false);
   const isAnonymous = user?.isAnonymous || false;
@@ -154,59 +158,203 @@ function MenuView({
                   All top players
                 </Button>
               </Stack>
-              <Stack spacing={1.5}>
-                {leaderboardData.slice(0, 3).map((player, index) => (
+              <Box
+                sx={{
+                  position: "relative",
+                  overflow: "hidden",
+                  flex: 1,
+                  minHeight: { xs: 200, md: 0 },
+                  maskImage:
+                    "linear-gradient(180deg, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(180deg, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)",
+                }}
+              >
+                <Stack
+                  spacing={1.5}
+                  sx={{
+                    pr: 0.5,
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                  }}
+                >
+                  {leaderboardData.map((player, index) => (
+                    <Box
+                      key={player.uid || index}
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      sx={{
+                        p: 1.5,
+                        bgcolor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 1,
+                      }}
+                    >
+                      <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Typography
+                          variant="h6"
+                          fontWeight="bold"
+                          sx={{ minWidth: 30 }}
+                        >
+                          {getRankIcon(index + 1)}
+                        </Typography>
+                        <Box>
+                          <Typography variant="body2" fontWeight="bold">
+                            {player.displayName || player.email || "Anonymous"}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {player.gamesPlayed || 0} games
+                          </Typography>
+                        </Box>
+                      </Stack>
+                      <Typography variant="body2" fontWeight="bold">
+                        {player.highScore || 0}
+                      </Typography>
+                    </Box>
+                  ))}
+                  {leaderboardData.length === 0 && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      align="center"
+                    >
+                      No scores yet. Be the first!
+                    </Typography>
+                  )}
+                </Stack>
+              </Box>
+            </Box>
+
+            {/* Action Buttons & User Info */}
+            <Stack
+              spacing={2}
+              sx={{
+                flex: { xs: 1, md: 0.5 },
+                width: "100%",
+              }}
+            >
+              <Stack spacing={2}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    textAlign: "center",
+                    color: "rgba(255, 255, 255, 0.9)",
+                    fontWeight: 600,
+                  }}
+                >
+                  Select Starting Difficulty
+                </Typography>
+
+                <Stack spacing={2} sx={{ width: "100%" }}>
                   <Box
-                    key={player.uid || index}
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
                     sx={{
                       p: 1.5,
                       bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)",
                       borderRadius: 1,
                     }}
                   >
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-                      <Typography
-                        variant="h6"
-                        fontWeight="bold"
-                        sx={{ minWidth: 30 }}
-                      >
-                        {getRankIcon(index + 1)}
-                      </Typography>
-                      <Box>
-                        <Typography variant="body2" fontWeight="bold">
-                          {player.displayName || player.email || "Anonymous"}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {player.gamesPlayed || 0} games
-                        </Typography>
-                      </Box>
-                    </Stack>
-                    <Typography variant="body2" fontWeight="bold">
-                      {player.highScore || 0}
-                    </Typography>
+                    <Button
+                      variant={
+                        selectedDifficulty === "EASY" ? "contained" : "outlined"
+                      }
+                      onClick={() => onSelectDifficulty("EASY")}
+                      fullWidth
+                    >
+                      🟢 EASY
+                    </Button>
                   </Box>
-                ))}
-                {leaderboardData.length === 0 && (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    align="center"
-                  >
-                    No scores yet. Be the first!
-                  </Typography>
-                )}
-              </Stack>
-            </Box>
 
-            {/* Action Buttons & User Info */}
-            <Stack
-              spacing={2}
-              sx={{ flex: { xs: 1, md: 0.5 }, width: "100%" }}
-              justifyContent="space-between"
-            >
+                  <Box
+                    sx={{
+                      p: !isDifficultyUnlocked("MEDIUM") ? 1.5 : 0,
+                      bgcolor: !isDifficultyUnlocked("MEDIUM")
+                        ? "rgba(255, 255, 255, 0.05)"
+                        : "transparent",
+                      borderRadius: 1,
+                      border: !isDifficultyUnlocked("MEDIUM")
+                        ? "1px solid rgba(255, 255, 255, 0.1)"
+                        : "none",
+                    }}
+                  >
+                    <Button
+                      variant={
+                        selectedDifficulty === "MEDIUM"
+                          ? "contained"
+                          : "outlined"
+                      }
+                      onClick={() => onSelectDifficulty("MEDIUM")}
+                      fullWidth
+                      disabled={!isDifficultyUnlocked("MEDIUM")}
+                      startIcon={
+                        !isDifficultyUnlocked("MEDIUM") ? <Lock /> : null
+                      }
+                    >
+                      🟡 MEDIUM
+                    </Button>
+                    {!isDifficultyUnlocked("MEDIUM") && (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
+                          textAlign: "center",
+                          color: "rgba(255, 255, 255, 0.7)",
+                          mt: 1,
+                          fontStyle: "italic",
+                          px: 1,
+                        }}
+                      >
+                        Unlocks when you reach Medium difficulty for the first
+                        time
+                      </Typography>
+                    )}
+                  </Box>
+
+                  <Box
+                    sx={{
+                      p: !isDifficultyUnlocked("HARD") ? 1.5 : 0,
+                      bgcolor: !isDifficultyUnlocked("HARD")
+                        ? "rgba(255, 255, 255, 0.05)"
+                        : "transparent",
+                      borderRadius: 1,
+                      border: !isDifficultyUnlocked("HARD")
+                        ? "1px solid rgba(255, 255, 255, 0.1)"
+                        : "none",
+                    }}
+                  >
+                    <Button
+                      variant={
+                        selectedDifficulty === "HARD" ? "contained" : "outlined"
+                      }
+                      onClick={() => onSelectDifficulty("HARD")}
+                      fullWidth
+                      disabled={!isDifficultyUnlocked("HARD")}
+                      startIcon={
+                        !isDifficultyUnlocked("HARD") ? <Lock /> : null
+                      }
+                    >
+                      🔴 HARD
+                    </Button>
+                    {!isDifficultyUnlocked("HARD") && (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
+                          textAlign: "center",
+                          color: "rgba(255, 255, 255, 0.7)",
+                          mt: 1,
+                          fontStyle: "italic",
+                          px: 1,
+                        }}
+                      >
+                        Unlocks when you reach Hard difficulty for the first
+                        time
+                      </Typography>
+                    )}
+                  </Box>
+                </Stack>
+              </Stack>
               <Button
                 variant="contained"
                 size="large"
@@ -215,17 +363,16 @@ function MenuView({
                 sx={{
                   py: 1.5,
                   fontSize: "1.1rem",
-                  flex: 1,
                 }}
               >
-                Start Quiz
+                Start New Quiz
               </Button>
               {hasSavedGame && (
                 <Button
                   variant="outlined"
                   size="large"
                   onClick={onResumeGame}
-                  sx={{ py: 1.5, flex: 1 }}
+                  sx={{ py: 1.5 }}
                 >
                   Continue Saved Game
                 </Button>
@@ -234,7 +381,7 @@ function MenuView({
                 variant="outlined"
                 endIcon={<Help />}
                 onClick={() => setOpenHowToPlay(true)}
-                sx={{ py: 1.5, flex: 1 }}
+                sx={{ py: 1.5 }}
               >
                 How to Play
               </Button>
@@ -489,6 +636,12 @@ function MenuView({
                 <br />
                 Stuck? No worries, use a hint! Just know that hints come at a
                 cost to your score. 💡
+                <br />
+                <br />
+                <strong>Unlocking starting difficulty levels:</strong> As you
+                play and complete games at each difficulty, you&apos;ll unlock
+                the next level for future games. So keep playing to access
+                Medium and Hard modes!
                 <br />
                 <br />
                 <strong>The goal:</strong> Get as many correct as you can! But

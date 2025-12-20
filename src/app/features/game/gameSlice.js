@@ -14,6 +14,9 @@ import {
   buildRunSummary,
   extractBaseName,
   formatCelebDisplayName,
+  getDifficultyMultiplier,
+  getLevelMultiplier,
+  getStreakMultiplier,
   normalizeLetters,
   pickUniqueCeleb,
   celebKey,
@@ -40,6 +43,7 @@ export const fetchUserStats = createAsyncThunk(
         totalScore: data.totalScore || 0,
         averageScore: data.averageScore || 0,
         accuracy: data.accuracy || 0,
+        highestLevelReached: data.levelReached || 1,
       };
     }
     return {
@@ -48,6 +52,7 @@ export const fetchUserStats = createAsyncThunk(
       totalScore: 0,
       averageScore: 0,
       accuracy: 0,
+      highestLevelReached: 1,
     };
   },
 );
@@ -72,6 +77,7 @@ const initialState = {
   score: 0,
   streak: 0,
   bestStreak: 0,
+  currentMultiplier: 1,
   highScore: 0,
   completedRuns: 0,
   currentCeleb: null, // string name
@@ -95,6 +101,7 @@ const initialState = {
     totalScore: 0,
     averageScore: 0,
     accuracy: 0,
+    highestLevelReached: 1,
   },
 };
 
@@ -102,17 +109,30 @@ const gameSlice = createSlice({
   name: "game",
   initialState,
   reducers: {
-    startNewGame(state) {
+    startNewGame(state, action) {
+      const startingDifficulty = action.payload?.difficulty || "EASY";
+
+      const startingLevel =
+        startingDifficulty === "HARD"
+          ? 11
+          : startingDifficulty === "MEDIUM"
+            ? 6
+            : 1;
+
       state.inGame = true;
       state.status = "playing";
-      state.level = 1;
+      state.level = startingLevel;
       state.lives = MAX_LIVES;
+      state.startingDifficulty = startingDifficulty;
       state.correctCount = 0;
       state.correctAnswers = 0;
       state.totalQuestions = 0;
       state.score = 0;
       state.streak = 0;
       state.bestStreak = 0;
+      state.currentMultiplier =
+        getDifficultyMultiplier(state.level || 1) *
+        getLevelMultiplier(state.level || 1);
       state.lastGuessResult = null;
       state.lastResultDetail = null;
       state.lastAnsweredCeleb = null;
@@ -174,15 +194,9 @@ const gameSlice = createSlice({
       );
 
       // Calculate streak multiplier
-      let streakMultiplier = 1;
-      const currentStreak = state.streak || 0;
-      if (currentStreak >= 6) {
-        streakMultiplier = 3;
-      } else if (currentStreak >= 4) {
-        streakMultiplier = 2;
-      } else if (currentStreak >= 2) {
-        streakMultiplier = 1.5;
-      }
+      let streakMultiplier = getStreakMultiplier(state.streak || 1);
+      streakMultiplier *= getLevelMultiplier(state.level || 1);
+      streakMultiplier *= getDifficultyMultiplier(state.level || 1);
 
       const scoreDelta = correctGuess
         ? Math.round(baseScoreDelta * streakMultiplier)
@@ -237,6 +251,12 @@ const gameSlice = createSlice({
         }
       }
 
+      let newMultiplier = getStreakMultiplier(state.streak || 1);
+      newMultiplier *= getDifficultyMultiplier(state.level || 1);
+      newMultiplier *= getLevelMultiplier(state.level || 1);
+
+      state.currentMultiplier = newMultiplier;
+
       state.lastResultDetail = {
         correct: correctGuess,
         correctAnswer: formatCelebDisplayName(
@@ -247,7 +267,7 @@ const gameSlice = createSlice({
         finalScore: state.score || 0,
         hintsUsed: hintsUsedThisAttempt,
         timeTakenMs,
-        streakMultiplier: correctGuess ? streakMultiplier : 1,
+        currentMultiplier: correctGuess ? streakMultiplier : 1,
       };
     },
     useHint(state) {
@@ -264,6 +284,11 @@ const gameSlice = createSlice({
       if (nextCeleb) {
         state.askedCelebKeys.push(celebKey(nextCeleb));
       }
+
+      let newMultiplier = getStreakMultiplier(state.streak || 1);
+      newMultiplier *= getDifficultyMultiplier(state.level || 1);
+      newMultiplier *= getLevelMultiplier(state.level || 1);
+      state.currentMultiplier = newMultiplier;
       state.currentQuestionStartTime = Date.now();
       state.hintsUsedThisQuestion = 0;
       state.lastGuessResult = null;

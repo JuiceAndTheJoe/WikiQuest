@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getDifficulty } from "../app/features/game/gameUtils";
 import { clearSavedGameState } from "../app/models/gameProgressModel";
 import HomeView from "../views/HomeView";
 
@@ -20,6 +21,7 @@ function HomePresenter({
   const [pendingName, setPendingName] = useState(user?.displayName || "");
   const [nameError, setNameError] = useState("");
   const [savingName, setSavingName] = useState(false);
+  const [selectedDifficulty, setSelectedDifficulty] = useState("EASY");
 
   const handleStartGame = useCallback(async () => {
     if (user?.uid) {
@@ -31,9 +33,26 @@ function HomePresenter({
       }
     }
 
-    onStartGame?.();
+    onStartGame?.({ difficulty: selectedDifficulty });
     navigate("/game");
-  }, [onStartGame, onClearSavedGame, navigate, user?.uid]);
+  }, [onStartGame, onClearSavedGame, navigate, user?.uid, selectedDifficulty]);
+
+  const isDifficultyUnlocked = useCallback(
+    (difficulty) => {
+      if (difficulty === "EASY") return true;
+
+      const difficultyMap = getDifficulty(userStats.highestLevelReached);
+      return (
+        difficultyMap === difficulty ||
+        (difficulty === "MEDIUM" && difficultyMap === "HARD")
+      );
+    },
+    [userStats]
+  );
+
+  const handleSelectDifficulty = useCallback((difficulty) => {
+    setSelectedDifficulty(difficulty);
+  }, []);
 
   const handleResumeGame = useCallback(() => {
     navigate("/game");
@@ -99,6 +118,9 @@ function HomePresenter({
       userStats={userStats}
       hasSavedGame={hasSavedGame}
       leaderboardData={leaderboardData}
+      isDifficultyUnlocked={isDifficultyUnlocked}
+      selectedDifficulty={selectedDifficulty}
+      onSelectDifficulty={handleSelectDifficulty}
     />
   );
 }

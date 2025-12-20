@@ -62,7 +62,7 @@ const mapState = (state) => {
 };
 
 const mapDispatch = (dispatch) => ({
-  onStartGame: () => dispatch(startNewGame()),
+  onStartGame: (params) => dispatch(startNewGame(params)),
   onClearSavedGame: () => dispatch(setSavedGameFlag(false)),
   loadSavedGame: (params) => dispatch(loadSavedGame(params)),
   fetchUserStats: (userId) => dispatch(fetchUserStats(userId)),
