@@ -149,51 +149,73 @@ function MenuView({
                   All top players
                 </Button>
               </Stack>
-              <Stack spacing={1.5}>
-                {leaderboardData.slice(0, 3).map((player, index) => (
-                  <Box
-                    key={player.uid || index}
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{
-                      p: 1.5,
-                      bgcolor: "rgba(255, 255, 255, 0.05)",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Stack direction="row" spacing={1.5} alignItems="center">
-                      <Typography
-                        variant="h6"
-                        fontWeight="bold"
-                        sx={{ minWidth: 30 }}
-                      >
-                        {getRankIcon(index + 1)}
+              <Box
+                sx={{
+                  position: "relative",
+                  overflow: "hidden",
+                  flex: 1,
+                  minHeight: { xs: 200, md: 0 },
+                  maskImage:
+                    "linear-gradient(180deg, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(180deg, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)",
+                }}
+              >
+                <Stack
+                  spacing={1.5}
+                  sx={{
+                    pr: 0.5,
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                  }}
+                >
+                  {leaderboardData.map((player, index) => (
+                    <Box
+                      key={player.uid || index}
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      sx={{
+                        p: 1.5,
+                        bgcolor: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: 1,
+                      }}
+                    >
+                      <Stack direction="row" spacing={1.5} alignItems="center">
+                        <Typography
+                          variant="h6"
+                          fontWeight="bold"
+                          sx={{ minWidth: 30 }}
+                        >
+                          {getRankIcon(index + 1)}
+                        </Typography>
+                        <Box>
+                          <Typography variant="body2" fontWeight="bold">
+                            {player.displayName || player.email || "Anonymous"}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {player.gamesPlayed || 0} games
+                          </Typography>
+                        </Box>
+                      </Stack>
+                      <Typography variant="body2" fontWeight="bold">
+                        {player.highScore || 0}
                       </Typography>
-                      <Box>
-                        <Typography variant="body2" fontWeight="bold">
-                          {player.displayName || player.email || "Anonymous"}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {player.gamesPlayed || 0} games
-                        </Typography>
-                      </Box>
-                    </Stack>
-                    <Typography variant="body2" fontWeight="bold">
-                      {player.highScore || 0}
+                    </Box>
+                  ))}
+                  {leaderboardData.length === 0 && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      align="center"
+                    >
+                      No scores yet. Be the first!
                     </Typography>
-                  </Box>
-                ))}
-                {leaderboardData.length === 0 && (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    align="center"
-                  >
-                    No scores yet. Be the first!
-                  </Typography>
-                )}
-              </Stack>
+                  )}
+                </Stack>
+              </Box>
             </Box>
 
             {/* Action Buttons & User Info */}
@@ -203,11 +225,9 @@ function MenuView({
                 flex: { xs: 1, md: 0.5 },
                 width: "100%",
               }}
-              justifyContent="space-between"
             >
               <Stack
                 sx={{
-                  flex: { xs: 1, md: 0.5 },
                   width: "100%",
                   flexDirection: "row",
                   gap: 1,
@@ -253,7 +273,6 @@ function MenuView({
                 sx={{
                   py: 1.5,
                   fontSize: "1.1rem",
-                  flex: 1,
                 }}
               >
                 Start Quiz
@@ -263,7 +282,7 @@ function MenuView({
                   variant="outlined"
                   size="large"
                   onClick={onResumeGame}
-                  sx={{ py: 1.5, flex: 1 }}
+                  sx={{ py: 1.5 }}
                 >
                   Continue Saved Game
                 </Button>
@@ -272,7 +291,7 @@ function MenuView({
                 variant="outlined"
                 endIcon={<Help />}
                 onClick={() => setOpenHowToPlay(true)}
-                sx={{ py: 1.5, flex: 1 }}
+                sx={{ py: 1.5 }}
               >
                 How to Play
               </Button>
