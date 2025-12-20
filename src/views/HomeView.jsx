@@ -49,6 +49,9 @@ function MenuView({
   userStats = { gamesPlayed: 0, highScore: 0 },
   leaderboardData = [],
   hasSavedGame = false,
+  isDifficultyUnlocked,
+  selectedDifficulty,
+  onSelectDifficulty,
 }) {
   const [openHowToPlay, setOpenHowToPlay] = useState(false);
   const isAnonymous = user?.isAnonymous || false;
@@ -196,9 +199,52 @@ function MenuView({
             {/* Action Buttons & User Info */}
             <Stack
               spacing={2}
-              sx={{ flex: { xs: 1, md: 0.5 }, width: "100%" }}
+              sx={{
+                flex: { xs: 1, md: 0.5 },
+                width: "100%",
+              }}
               justifyContent="space-between"
             >
+              <Stack
+                sx={{
+                  flex: { xs: 1, md: 0.5 },
+                  width: "100%",
+                  flexDirection: "row",
+                  gap: 1,
+                }}
+              >
+                <Button
+                  variant={
+                    selectedDifficulty === "EASY" ? "contained" : "outlined"
+                  }
+                  onClick={() => onSelectDifficulty("EASY")}
+                  fullWidth
+                >
+                  🟢 EASY - Start from Level 1
+                </Button>
+
+                <Button
+                  variant={
+                    selectedDifficulty === "MEDIUM" ? "contained" : "outlined"
+                  }
+                  onClick={() => onSelectDifficulty("MEDIUM")}
+                  fullWidth
+                  disabled={!isDifficultyUnlocked("MEDIUM")}
+                >
+                  🟡 MEDIUM - Start from Level 6
+                </Button>
+
+                <Button
+                  variant={
+                    selectedDifficulty === "HARD" ? "contained" : "outlined"
+                  }
+                  onClick={() => onSelectDifficulty("HARD")}
+                  fullWidth
+                  disabled={!isDifficultyUnlocked("HARD")}
+                >
+                  🔴 HARD - Start from Level 11
+                </Button>
+              </Stack>
               <Button
                 variant="contained"
                 size="large"

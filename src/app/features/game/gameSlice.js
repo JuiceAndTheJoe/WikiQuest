@@ -105,11 +105,22 @@ const gameSlice = createSlice({
   name: "game",
   initialState,
   reducers: {
-    startNewGame(state) {
+    startNewGame(state, action) {
+      const startingDifficulty = action.payload?.difficulty || "EASY";
+
+      const startingLevel =
+        startingDifficulty === "HARD"
+          ? 11
+          : startingDifficulty === "MEDIUM"
+            ? 6
+            : 1;
+
       state.inGame = true;
       state.status = "playing";
-      state.level = 1;
+      state.level = startingLevel;
+      state.highestLevel = startingLevel;
       state.lives = MAX_LIVES;
+      state.startingDifficulty = startingDifficulty;
       state.correctCount = 0;
       state.correctAnswers = 0;
       state.totalQuestions = 0;
@@ -219,6 +230,7 @@ const gameSlice = createSlice({
         state.bestStreak = Math.max(state.bestStreak || 0, state.streak || 0);
         // advance level
         state.level = (state.level || 1) + 1;
+        state.highestLevel = Math.max(state.highestLevel || 1, state.level);
         // update highScore
         state.highScore = Math.max(state.highScore || 0, state.level - 1);
         state.lastAnsweredCeleb = rawTarget;

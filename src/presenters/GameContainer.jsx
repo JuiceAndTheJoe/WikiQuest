@@ -136,7 +136,7 @@ const mapDispatch = (dispatch) => ({
   onUseHint: () => dispatch(useHint()),
   onSkipQuestion: () => dispatch(skipQuestion()),
   onNextQuestion: () => dispatch(advanceToNextQuestion()),
-  startNewGame: () => dispatch(startNewGame()),
+  startNewGame: (params) => dispatch(startNewGame(params)),
   loadSavedGame: (params) => dispatch(loadSavedGame(params)),
   fetchPage: (title) => dispatch(fetchWikipediaPage(title)),
 });
