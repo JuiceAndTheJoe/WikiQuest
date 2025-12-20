@@ -134,9 +134,13 @@ function MenuView({
             <Box
               sx={{
                 p: 3,
-                bgcolor: isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(255, 255, 255, 0.95)",
+                bgcolor: isDark
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(255, 255, 255, 0.95)",
                 borderRadius: 2,
-                border: isDark ? "1px solid rgba(255, 255, 255, 0.2)" : "1px solid rgba(0, 0, 0, 0.2)",
+                border: isDark
+                  ? "1px solid rgba(255, 255, 255, 0.2)"
+                  : "1px solid rgba(0, 0, 0, 0.2)",
                 flex: { xs: 1, md: 0.5 },
                 display: "flex",
                 flexDirection: "column",
@@ -240,7 +244,7 @@ function MenuView({
                   variant="h6"
                   sx={{
                     textAlign: "center",
-                    color: "rgba(255, 255, 255, 0.9)",
+                    color: "text.primary",
                     fontWeight: 600,
                   }}
                 >
@@ -250,8 +254,9 @@ function MenuView({
                 <Stack spacing={2} sx={{ width: "100%" }}>
                   <Box
                     sx={{
-                      p: 1.5,
-                      bgcolor: isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)",
+                      bgcolor: isDark
+                        ? "rgba(255, 255, 255, 0.05)"
+                        : "rgba(0, 0, 0, 0.05)",
                       borderRadius: 1,
                     }}
                   >
