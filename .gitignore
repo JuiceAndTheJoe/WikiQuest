@@ -131,3 +131,6 @@ dist
 
 # Firebase cache
 .firebase/
+
+# Firebase config (contains API keys)
+src/firebaseConfig.js
